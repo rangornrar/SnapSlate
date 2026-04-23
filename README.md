@@ -92,26 +92,4 @@ Sortie produite:
 - `installer/`: scripts de packaging, MSIX, Setup.exe et documentation d'installation
 - `.github/workflows/build.yml`: CI Windows pour verifier que le projet compile
 
-## Publication GitHub
 
-Le repo contient tout le necessaire pour une publication propre:
-
-- README principal
-- changelog
-- guide de contribution
-- guide securite
-- templates d'issues
-- template de pull request
-- workflow GitHub Actions
-- fichier de metadonnees GitHub dans `docs/github/GITHUB_METADATA.md`
-
-## Version actuelle
-
-- Version application: `1.0.0.0`
-
-## Roadmap courte
-
-- Hook systeme complet du raccourci de capture
-- Workflow de sauvegarde plus riche
-- Export additionnel
-- Amelioration de la gestion des historiques d'annotation

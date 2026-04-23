@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SnapSlate (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "SnapSlate (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

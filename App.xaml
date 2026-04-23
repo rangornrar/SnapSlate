@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application
+    x:Class="SnapSlate.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnapSlate">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="ShellBackgroundBrush" Color="#FFF6F1E8" />
+                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#F9FFFDFC" />
+                    <SolidColorBrush x:Key="ShellPanelAltBrush" Color="#FFF0E7DA" />
+                    <SolidColorBrush x:Key="ShellStrokeBrush" Color="#1F46352A" />
+                    <SolidColorBrush x:Key="ShellMutedTextBrush" Color="#A3655849" />
+                    <SolidColorBrush x:Key="ShellStrongTextBrush" Color="#FF1F1B17" />
+                    <SolidColorBrush x:Key="CanvasBackdropBrush" Color="#FFF4F7FB" />
+                    <SolidColorBrush x:Key="CanvasChromeBrush" Color="#FFE3EAF5" />
+                    <SolidColorBrush x:Key="CanvasPatternBrush" Color="#FFF0F4FA" />
+                    <SolidColorBrush x:Key="SelectionSurfaceBrush" Color="#1A112E46" />
+                    <SolidColorBrush x:Key="OverlayBadgeBrush" Color="#F31B2730" />
+                    <SolidColorBrush x:Key="OverlayBadgeTextBrush" Color="#FFF8FBFD" />
+                    <SolidColorBrush x:Key="ToolSelectedBrush" Color="#FF112E46" />
+                    <SolidColorBrush x:Key="ToolSelectedTextBrush" Color="#FFF5FBFF" />
+                    <SolidColorBrush x:Key="ToolUnselectedTextBrush" Color="#FF1E1B18" />
+                    <SolidColorBrush x:Key="PrimaryActionBrush" Color="#FF143753" />
+                    <SolidColorBrush x:Key="PrimaryActionTextBrush" Color="#FFF7FBFD" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="ShellBackgroundBrush" Color="#FF151A1E" />
+                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#E81E252B" />
+                    <SolidColorBrush x:Key="ShellPanelAltBrush" Color="#FF283038" />
+                    <SolidColorBrush x:Key="ShellStrokeBrush" Color="#2CF3F6F9" />
+                    <SolidColorBrush x:Key="ShellMutedTextBrush" Color="#B7C3CDD7" />
+                    <SolidColorBrush x:Key="ShellStrongTextBrush" Color="#FFF5F7FA" />
+                    <SolidColorBrush x:Key="CanvasBackdropBrush" Color="#FF111A22" />
+                    <SolidColorBrush x:Key="CanvasChromeBrush" Color="#FF1A2733" />
+                    <SolidColorBrush x:Key="CanvasPatternBrush" Color="#FF15202A" />
+                    <SolidColorBrush x:Key="SelectionSurfaceBrush" Color="#33000000" />
+                    <SolidColorBrush x:Key="OverlayBadgeBrush" Color="#F6EDF6FB" />
+                    <SolidColorBrush x:Key="OverlayBadgeTextBrush" Color="#FF18222C" />
+                    <SolidColorBrush x:Key="ToolSelectedBrush" Color="#FFF0F7FF" />
+                    <SolidColorBrush x:Key="ToolSelectedTextBrush" Color="#FF162433" />
+                    <SolidColorBrush x:Key="ToolUnselectedTextBrush" Color="#FFF2F5F8" />
+                    <SolidColorBrush x:Key="PrimaryActionBrush" Color="#FFF0F7FF" />
+                    <SolidColorBrush x:Key="PrimaryActionTextBrush" Color="#FF112233" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <LinearGradientBrush x:Key="GradientSunsetBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FFF05A41" Offset="0" />
+                <GradientStop Color="#FFFFC66E" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GradientEmberBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FFBD3C2B" Offset="0" />
+                <GradientStop Color="#FFF06B59" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GradientCitrusBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FFF0A73B" Offset="0" />
+                <GradientStop Color="#FFF6E47A" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GradientMintBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FF16B38E" Offset="0" />
+                <GradientStop Color="#FF84E2C5" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GradientLagoonBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FF0F9EAF" Offset="0" />
+                <GradientStop Color="#FF73E1E9" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GradientSkyBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FF1F84E0" Offset="0" />
+                <GradientStop Color="#FF8CCBFF" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GradientOceanBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FF173A73" Offset="0" />
+                <GradientStop Color="#FF4687E0" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GradientRoseBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FFD85A88" Offset="0" />
+                <GradientStop Color="#FFF5A0BD" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GradientBerryBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FFA53FA4" Offset="0" />
+                <GradientStop Color="#FFF07BC5" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GradientGrapeBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FF6746C3" Offset="0" />
+                <GradientStop Color="#FFB089FF" Offset="1" />
+            </LinearGradientBrush>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

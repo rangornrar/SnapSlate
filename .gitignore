@@ -1,0 +1,35 @@
+# Build outputs
+bin/
+obj/
+AppPackages/
+
+# Visual Studio / Rider / user files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs and diagnostics
+*.log
+build-diag.log
+
+# Internal assistant notes
+AGENTS.md
+
+# Test results
+TestResults/
+
+# Installer outputs
+installer/dist/
+installer/private/
+installer/release/
+installer/*.zip
+
+# Package artifacts
+*.appx
+*.appxbundle
+*.appxupload
+*.msix
+*.msixbundle
+*.msixupload

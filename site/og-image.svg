@@ -1,0 +1,30 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#020617"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="a" x1="180" y1="140" x2="980" y2="510" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" rx="36" fill="url(#g)"/>
+  <circle cx="980" cy="110" r="180" fill="#38BDF8" fill-opacity="0.12"/>
+  <circle cx="220" cy="520" r="220" fill="#2563EB" fill-opacity="0.14"/>
+  <rect x="84" y="84" width="1032" height="462" rx="28" stroke="rgba(148,163,184,0.22)"/>
+  <text x="120" y="184" fill="#7DD3FC" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="4">ARCHI-IT LABS</text>
+  <text x="120" y="274" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="84" font-weight="900">SnapSlate</text>
+  <text x="120" y="348" fill="#E2E8F0" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="500">Capture, annotate, and export Windows procedures</text>
+  <text x="120" y="416" fill="#94A3B8" font-family="Inter, Arial, sans-serif" font-size="27">Win + Shift + S · étapes · légendes · PDF / DOCX / Markdown / HTML</text>
+  <rect x="120" y="462" width="220" height="10" rx="5" fill="url(#a)"/>
+  <rect x="780" y="132" width="244" height="292" rx="22" fill="#E5E7EB" stroke="rgba(148,163,184,0.28)"/>
+  <rect x="804" y="156" width="196" height="26" rx="10" fill="#0F172A"/>
+  <rect x="804" y="200" width="128" height="12" rx="6" fill="#0F172A"/>
+  <rect x="804" y="226" width="164" height="10" rx="5" fill="#94A3B8"/>
+  <rect x="804" y="252" width="184" height="10" rx="5" fill="#CBD5E1"/>
+  <rect x="804" y="290" width="154" height="52" rx="18" fill="#38BDF8"/>
+  <text x="826" y="322" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800">Procedure</text>
+  <rect x="1036" y="174" width="52" height="52" rx="16" fill="#2563EB"/>
+  <text x="1053" y="207" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="900">1</text>
+</svg>

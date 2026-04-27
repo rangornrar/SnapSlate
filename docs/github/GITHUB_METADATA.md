@@ -37,29 +37,15 @@ Point important a garder dans la description publique:
 - le flux `Win + Shift + S` fonctionne tant que l'application est ouverte
 - le remplacement complet du raccourci systeme quand l'app est fermee fait partie de la roadmap, pas de la version actuelle
 
-## Premiere release GitHub
+## Release note actuelle
 
-### Titre
+La release note prete a copier dans GitHub est ici:
 
-`v1.0.0 - First public SnapSlate build`
+- `docs/github/RELEASE_v2026.04.26_001.md`
 
-### Corps
+### Titre conseille
 
-```md
-## SnapSlate v1.0.0
-
-Premiere version publiable de SnapSlate, une application Windows d'annotation de captures d'ecran construite avec WinUI 3.
-
-### Inclus dans cette version
-
-- import automatique des captures `Win + Shift + S` pendant que l'application est ouverte
-- un onglet par capture
-- crop interactif
-- texte, gommettes, fleches droites, fleches courbes, rectangles et ovales
-- 10 palettes degradees
-- reinitialisation optionnelle de la numerotation des gommettes lors du changement de couleur
-- export PNG
-- setup Windows pour simplifier l'installation
+`v2026.04.26_001 - SnapSlate production update`
 
 ### Fichier a attacher a la release
 
@@ -67,8 +53,7 @@ Premiere version publiable de SnapSlate, une application Windows d'annotation de
 
 ### Limitation actuelle
 
-`SnapSlate` n'intercepte pas encore le raccourci systeme si l'application est fermee. Le flux automatique passe aujourd'hui par l'ecoute du presse-papiers pendant l'execution de l'application.
-```
+`SnapSlate` intercepte les captures `Win + Shift + S` pendant que l'application est ouverte. Le remplacement complet du raccourci systeme quand l'application est fermee fait encore partie de la roadmap.
 
 ## Assets conseilles pour le depot
 

@@ -8,5 +8,7 @@ public enum EditorTool
     ArrowStraight,
     ArrowCurved,
     Rectangle,
-    Ellipse
+    Ellipse,
+    Focus,
+    Mask
 }

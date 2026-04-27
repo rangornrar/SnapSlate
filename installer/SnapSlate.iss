@@ -1,5 +1,5 @@
 #define MyAppName "SnapSlate"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "2026.4.26.1"
 #define MyAppPublisher "SnapSlate"
 #define MyAppSetupName "SnapSlate-Setup"
 
@@ -21,8 +21,10 @@ SetupIconFile=..\Assets\AppIcon.ico
 OutputDir=release
 OutputBaseFilename={#MyAppSetupName}
 ArchitecturesInstallIn64BitMode=x64compatible
+ShowLanguageDialog=yes
 
 [Languages]
+Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 
 [Files]

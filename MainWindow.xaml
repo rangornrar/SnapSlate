@@ -12,10 +12,9 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid
-        x:Name="RootGrid"
-        Background="{ThemeResource ShellBackgroundBrush}">
+    <Grid x:Name="RootGrid" Background="{ThemeResource ShellBackgroundBrush}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -27,340 +26,619 @@
             </TitleBar.IconSource>
         </TitleBar>
 
-        <Grid Grid.Row="1" Padding="20" RowSpacing="16" ColumnSpacing="16">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="270" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="310" />
-            </Grid.ColumnDefinitions>
+        <NavigationView
+            x:Name="ShellNavigationView"
+            Grid.Row="1"
+            PaneDisplayMode="Top"
+            CompactModeThresholdWidth="0"
+            IsBackButtonVisible="Collapsed"
+            IsPaneToggleButtonVisible="False"
+            IsSettingsVisible="False"
+            SelectionChanged="ShellNavigationView_SelectionChanged">
+            <NavigationView.MenuItems>
+                <NavigationViewItem x:Name="CaptureNavItem" Tag="Capture" />
+                <NavigationViewItem x:Name="ProcedureNavItem" Tag="Procedure" />
+                <NavigationViewItem x:Name="ExportNavItem" Tag="Export" />
+                <NavigationViewItem x:Name="SettingsNavItem" Tag="Settings" />
+            </NavigationView.MenuItems>
+        </NavigationView>
 
-            <Border
-                Grid.RowSpan="2"
-                Grid.Column="0"
-                Background="{ThemeResource ShellPanelBrush}"
-                BorderBrush="{ThemeResource ShellStrokeBrush}"
-                BorderThickness="1"
-                CornerRadius="24"
-                Padding="16">
+        <Grid Grid.Row="2">
+            <Grid x:Name="CaptureSection" Visibility="Collapsed">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="12">
-                        <TextBlock
-                            FontFamily="Bahnschrift SemiBold SemiConden"
-                            FontSize="30"
-                            Foreground="{ThemeResource ShellStrongTextBrush}"
-                            Text="SnapSlate" />
-                        <TextBlock
-                            Foreground="{ThemeResource ShellMutedTextBrush}"
-                            Text="Win + Shift + S alimente automatiquement de nouveaux onglets tant que l'application reste ouverte."
-                            TextWrapping="Wrap" />
+                    <Grid Padding="20" ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                        <TextBlock
-                            FontFamily="Bahnschrift SemiBold SemiConden"
-                            FontSize="16"
-                            Foreground="{ThemeResource ShellStrongTextBrush}"
-                            Text="Outils" />
-                        <Button x:Name="CropToolButton" Click="ToolButton_Click" Tag="Crop" Content="Crop" />
-                        <Button x:Name="TextToolButton" Click="ToolButton_Click" Tag="Text" Content="Texte" />
-                        <Button x:Name="StickerToolButton" Click="ToolButton_Click" Tag="Sticker" Content="Gommette" />
-                        <Button x:Name="ArrowStraightToolButton" Click="ToolButton_Click" Tag="ArrowStraight" Content="Fleche droite" />
-                        <Button x:Name="ArrowCurvedToolButton" Click="ToolButton_Click" Tag="ArrowCurved" Content="Fleche courbe" />
-                        <Button x:Name="RectangleToolButton" Click="ToolButton_Click" Tag="Rectangle" Content="Rectangle" />
-                        <Button x:Name="EllipseToolButton" Click="ToolButton_Click" Tag="Ellipse" Content="Ovale" />
+                        <Border Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="24">
+                            <StackPanel Spacing="16">
+                                <TextBlock x:Name="CapturePageTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="32" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                <TextBlock x:Name="CapturePageSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                <Button x:Name="CaptureQuickImportButton" Click="ImportScreenshotButton_Click" HorizontalAlignment="Left" />
 
-                        <TextBlock
-                            FontFamily="Bahnschrift SemiBold SemiConden"
-                            FontSize="16"
-                            Foreground="{ThemeResource ShellStrongTextBrush}"
-                            Text="Palettes degradees" />
-                        <Grid RowSpacing="8" ColumnSpacing="8">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="12">
+                                    <TextBlock x:Name="CaptureHowTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                    <TextBlock x:Name="CaptureHowBodyText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
 
-                            <Button x:Name="SunsetPaletteButton" Grid.Row="0" Grid.Column="0" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientSunsetBrush}" Click="PaletteButton_Click" Tag="Sunset" />
-                            <Button x:Name="EmberPaletteButton" Grid.Row="0" Grid.Column="1" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientEmberBrush}" Click="PaletteButton_Click" Tag="Ember" />
-                            <Button x:Name="CitrusPaletteButton" Grid.Row="0" Grid.Column="2" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientCitrusBrush}" Click="PaletteButton_Click" Tag="Citrus" />
-                            <Button x:Name="MintPaletteButton" Grid.Row="0" Grid.Column="3" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientMintBrush}" Click="PaletteButton_Click" Tag="Mint" />
-                            <Button x:Name="LagoonPaletteButton" Grid.Row="0" Grid.Column="4" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientLagoonBrush}" Click="PaletteButton_Click" Tag="Lagoon" />
-                            <Button x:Name="SkyPaletteButton" Grid.Row="1" Grid.Column="0" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientSkyBrush}" Click="PaletteButton_Click" Tag="Sky" />
-                            <Button x:Name="OceanPaletteButton" Grid.Row="1" Grid.Column="1" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientOceanBrush}" Click="PaletteButton_Click" Tag="Ocean" />
-                            <Button x:Name="RosePaletteButton" Grid.Row="1" Grid.Column="2" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientRoseBrush}" Click="PaletteButton_Click" Tag="Rose" />
-                            <Button x:Name="BerryPaletteButton" Grid.Row="1" Grid.Column="3" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientBerryBrush}" Click="PaletteButton_Click" Tag="Berry" />
-                            <Button x:Name="GrapePaletteButton" Grid.Row="1" Grid.Column="4" Width="44" Height="44" CornerRadius="14" Background="{StaticResource GradientGrapeBrush}" Click="PaletteButton_Click" Tag="Grape" />
-                        </Grid>
-                        <TextBlock x:Name="PaletteSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Palette active : sunset note" />
-                    </StackPanel>
-                </ScrollViewer>
-            </Border>
-
-            <Border
-                Grid.Row="0"
-                Grid.Column="1"
-                Grid.ColumnSpan="2"
-                Background="{ThemeResource ShellPanelBrush}"
-                BorderBrush="{ThemeResource ShellStrokeBrush}"
-                BorderThickness="1"
-                CornerRadius="24"
-                Padding="12">
-                <Grid ColumnSpacing="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <ListView
-                        x:Name="DocumentTabsListView"
-                        SelectionChanged="DocumentTabsListView_SelectionChanged"
-                        SelectionMode="Single"
-                        ScrollViewer.HorizontalScrollMode="Enabled"
-                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                        ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <ItemsStackPanel Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <Setter Property="Margin" Value="0,0,8,0" />
-                                <Setter Property="Padding" Value="0" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="local:ScreenshotDocument">
-                                <Border
-                                    MinWidth="190"
-                                    Background="{ThemeResource ShellPanelAltBrush}"
-                                    BorderBrush="{ThemeResource ShellStrokeBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="18"
-                                    Padding="12,10">
-                                    <Grid ColumnSpacing="10">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel>
-                                            <TextBlock FontWeight="SemiBold" Text="{Binding TabTitle}" TextTrimming="CharacterEllipsis" />
-                                            <TextBlock FontSize="12" Foreground="{ThemeResource ShellMutedTextBrush}" Text="{Binding TabSubtitle}" TextTrimming="CharacterEllipsis" />
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Background="{ThemeResource ShellPanelAltBrush}" CornerRadius="18" Padding="14">
+                                        <StackPanel Spacing="6">
+                                            <TextBlock x:Name="CaptureStepOneTitleText" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="CaptureStepOneBodyText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
                                         </StackPanel>
-                                        <Button
-                                            Grid.Column="1"
-                                            Tag="{Binding}"
-                                            Click="CloseDocumentButton_Click"
-                                            Content="x"
-                                            Width="28"
-                                            Height="28"
-                                            CornerRadius="14" />
-                                    </Grid>
+                                    </Border>
+                                    <Border Grid.Column="1" Background="{ThemeResource ShellPanelAltBrush}" CornerRadius="18" Padding="14">
+                                        <StackPanel Spacing="6">
+                                            <TextBlock x:Name="CaptureStepTwoTitleText" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="CaptureStepTwoBodyText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Grid.Column="2" Background="{ThemeResource ShellPanelAltBrush}" CornerRadius="18" Padding="14">
+                                        <StackPanel Spacing="6">
+                                            <TextBlock x:Name="CaptureStepThreeTitleText" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="CaptureStepThreeBodyText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="24">
+                            <StackPanel Spacing="16">
+                                <TextBlock x:Name="CaptureShortcutsTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                <StackPanel Spacing="10">
+                                    <TextBlock x:Name="CaptureShortcutOneText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="CaptureShortcutTwoText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="CaptureShortcutThreeText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <Border Background="{ThemeResource CanvasBackdropBrush}" CornerRadius="18" Padding="16">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock x:Name="CaptureStatusTitleText" FontWeight="SemiBold" />
+                                        <TextBlock x:Name="CaptureStatusBodyText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                    </StackPanel>
                                 </Border>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
 
-                    <Button Grid.Column="1" Click="NewDemoTabButton_Click" Content="Nouvel onglet demo" />
-                </Grid>
-            </Border>
-
-            <Grid Grid.Row="1" Grid.Column="1" RowSpacing="12">
+            <Grid x:Name="ProcedureSection" Visibility="Visible">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <Button Click="ImportScreenshotButton_Click" Content="Importer fichier" />
-                    <Button Click="ExportButton_Click" Content="Exporter PNG" />
-                    <Button x:Name="ApplyCropButton" Click="ApplyCropButton_Click" IsEnabled="False" Content="Appliquer crop" />
-                    <Button x:Name="ResetCropButton" Click="ResetCropButton_Click" IsEnabled="False" Content="Reset crop" />
-                    <Button Click="ClearAnnotationsButton_Click" Content="Effacer annotations" />
-                </StackPanel>
+                <Border Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="0,0,0,1" Padding="18,14">
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Button x:Name="ImportScreenshotButton" Click="ImportScreenshotButton_Click" />
+                            <Button x:Name="ExportCurrentButton" Click="ExportButton_Click" />
+                            <Button x:Name="UndoButton" Click="UndoButton_Click" />
+                            <Button x:Name="RedoButton" Click="RedoButton_Click" />
+                            <Button x:Name="ZoomOutButton" Click="ZoomOutButton_Click" />
+                            <Button x:Name="ZoomResetButton" Click="ZoomResetButton_Click" />
+                            <Button x:Name="ZoomInButton" Click="ZoomInButton_Click" />
+                            <TextBlock x:Name="ZoomLevelText" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                            <Button x:Name="SaveButton" Click="ExportButton_Click" />
+                            <Button x:Name="CollapseStepsButton" Click="CollapseStepsButton_Click" />
+                        </StackPanel>
 
-                <Border
-                    Grid.Row="1"
-                    Background="{ThemeResource ShellPanelBrush}"
-                    BorderBrush="{ThemeResource ShellStrokeBrush}"
-                    BorderThickness="1"
-                    CornerRadius="24"
-                    Padding="16">
-                    <Grid RowSpacing="12">
+                        <Grid Grid.Column="1" ColumnSpacing="12" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="280" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="ProcedureTitleLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                <TextBox x:Name="DocumentTitleTextBox" Width="280" TextChanged="DocumentTitleTextBox_TextChanged" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="ProcedureStateLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" HorizontalAlignment="Right" />
+                                <TextBlock x:Name="ProcedureStateText" FontWeight="SemiBold" HorizontalAlignment="Right" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Background="{ThemeResource ShellPanelAltBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="0,0,0,1" Padding="10,6">
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="CropToolButton" Click="ToolButton_Click" Tag="Crop" />
+                                <Button x:Name="TextToolButton" Click="ToolButton_Click" Tag="Text" />
+                                <Button x:Name="StickerToolButton" Click="ToolButton_Click" Tag="Sticker" />
+                                <Button x:Name="ArrowStraightToolButton" Click="ToolButton_Click" Tag="ArrowStraight" />
+                                <Button x:Name="ArrowCurvedToolButton" Click="ToolButton_Click" Tag="ArrowCurved" />
+                                <Button x:Name="RectangleToolButton" Click="ToolButton_Click" Tag="Rectangle" />
+                                <Button x:Name="EllipseToolButton" Click="ToolButton_Click" Tag="Ellipse" />
+                                <Button x:Name="FocusToolButton" Click="ToolButton_Click" Tag="Focus" />
+                                <Button x:Name="MaskToolButton" Click="ToolButton_Click" Tag="Mask" />
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock x:Name="CurrentToolLabelText" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                            <TextBlock x:Name="CurrentToolText" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="2" Background="{ThemeResource ShellBackgroundBrush}" Padding="12">
+                    <Grid RowSpacing="14">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Grid ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <TextBlock FontFamily="Bahnschrift SemiBold SemiConden" FontSize="28" Foreground="{ThemeResource ShellStrongTextBrush}" Text="Atelier de screenshot" />
-                                <TextBlock x:Name="CanvasSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Aucun onglet selectionne." TextWrapping="Wrap" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Foreground="{ThemeResource ShellMutedTextBrush}" Text="Outil actif" />
-                                <TextBlock x:Name="CurrentToolText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="20" Foreground="{ThemeResource ShellStrongTextBrush}" Text="Fleche droite" />
-                            </StackPanel>
-                        </Grid>
+                        <Border Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="16" Padding="8">
+                            <Grid ColumnSpacing="12" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="2" VerticalAlignment="Center">
+                                    <TextBlock x:Name="PaletteSectionTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="10" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                    <TextBlock x:Name="PaletteSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="9" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Visibility="Collapsed" />
+                                </StackPanel>
+                                <ScrollViewer x:Name="PaletteScrollViewer" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                    <StackPanel x:Name="PaletteStrip" Orientation="Horizontal" Spacing="4" />
+                                </ScrollViewer>
+                                <StackPanel Grid.Column="2" Spacing="2" VerticalAlignment="Center">
+                                    <TextBlock x:Name="ShadeSectionTitleText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="9" />
+                                    <StackPanel x:Name="ShadeStrip" Orientation="Horizontal" Spacing="3" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="3" Spacing="2" VerticalAlignment="Center">
+                                    <TextBlock x:Name="OpacityLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="9" />
+                                    <Slider x:Name="OpacitySlider" Minimum="0.1" Maximum="1" StepFrequency="0.05" ValueChanged="OpacitySlider_ValueChanged" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
 
-                        <Viewbox Grid.Row="1" Stretch="Uniform">
-                            <Border Background="{ThemeResource CanvasBackdropBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="16">
-                                <Grid>
+                        <Grid Grid.Row="2" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="StepsPaneColumn" Width="220" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition x:Name="InspectorPaneColumn" Width="220" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="14">
+                                <Grid RowSpacing="10">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="56" />
+                                        <RowDefinition Height="Auto" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Grid>
+                                    <Grid ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Preview surface" />
-                                        <TextBlock x:Name="CanvasFileNameText" Grid.Column="1" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" Text="capture.png" />
+                                        <TextBlock x:Name="StepsPaneTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                            <Button x:Name="AddStepButton" Click="NewDemoTabButton_Click" />
+                                            <Button x:Name="MoveStepUpButton" Click="MoveStepUpButton_Click" />
+                                            <Button x:Name="MoveStepDownButton" Click="MoveStepDownButton_Click" />
+                                        </StackPanel>
                                     </Grid>
 
-                                    <Grid
-                                        x:Name="PreviewViewport"
+                                    <ListView
+                                        x:Name="DocumentTabsListView"
                                         Grid.Row="1"
-                                        Width="1360"
-                                        Height="820"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center">
-                                        <Grid
-                                            x:Name="SceneRoot"
-                                            Width="1360"
-                                            Height="820"
-                                            RenderTransformOrigin="0,0">
-                                            <Grid.RenderTransform>
-                                                <TranslateTransform x:Name="SceneTransform" />
-                                            </Grid.RenderTransform>
-
-                                            <Rectangle Fill="{ThemeResource CanvasPatternBrush}" RadiusX="20" RadiusY="20" />
-                                            <Grid x:Name="PlaceholderPanel" Padding="40">
-                                                <Grid RowSpacing="16">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="90" />
-                                                        <RowDefinition Height="*" />
-                                                    </Grid.RowDefinitions>
-                                                    <Rectangle Fill="#FFE7EDF5" RadiusX="16" RadiusY="16" />
-                                                    <Grid Grid.Row="1" ColumnSpacing="16">
+                                        SelectionChanged="DocumentTabsListView_SelectionChanged"
+                                        SelectionMode="Single"
+                                        AllowDrop="True"
+                                        CanDragItems="True"
+                                        CanReorderItems="True"
+                                        IsSwipeEnabled="False"
+                                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                        DragItemsCompleted="DocumentTabsListView_DragItemsCompleted">
+                                        <ListView.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <ItemsStackPanel Orientation="Vertical" />
+                                            </ItemsPanelTemplate>
+                                        </ListView.ItemsPanel>
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="ListViewItem">
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="Margin" Value="0,0,0,10" />
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="local:ScreenshotDocument">
+                                                <Border Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="16" Padding="10">
+                                                    <Grid ColumnSpacing="10">
                                                         <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="300" />
+                                                            <ColumnDefinition Width="6" />
+                                                            <ColumnDefinition Width="58" />
                                                             <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="220" />
+                                                            <ColumnDefinition Width="Auto" />
                                                         </Grid.ColumnDefinitions>
-                                                        <StackPanel Spacing="16">
-                                                            <Rectangle Height="170" Fill="#FFDDE6EF" RadiusX="16" RadiusY="16" />
-                                                            <Rectangle Height="140" Fill="#FFF7DFC0" RadiusX="16" RadiusY="16" />
+                                                        <Rectangle Fill="{ThemeResource ToolSelectedBrush}" RadiusX="3" RadiusY="3" />
+                                                        <Border Grid.Column="1" Background="{ThemeResource CanvasBackdropBrush}" CornerRadius="10" Padding="3">
+                                                            <Image Source="{x:Bind ThumbnailSource}" Stretch="UniformToFill" />
+                                                        </Border>
+                                                        <StackPanel Grid.Column="2" Spacing="5">
+                                                            <TextBox Text="{x:Bind BaseTitle, Mode=TwoWay}" FontSize="14" FontWeight="SemiBold" MinHeight="32" Padding="10,4" PlaceholderText="Titre de l'étape" Background="{ThemeResource ShellBackgroundBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" />
+                                                            <TextBox Text="{x:Bind StepNote, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" Height="52" FontSize="12" Padding="10,4" PlaceholderText="Note rapide" Background="{ThemeResource ShellBackgroundBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" />
+                                                            <StackPanel Spacing="2">
+                                                                <TextBlock FontSize="11" Foreground="{ThemeResource ShellMutedTextBrush}" Text="{x:Bind OriginLabel}" />
+                                                                <TextBlock FontSize="11" Foreground="{ThemeResource ShellMutedTextBrush}" Text="{x:Bind FileNameLabel}" TextTrimming="CharacterEllipsis" />
+                                                            </StackPanel>
+                                                            <TextBlock FontSize="11" Foreground="{ThemeResource ShellMutedTextBrush}" Text="{x:Bind TabSubtitle}" />
                                                         </StackPanel>
-                                                        <StackPanel Grid.Column="1" Spacing="16">
-                                                            <Rectangle Height="280" Fill="#FFE3ECF6" RadiusX="18" RadiusY="18" />
-                                                            <Rectangle Height="92" Fill="#FFEAF0F6" RadiusX="16" RadiusY="16" />
-                                                        </StackPanel>
-                                                        <StackPanel Grid.Column="2" Spacing="16">
-                                                            <Rectangle Height="150" Fill="#FFDDE7F1" RadiusX="16" RadiusY="16" />
-                                                            <Rectangle Height="190" Fill="#FFF2D9E2" RadiusX="16" RadiusY="16" />
+                                                        <StackPanel Grid.Column="3" Spacing="4">
+                                                            <Button Tag="{Binding}" Click="MoveDocumentUpButton_Click" Content="↑" MinWidth="28" MinHeight="28" Padding="0" />
+                                                            <Button Tag="{Binding}" Click="MoveDocumentDownButton_Click" Content="↓" MinWidth="28" MinHeight="28" Padding="0" />
+                                                            <Button Tag="{Binding}" Click="DuplicateDocumentButton_Click" Content="⧉" MinWidth="28" MinHeight="28" Padding="0" />
+                                                            <Button Tag="{Binding}" Click="CloseDocumentButton_Click" Content="✕" MinWidth="28" MinHeight="28" Padding="0" />
                                                         </StackPanel>
                                                     </Grid>
-                                                </Grid>
-                                            </Grid>
-
-                                            <Image x:Name="ImportedImage" Stretch="Uniform" Visibility="Collapsed" />
-                                            <Canvas x:Name="AnnotationCanvas" />
-                                            <Canvas x:Name="OverlayCanvas" IsHitTestVisible="False">
-                                                <Rectangle
-                                                    x:Name="CropPreview"
-                                                    Fill="#1E00C5A7"
-                                                    RadiusX="20"
-                                                    RadiusY="20"
-                                                    Stroke="#FF00C5A7"
-                                                    StrokeDashArray="10,6"
-                                                    StrokeThickness="4"
-                                                    Visibility="Collapsed" />
-                                                <Border
-                                                    x:Name="CropBadge"
-                                                    Background="{ThemeResource OverlayBadgeBrush}"
-                                                    CornerRadius="12"
-                                                    Padding="10,6"
-                                                    Visibility="Collapsed">
-                                                    <TextBlock x:Name="CropBadgeText" Foreground="{ThemeResource OverlayBadgeTextBrush}" Text="Crop 0 x 0" />
                                                 </Border>
-                                            </Canvas>
-                                            <Border
-                                                x:Name="InteractionSurface"
-                                                Background="Transparent"
-                                                PointerMoved="InteractionSurface_PointerMoved"
-                                                PointerPressed="InteractionSurface_PointerPressed"
-                                                PointerReleased="InteractionSurface_PointerReleased" />
-                                        </Grid>
-                                    </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
                                 </Grid>
                             </Border>
-                        </Viewbox>
-                    </Grid>
-                </Border>
 
-                <Border Grid.Row="2" Background="{ThemeResource ShellPanelAltBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="20" Padding="16,12">
-                    <TextBlock x:Name="StatusText" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Cliquez ou glissez dans la surface pour poser une annotation." />
+                            <Border Grid.Column="1" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="14">
+                                <Grid RowSpacing="12">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                            <Grid RowSpacing="8" Visibility="Collapsed">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                        <StackPanel Spacing="4">
+                                            <TextBlock x:Name="CanvasSummaryTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                            <TextBlock x:Name="CanvasSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10">
+                                            <TextBlock x:Name="CanvasFileLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                            <TextBlock x:Name="CanvasFileNameText" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Border Grid.Row="1" Background="{ThemeResource CanvasBackdropBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="12">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid ColumnSpacing="8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock x:Name="CanvasPreviewLabelText" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                                <TextBlock x:Name="ImageSourceText" Grid.Column="1" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                            </Grid>
+
+                                            <ScrollViewer
+                                                x:Name="CanvasScrollViewer"
+                                                Grid.Row="1"
+                                                ZoomMode="Enabled"
+                                                MinZoomFactor="0.5"
+                                                MaxZoomFactor="2.0"
+                                                HorizontalScrollBarVisibility="Auto"
+                                                VerticalScrollBarVisibility="Auto">
+                                                <Grid
+                                                    x:Name="PreviewViewport"
+                                                    Width="1360"
+                                                    Height="820"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center">
+                                                    <Grid.RenderTransform>
+                                                        <TransformGroup>
+                                                            <ScaleTransform x:Name="SceneScaleTransform" ScaleX="1" ScaleY="1" />
+                                                            <TranslateTransform x:Name="SceneTransform" />
+                                                        </TransformGroup>
+                                                    </Grid.RenderTransform>
+
+                                                    <Rectangle Fill="{ThemeResource CanvasPatternBrush}" RadiusX="20" RadiusY="20" />
+                                                    <Grid x:Name="PlaceholderPanel" Padding="40" IsHitTestVisible="False">
+                                                        <Grid RowSpacing="16">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="90" />
+                                                                <RowDefinition Height="*" />
+                                                            </Grid.RowDefinitions>
+                                                            <Rectangle Fill="#FFE7EDF5" RadiusX="16" RadiusY="16" />
+                                                            <StackPanel Grid.Row="1" Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                <TextBlock x:Name="PlaceholderTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="28" />
+                                                                <TextBlock x:Name="PlaceholderBodyText" Width="520" TextWrapping="Wrap" Foreground="{ThemeResource ShellMutedTextBrush}" TextAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Image x:Name="ImportedImage" Stretch="Fill" IsHitTestVisible="False" />
+                                                    <Border
+                                                        x:Name="InteractionSurface"
+                                                        Background="Transparent"
+                                                        PointerMoved="InteractionSurface_PointerMoved"
+                                                        PointerPressed="InteractionSurface_PointerPressed"
+                                                        PointerReleased="InteractionSurface_PointerReleased" />
+                                                    <Canvas x:Name="AnnotationCanvas">
+                                                        <Rectangle
+                                                            x:Name="SelectionOutline"
+                                                            Fill="Transparent"
+                                                            Stroke="{ThemeResource ToolSelectedBrush}"
+                                                            StrokeDashArray="6,4"
+                                                            StrokeThickness="2"
+                                                            IsHitTestVisible="False"
+                                                            Visibility="Collapsed" />
+                                                        <Rectangle
+                                                            x:Name="CropPreview"
+                                                            Fill="#1E00C5A7"
+                                                            RadiusX="20"
+                                                            RadiusY="20"
+                                                            Stroke="#FF00C5A7"
+                                                            StrokeDashArray="10,6"
+                                                            StrokeThickness="4"
+                                                            IsHitTestVisible="False"
+                                                            Visibility="Collapsed" />
+                                                        <Border
+                                                            x:Name="CropBadge"
+                                                            Background="{ThemeResource OverlayBadgeBrush}"
+                                                            CornerRadius="12"
+                                                            Padding="10,6"
+                                                            IsHitTestVisible="False"
+                                                            Visibility="Collapsed">
+                                                            <TextBlock x:Name="CropBadgeText" Foreground="{ThemeResource OverlayBadgeTextBrush}" />
+                                                        </Border>
+                                                    </Canvas>
+                                                </Grid>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Column="2" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="14">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Spacing="14">
+                                    <StackPanel x:Name="StepDetailsPanel" Spacing="10">
+                                        <TextBlock x:Name="StepDetailsTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        <TextBlock x:Name="StepTitleLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="StepTitleTextBox" TextChanged="DocumentTitleTextBox_TextChanged" />
+                                        <TextBlock x:Name="StepNoteLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="StepNoteTextBox" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="StepNoteTextBox_TextChanged" />
+                                        <TextBlock x:Name="TemplateTypeLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <ComboBox x:Name="TemplateTypeComboBox" SelectionChanged="TemplateTypeComboBox_SelectionChanged" />
+                                        <TextBlock x:Name="AudienceLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="AudienceTextBox" TextChanged="AudienceTextBox_TextChanged" />
+                                        <TextBlock x:Name="AuthorLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="AuthorTextBox" TextChanged="AuthorTextBox_TextChanged" />
+                                        <TextBlock x:Name="DocumentVersionLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="DocumentVersionTextBox" TextChanged="DocumentVersionTextBox_TextChanged" />
+                                        <TextBlock x:Name="StickerSequenceText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    </StackPanel>
+
+                                    <StackPanel x:Name="AnnotationContextPanel" Spacing="10" Visibility="Collapsed">
+                                        <TextBlock x:Name="AnnotationPanelTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        <TextBlock x:Name="StickerValueLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <Border Background="{ThemeResource ShellBackgroundBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="12" Padding="10,8">
+                                            <TextBlock x:Name="StickerValueText" FontSize="18" FontFamily="Bahnschrift SemiBold SemiConden" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        </Border>
+                                        <TextBlock x:Name="StickerLegendLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="StickerLegendTextBox" TextChanged="StickerLegendTextBox_TextChanged" />
+                                        <TextBlock x:Name="AnnotationTextLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="AnnotationTextBox" TextChanged="AnnotationTextBox_TextChanged" />
+                                        <TextBlock x:Name="StickerModeLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <ComboBox x:Name="StickerModeComboBox" SelectionChanged="StickerModeComboBox_SelectionChanged" />
+                                        <CheckBox x:Name="ResetStickerNumberOnColorChangeCheckBox" Checked="ResetStickerNumberOnColorChangeCheckBox_Changed" Unchecked="ResetStickerNumberOnColorChangeCheckBox_Changed" />
+                                        <TextBlock x:Name="StrokeThicknessLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <Slider x:Name="StrokeThicknessSlider" ValueChanged="StrokeThicknessSlider_ValueChanged" />
+                                        <TextBlock x:Name="SelectedOpacityLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <Slider x:Name="SelectedOpacitySlider" Minimum="0.1" Maximum="1" StepFrequency="0.05" ValueChanged="SelectedOpacitySlider_ValueChanged" />
+                                        <TextBlock x:Name="StrokeSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBlock x:Name="CropStateText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                        <TextBlock x:Name="SelectedAnnotationSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                            <Button x:Name="ApplyCropButton" Click="ApplyCropButton_Click" />
+                                            <Button x:Name="ResetCropButton" Click="ResetCropButton_Click" />
+                                            <Button x:Name="ClearAnnotationsButton" Click="ClearAnnotationsButton_Click" />
+                                            <Button x:Name="DuplicateSelectedButton" Click="DuplicateSelectedAnnotationButton_Click" />
+                                            <Button x:Name="DeleteSelectedButton" Click="DeleteSelectedAnnotationButton_Click" />
+                                        </StackPanel>
+
+                                        <StackPanel x:Name="LegendPanel" Spacing="10">
+                                            <TextBlock x:Name="LegendTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                            <ListView x:Name="LegendListView" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
+                    </Grid>
                 </Border>
             </Grid>
 
-            <Border
-                Grid.Row="1"
-                Grid.Column="2"
-                Background="{ThemeResource ShellPanelBrush}"
-                BorderBrush="{ThemeResource ShellStrokeBrush}"
-                BorderThickness="1"
-                CornerRadius="24"
-                Padding="16">
+            <Grid x:Name="ExportSection" Visibility="Collapsed">
+                <Grid Padding="20" ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="24">
+                        <StackPanel Spacing="16">
+                            <TextBlock x:Name="ExportPageTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="32" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                            <TextBlock x:Name="ExportPageSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="8">
+                                    <TextBlock x:Name="ExportTemplateLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <ComboBox x:Name="ExportTemplateComboBox" SelectionChanged="ExportTemplateComboBox_SelectionChanged" />
+                                    <TextBlock x:Name="ExportTemplateValueText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="8">
+                                    <TextBlock x:Name="ExportFormatLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <ComboBox x:Name="ExportFormatComboBox" SelectionChanged="ExportFormatComboBox_SelectionChanged" />
+                                </StackPanel>
+                            </Grid>
+
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="8">
+                                    <TextBlock x:Name="ExportAudienceLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <TextBox x:Name="ExportAudienceTextBox" TextChanged="ExportAudienceTextBox_TextChanged" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="8">
+                                    <TextBlock x:Name="ExportAuthorLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <TextBox x:Name="ExportAuthorTextBox" TextChanged="ExportAuthorTextBox_TextChanged" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="8">
+                                    <TextBlock x:Name="ExportVersionLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <TextBox x:Name="ExportVersionTextBox" TextChanged="ExportVersionTextBox_TextChanged" />
+                                </StackPanel>
+                                    <StackPanel Grid.Column="1" Spacing="8">
+                                        <TextBlock x:Name="ExportFolderLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <Grid ColumnSpacing="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox x:Name="ExportFolderTextBox" TextChanged="ExportFolderTextBox_TextChanged" />
+                                            <Button x:Name="BrowseExportFolderButton" Grid.Column="1" Click="BrowseExportFolderButton_Click" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="ExportPngButton" Click="ExportButton_Click" />
+                                <Button x:Name="ExportAllFormatsButton" Click="ExportAllFormatsButton_Click" />
+                                <Button x:Name="ExportMarkdownButton" Click="ExportMarkdownButton_Click" />
+                                <Button x:Name="ExportHtmlButton" Click="ExportHtmlButton_Click" />
+                                <Button x:Name="ExportPdfButton" Click="ExportPdfButton_Click" />
+                                <Button x:Name="ExportDocxButton" Click="ExportDocxButton_Click" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="24">
+                        <StackPanel Spacing="14">
+                            <TextBlock x:Name="ExportPreviewTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="24" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                            <TextBlock x:Name="ExportPreviewSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                            <ListView x:Name="ExportStepsListView" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <Grid x:Name="SettingsSection" Visibility="Collapsed">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="16">
-                        <TextBlock FontFamily="Bahnschrift SemiBold SemiConden" FontSize="16" Foreground="{ThemeResource ShellStrongTextBrush}" Text="Proprietes" />
-                        <TextBox x:Name="AnnotationTextBox" Header="Libelle" PlaceholderText="Ex: verifier le total" TextChanged="AnnotationTextBox_TextChanged" />
-                        <ComboBox x:Name="StickerModeComboBox" Header="Mode gommette" SelectionChanged="StickerModeComboBox_SelectionChanged">
-                            <x:String>Numerique</x:String>
-                            <x:String>Alphabetique</x:String>
-                            <x:String>Texte du champ</x:String>
-                        </ComboBox>
-                        <CheckBox
-                            x:Name="ResetStickerNumberOnColorChangeCheckBox"
-                            Checked="ResetStickerNumberOnColorChangeCheckBox_Changed"
-                            Unchecked="ResetStickerNumberOnColorChangeCheckBox_Changed"
-                            Content="Repartir de 1 ou A quand la couleur change" />
-                        <TextBlock x:Name="StickerSequenceText" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Prochaine gommette : 1" />
-                        <Slider x:Name="StrokeThicknessSlider" ValueChanged="StrokeThicknessSlider_ValueChanged" />
-                        <TextBlock x:Name="StrokeSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Trait actuel : 6 px" />
-                        <TextBlock x:Name="CropStateText" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Aucun crop applique pour le moment." TextWrapping="Wrap" />
-                        <TextBlock x:Name="ImageSourceText" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Source : demo" TextWrapping="Wrap" />
-                        <TextBlock Foreground="{ThemeResource ShellMutedTextBrush}" Text="Les onglets affichent une proposition d'enregistrement a la fermeture si le contenu n'a pas ete sauvegarde." TextWrapping="Wrap" />
-                    </StackPanel>
+                    <Grid Padding="20" ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="24">
+                                <StackPanel Spacing="14">
+                                <TextBlock x:Name="SettingsPageTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="32" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                <TextBlock x:Name="SettingsPageSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+
+                                <TextBlock x:Name="AppearanceSettingsTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                <StackPanel Spacing="6">
+                                    <TextBlock x:Name="ThemeSettingLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <ComboBox x:Name="ThemeComboBox" SelectionChanged="ThemeComboBox_SelectionChanged" />
+                                    <TextBlock x:Name="ThemeSettingHelpText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <TextBlock x:Name="LanguageSettingsTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                <StackPanel Spacing="6">
+                                    <TextBlock x:Name="LanguageSettingLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <ComboBox x:Name="LanguageComboBox" SelectionChanged="LanguageComboBox_SelectionChanged" />
+                                    <TextBlock x:Name="LanguageSettingHelpText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <TextBlock x:Name="CaptureSettingsTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                <StackPanel Spacing="6">
+                                    <TextBlock x:Name="CaptureSettingLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <CheckBox x:Name="AutoImportClipboardCheckBox" Checked="AutoImportClipboardCheckBox_Changed" Unchecked="AutoImportClipboardCheckBox_Changed" />
+                                    <TextBlock x:Name="CaptureSettingHelpText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <TextBlock x:Name="ExportSettingsTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                <StackPanel Spacing="6">
+                                    <TextBlock x:Name="DefaultExportFolderLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="DefaultExportFolderTextBox" TextChanged="DefaultExportFolderTextBox_TextChanged" />
+                                        <Button x:Name="BrowseDefaultExportFolderButton" Grid.Column="1" Click="BrowseDefaultExportFolderButton_Click" />
+                                        </Grid>
+                                    <TextBlock x:Name="DefaultExportFolderHelpText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock x:Name="DefaultExportFormatSettingLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                    <ComboBox x:Name="DefaultExportFormatComboBox" SelectionChanged="DefaultExportFormatComboBox_SelectionChanged" />
+                                    <TextBlock x:Name="DefaultExportFormatHelpText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <TextBlock x:Name="SettingsRestartHintText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="24">
+                            <StackPanel Spacing="14">
+                                <TextBlock x:Name="SettingsShortcutsTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="24" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                <TextBlock x:Name="SettingsShortcutsSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+                                <ListView x:Name="SettingsShortcutsListView" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </ScrollViewer>
-            </Border>
+            </Grid>
         </Grid>
 
-        <Border Grid.Row="2" Margin="20,0,20,20" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="18" Padding="16,10">
+        <Border Grid.Row="3" Margin="20,0,20,20" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="18" Padding="16,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock x:Name="FooterText" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Chaque capture Win + Shift + S cree un nouvel onglet." />
-                <TextBlock x:Name="AnnotationCountText" Grid.Column="1" Foreground="{ThemeResource ShellMutedTextBrush}" Text="Annotations : 0" />
+                <TextBlock x:Name="StatusText" Foreground="{ThemeResource ShellMutedTextBrush}" TextTrimming="CharacterEllipsis" />
+                <TextBlock x:Name="AnnotationCountText" Grid.Column="1" Foreground="{ThemeResource ShellMutedTextBrush}" />
             </Grid>
         </Border>
     </Grid>

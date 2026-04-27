@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Foundation;
 
 namespace SnapSlate;
@@ -9,12 +10,23 @@ namespace SnapSlate;
 public sealed class ScreenshotDocument : INotifyPropertyChanged
 {
     private string _baseTitle = "Capture";
+    private string _stepNote = string.Empty;
     private string _originLabel = "Demo";
     private string _sourceLabel = "Source inconnue";
     private string _fileNameLabel = "capture.png";
+    private int _sourcePixelWidth = 1360;
+    private int _sourcePixelHeight = 820;
+    private byte[]? _imageBytes;
+    private BitmapImage? _thumbnailSource;
     private string _selectedPaletteKey = "Sunset";
+    private int _selectedPaletteShadeIndex = 3;
     private string _paletteDisplayName = "sunset note";
     private string _annotationText = "Note rapide";
+    private GuideTemplateType _templateType = GuideTemplateType.UserManual;
+    private string _audience = "Utilisateurs finaux";
+    private string _author = "SnapSlate";
+    private string _documentVersion = "1.0";
+    private double _defaultOpacity = 1;
     private int _stickerModeIndex;
     private double _strokeThickness = 6;
     private int _nextStickerIndex = 1;
@@ -23,7 +35,6 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
     private Rect? _appliedCropRect;
     private string? _savedPath;
     private bool _isDirty;
-    private byte[]? _imageBytes;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -41,8 +52,21 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
             if (SetField(ref _baseTitle, value))
             {
                 OnPropertyChanged(nameof(TabTitle));
+                OnPropertyChanged(nameof(StepTitle));
             }
         }
+    }
+
+    public string StepTitle
+    {
+        get => BaseTitle;
+        set => BaseTitle = value;
+    }
+
+    public string StepNote
+    {
+        get => _stepNote;
+        set => SetField(ref _stepNote, value);
     }
 
     public string OriginLabel
@@ -69,16 +93,40 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
         set => SetField(ref _fileNameLabel, value);
     }
 
+    public int SourcePixelWidth
+    {
+        get => _sourcePixelWidth;
+        set => SetField(ref _sourcePixelWidth, value);
+    }
+
+    public int SourcePixelHeight
+    {
+        get => _sourcePixelHeight;
+        set => SetField(ref _sourcePixelHeight, value);
+    }
+
     public byte[]? ImageBytes
     {
         get => _imageBytes;
         set => SetField(ref _imageBytes, value);
     }
 
+    public BitmapImage? ThumbnailSource
+    {
+        get => _thumbnailSource;
+        set => SetField(ref _thumbnailSource, value);
+    }
+
     public string SelectedPaletteKey
     {
         get => _selectedPaletteKey;
         set => SetField(ref _selectedPaletteKey, value);
+    }
+
+    public int SelectedPaletteShadeIndex
+    {
+        get => _selectedPaletteShadeIndex;
+        set => SetField(ref _selectedPaletteShadeIndex, value);
     }
 
     public string PaletteDisplayName
@@ -93,6 +141,30 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
         set => SetField(ref _annotationText, value);
     }
 
+    public GuideTemplateType TemplateType
+    {
+        get => _templateType;
+        set => SetField(ref _templateType, value);
+    }
+
+    public string Audience
+    {
+        get => _audience;
+        set => SetField(ref _audience, value);
+    }
+
+    public string Author
+    {
+        get => _author;
+        set => SetField(ref _author, value);
+    }
+
+    public string DocumentVersion
+    {
+        get => _documentVersion;
+        set => SetField(ref _documentVersion, value);
+    }
+
     public int StickerModeIndex
     {
         get => _stickerModeIndex;
@@ -103,6 +175,12 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
     {
         get => _strokeThickness;
         set => SetField(ref _strokeThickness, value);
+    }
+
+    public double DefaultOpacity
+    {
+        get => _defaultOpacity;
+        set => SetField(ref _defaultOpacity, value);
     }
 
     public int NextStickerIndex

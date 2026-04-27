@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.UI;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -35,6 +38,7 @@ public sealed partial class MainWindow : Window
 
     private readonly ObservableCollection<ScreenshotDocument> _documents = [];
     private readonly Dictionary<string, GradientPaletteDefinition> _palettes;
+    private readonly List<GradientPaletteDefinition> _paletteOrder = [];
     private readonly Dictionary<EditorTool, string> _toolLabels = new()
     {
         [EditorTool.Crop] = "Crop",
@@ -43,7 +47,9 @@ public sealed partial class MainWindow : Window
         [EditorTool.ArrowStraight] = "Fleche droite",
         [EditorTool.ArrowCurved] = "Fleche courbe",
         [EditorTool.Rectangle] = "Rectangle",
-        [EditorTool.Ellipse] = "Ovale"
+        [EditorTool.Ellipse] = "Ovale",
+        [EditorTool.Focus] = "Focus",
+        [EditorTool.Mask] = "Masquage"
     };
 
     private readonly Dictionary<EditorTool, string> _toolHints = new()
@@ -54,22 +60,38 @@ public sealed partial class MainWindow : Window
         [EditorTool.ArrowStraight] = "Glissez pour tracer une fleche droite.",
         [EditorTool.ArrowCurved] = "Glissez pour tracer une fleche courbe.",
         [EditorTool.Rectangle] = "Glissez pour entourer une zone rectangulaire.",
-        [EditorTool.Ellipse] = "Glissez pour entourer une zone ovale."
+        [EditorTool.Ellipse] = "Glissez pour entourer une zone ovale.",
+        [EditorTool.Focus] = "Glissez pour mettre une zone en avant.",
+        [EditorTool.Mask] = "Glissez pour masquer une zone."
     };
 
     private readonly List<Button> _toolButtons;
     private readonly Dictionary<string, Button> _paletteButtons;
+    private readonly List<Button> _shadeButtons = [];
     private EditorTool _currentTool = EditorTool.ArrowStraight;
     private ScreenshotDocument? _currentDocument;
+    private AnnotationModel? _selectedAnnotation;
     private FrameworkElement? _activeElement;
+    private AnnotationModel? _draggingAnnotation;
+    private FrameworkElement? _draggingAnnotationElement;
     private Point _dragStart;
+    private Point _annotationDragStart;
+    private Rect _annotationDragStartBounds;
+    private Point _annotationDragStartPoint;
+    private Point _annotationDragStartEndPoint;
     private bool _isDragging;
+    private bool _isDraggingAnnotation;
     private bool _isApplyingDocumentState;
+    private bool _isSyncingAnnotationSelectionUi;
+    private bool _isInitializingUi;
     private bool _isProcessingClipboard;
-    private string? _lastClipboardHash;
-    private DateTimeOffset _lastClipboardImportAt = DateTimeOffset.MinValue;
+    private bool _clipboardWatcherPrimed;
+    private readonly DispatcherQueueTimer _clipboardPollTimer;
+    private string? _lastClipboardFingerprint;
     private int _nextCaptureIndex = 1;
     private int _nextDemoIndex = 1;
+    private double _currentZoom = 1.0;
+    private ShellSection _currentSection = ShellSection.Procedure;
 
     public MainWindow()
     {
@@ -91,21 +113,11 @@ public sealed partial class MainWindow : Window
             ArrowStraightToolButton,
             ArrowCurvedToolButton,
             RectangleToolButton,
-            EllipseToolButton
+            EllipseToolButton,
+            FocusToolButton,
+            MaskToolButton
         ];
-        _paletteButtons = new Dictionary<string, Button>(StringComparer.Ordinal)
-        {
-            ["Sunset"] = SunsetPaletteButton,
-            ["Ember"] = EmberPaletteButton,
-            ["Citrus"] = CitrusPaletteButton,
-            ["Mint"] = MintPaletteButton,
-            ["Lagoon"] = LagoonPaletteButton,
-            ["Sky"] = SkyPaletteButton,
-            ["Ocean"] = OceanPaletteButton,
-            ["Rose"] = RosePaletteButton,
-            ["Berry"] = BerryPaletteButton,
-            ["Grape"] = GrapePaletteButton
-        };
+        _paletteButtons = new Dictionary<string, Button>(StringComparer.Ordinal);
 
         PreviewViewport.Clip = new RectangleGeometry();
         DocumentTabsListView.ItemsSource = _documents;
@@ -113,27 +125,68 @@ public sealed partial class MainWindow : Window
         StrokeThicknessSlider.Maximum = 14;
         StrokeThicknessSlider.Value = 6;
 
+        InitializeShellUi();
+        BuildPaletteStrip();
+        BuildShadeStrip();
         SelectTool(EditorTool.ArrowStraight);
         AddDocument(CreateDemoDocument(isInitial: true), select: true);
 
+        _clipboardPollTimer = DispatcherQueue.CreateTimer();
+        _clipboardPollTimer.Interval = TimeSpan.FromMilliseconds(850);
+        _clipboardPollTimer.IsRepeating = true;
+        _clipboardPollTimer.Tick += ClipboardPollTimer_Tick;
+        _clipboardPollTimer.Start();
+        Closed += MainWindow_Closed;
+
         Clipboard.ContentChanged += Clipboard_ContentChanged;
+        _ = PrimeClipboardWatcherAsync();
     }
 
     private static Dictionary<string, GradientPaletteDefinition> CreatePalettes()
     {
         return new Dictionary<string, GradientPaletteDefinition>(StringComparer.Ordinal)
         {
-            ["Sunset"] = new("Sunset", "sunset note", ColorHelper.FromArgb(255, 240, 90, 65), ColorHelper.FromArgb(255, 255, 198, 110)),
-            ["Ember"] = new("Ember", "ember alert", ColorHelper.FromArgb(255, 189, 60, 43), ColorHelper.FromArgb(255, 240, 107, 89)),
-            ["Citrus"] = new("Citrus", "citrus focus", ColorHelper.FromArgb(255, 240, 167, 59), ColorHelper.FromArgb(255, 246, 228, 122)),
-            ["Mint"] = new("Mint", "mint product", ColorHelper.FromArgb(255, 22, 179, 142), ColorHelper.FromArgb(255, 132, 226, 197)),
-            ["Lagoon"] = new("Lagoon", "lagoon flow", ColorHelper.FromArgb(255, 15, 158, 175), ColorHelper.FromArgb(255, 115, 225, 233)),
-            ["Sky"] = new("Sky", "sky workflow", ColorHelper.FromArgb(255, 31, 132, 224), ColorHelper.FromArgb(255, 140, 203, 255)),
-            ["Ocean"] = new("Ocean", "ocean depth", ColorHelper.FromArgb(255, 23, 58, 115), ColorHelper.FromArgb(255, 70, 135, 224)),
-            ["Rose"] = new("Rose", "rose highlight", ColorHelper.FromArgb(255, 216, 90, 136), ColorHelper.FromArgb(255, 245, 160, 189)),
-            ["Berry"] = new("Berry", "berry spark", ColorHelper.FromArgb(255, 165, 63, 164), ColorHelper.FromArgb(255, 240, 123, 197)),
-            ["Grape"] = new("Grape", "grape accent", ColorHelper.FromArgb(255, 103, 70, 195), ColorHelper.FromArgb(255, 176, 137, 255))
+            ["Sunset"] = CreatePalette("Sunset", "sunset note", ColorHelper.FromArgb(255, 240, 90, 65), ColorHelper.FromArgb(255, 255, 198, 110)),
+            ["Ember"] = CreatePalette("Ember", "ember alert", ColorHelper.FromArgb(255, 189, 60, 43), ColorHelper.FromArgb(255, 240, 107, 89)),
+            ["Citrus"] = CreatePalette("Citrus", "citrus focus", ColorHelper.FromArgb(255, 240, 167, 59), ColorHelper.FromArgb(255, 246, 228, 122)),
+            ["Mint"] = CreatePalette("Mint", "mint product", ColorHelper.FromArgb(255, 22, 179, 142), ColorHelper.FromArgb(255, 132, 226, 197)),
+            ["Lagoon"] = CreatePalette("Lagoon", "lagoon flow", ColorHelper.FromArgb(255, 15, 158, 175), ColorHelper.FromArgb(255, 115, 225, 233)),
+            ["Sky"] = CreatePalette("Sky", "sky workflow", ColorHelper.FromArgb(255, 31, 132, 224), ColorHelper.FromArgb(255, 140, 203, 255)),
+            ["Ocean"] = CreatePalette("Ocean", "ocean depth", ColorHelper.FromArgb(255, 23, 58, 115), ColorHelper.FromArgb(255, 70, 135, 224)),
+            ["Rose"] = CreatePalette("Rose", "rose highlight", ColorHelper.FromArgb(255, 216, 90, 136), ColorHelper.FromArgb(255, 245, 160, 189)),
+            ["Berry"] = CreatePalette("Berry", "berry spark", ColorHelper.FromArgb(255, 165, 63, 164), ColorHelper.FromArgb(255, 240, 123, 197)),
+            ["Grape"] = CreatePalette("Grape", "grape accent", ColorHelper.FromArgb(255, 103, 70, 195), ColorHelper.FromArgb(255, 176, 137, 255))
         };
+    }
+
+    private static GradientPaletteDefinition CreatePalette(string key, string displayName, Color startColor, Color endColor)
+    {
+        return new GradientPaletteDefinition(key, displayName, startColor, endColor)
+        {
+            Shades = BuildShades(startColor, endColor)
+        };
+    }
+
+    private static IReadOnlyList<Color> BuildShades(Color startColor, Color endColor)
+    {
+        var shades = new List<Color>(7);
+        for (var i = 0; i < 7; i++)
+        {
+            var factor = i / 6.0;
+            shades.Add(InterpolateColor(startColor, endColor, factor));
+        }
+
+        return shades;
+    }
+
+    private static Color InterpolateColor(Color start, Color end, double factor)
+    {
+        byte lerp(byte s, byte e) => (byte)Math.Round(s + ((e - s) * factor));
+        return ColorHelper.FromArgb(
+            255,
+            lerp(start.R, end.R),
+            lerp(start.G, end.G),
+            lerp(start.B, end.B));
     }
 
     private ScreenshotDocument CreateDemoDocument(bool isInitial = false)
@@ -147,6 +200,9 @@ public sealed partial class MainWindow : Window
             OriginLabel = "Demo",
             SourceLabel = "Planche de demonstration interne",
             FileNameLabel = "demo-reference.png",
+            SourcePixelWidth = (int)SceneWidth,
+            SourcePixelHeight = (int)SceneHeight,
+            ThumbnailSource = new BitmapImage(new Uri("ms-appx:///Assets/Square150x150Logo.scale-200.png")),
             SelectedPaletteKey = palette.Key,
             PaletteDisplayName = palette.DisplayName,
             AnnotationText = "Note rapide",
@@ -201,7 +257,9 @@ public sealed partial class MainWindow : Window
             return null;
         }
 
+        var (sourceWidth, sourceHeight) = await GetImageSizeAsync(bytes);
         var palette = _palettes["Sunset"];
+        var thumbnail = await CreateBitmapImageAsync(bytes, 160);
         return new ScreenshotDocument
         {
             BaseTitle = System.IO.Path.GetFileNameWithoutExtension(file.Name),
@@ -209,7 +267,10 @@ public sealed partial class MainWindow : Window
             OriginLabel = "Fichier importe",
             SourceLabel = file.Path,
             FileNameLabel = file.Name,
+            SourcePixelWidth = sourceWidth,
+            SourcePixelHeight = sourceHeight,
             ImageBytes = bytes,
+            ThumbnailSource = thumbnail,
             SelectedPaletteKey = palette.Key,
             PaletteDisplayName = palette.DisplayName,
             AnnotationText = "Note rapide",
@@ -220,10 +281,12 @@ public sealed partial class MainWindow : Window
         };
     }
 
-    private ScreenshotDocument CreateDocumentFromClipboard(byte[] bytes)
+    private async Task<ScreenshotDocument> CreateDocumentFromClipboardAsync(byte[] bytes)
     {
+        var (sourceWidth, sourceHeight) = await GetImageSizeAsync(bytes);
         var palette = _palettes["Sunset"];
         var captureIndex = _nextCaptureIndex++;
+        var thumbnail = await CreateBitmapImageAsync(bytes, 160);
         return new ScreenshotDocument
         {
             BaseTitle = $"Capture {captureIndex:00}",
@@ -231,7 +294,10 @@ public sealed partial class MainWindow : Window
             OriginLabel = "Win + Shift + S",
             SourceLabel = $"Capture Windows importee a {DateTime.Now:HH:mm:ss}",
             FileNameLabel = $"capture-{captureIndex:00}.png",
+            SourcePixelWidth = sourceWidth,
+            SourcePixelHeight = sourceHeight,
             ImageBytes = bytes,
+            ThumbnailSource = thumbnail,
             SelectedPaletteKey = palette.Key,
             PaletteDisplayName = palette.DisplayName,
             AnnotationText = "Note rapide",
@@ -258,15 +324,16 @@ public sealed partial class MainWindow : Window
         }
 
         _currentDocument = document;
+        _selectedAnnotation = null;
         _isApplyingDocumentState = true;
 
         try
         {
             CanvasSummaryText.Text = document.Origin switch
             {
-                DocumentOrigin.ClipboardCapture => "Capture Win + Shift + S importee automatiquement dans un nouvel onglet.",
-                DocumentOrigin.FileImport => "Fichier importe dans un nouvel onglet pour annoter sans ecraser l'original.",
-                _ => "Planche de demo : annotez la scene ou importez un screenshot."
+                DocumentOrigin.ClipboardCapture => "Nouvelle capture importee.",
+                DocumentOrigin.FileImport => "Image importee.",
+                _ => "Planche de demonstration."
             };
             CanvasFileNameText.Text = document.FileNameLabel;
             ImageSourceText.Text = $"Source : {document.SourceLabel}";
@@ -277,7 +344,8 @@ public sealed partial class MainWindow : Window
             ResetStickerNumberOnColorChangeCheckBox.IsChecked = document.ResetStickerNumberOnColorChange;
             StrokeSummaryText.Text = $"Trait actuel : {document.StrokeThickness:0} px";
 
-            ApplyPaletteSelection(document.SelectedPaletteKey, updateDocument: false, resetStickerCounter: false);
+            ApplyPaletteSelection(document.SelectedPaletteKey, document.SelectedPaletteShadeIndex, updateDocument: false, updateSelectedAnnotation: false);
+            SyncDocumentEditors(document);
 
             if (document.ImageBytes is { Length: > 0 })
             {
@@ -292,8 +360,10 @@ public sealed partial class MainWindow : Window
                 PlaceholderPanel.Visibility = Visibility.Visible;
             }
 
+            ApplyDocumentSceneSize(document);
             ApplyCropState(document);
             RenderAnnotations(document);
+            SelectAnnotation(null);
             UpdateStickerSequenceText(document);
             UpdateAnnotationCount(document);
             UpdateStatus();
@@ -304,15 +374,36 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private static async Task<BitmapImage> CreateBitmapImageAsync(byte[] bytes)
+    private static async Task<BitmapImage> CreateBitmapImageAsync(byte[] bytes, int? decodePixelWidth = null)
     {
         using var stream = new InMemoryRandomAccessStream();
         await stream.WriteAsync(bytes.AsBuffer());
         stream.Seek(0);
 
         var bitmap = new BitmapImage();
+        if (decodePixelWidth is int width && width > 0)
+        {
+            bitmap.DecodePixelWidth = width;
+        }
         await bitmap.SetSourceAsync(stream);
         return bitmap;
+    }
+
+    private static async Task<(int Width, int Height)> GetImageSizeAsync(byte[] bytes)
+    {
+        using var stream = new InMemoryRandomAccessStream();
+        await stream.WriteAsync(bytes.AsBuffer());
+        stream.Seek(0);
+
+        try
+        {
+            var decoder = await BitmapDecoder.CreateAsync(stream);
+            return ((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+        }
+        catch
+        {
+            return ((int)SceneWidth, (int)SceneHeight);
+        }
     }
 
     private void SelectTool(EditorTool tool)
@@ -337,22 +428,60 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void PaletteButton_Click(object sender, RoutedEventArgs e)
+    private async void PaletteButton_Click(object sender, RoutedEventArgs e)
     {
         if (_currentDocument is null || sender is not Button button || button.Tag is not string key)
         {
             return;
         }
 
-        var resetCounter = _currentDocument.ResetStickerNumberOnColorChange &&
-            !string.Equals(_currentDocument.SelectedPaletteKey, key, StringComparison.Ordinal);
+        await ApplyPaletteSelectionAsync(key, _currentDocument.SelectedPaletteShadeIndex);
+    }
 
-        ApplyPaletteSelection(key, updateDocument: true, resetStickerCounter: resetCounter);
+    private async Task ApplyPaletteSelectionAsync(string key, int shadeIndex)
+    {
+        if (_currentDocument is null || !_palettes.TryGetValue(key, out _))
+        {
+            return;
+        }
+
+        var paletteChanged = !string.Equals(_currentDocument.SelectedPaletteKey, key, StringComparison.Ordinal);
+        var shadeChanged = _currentDocument.SelectedPaletteShadeIndex != shadeIndex;
+        bool? stickerRenumberChoice = null;
+
+        if (_selectedAnnotation?.Kind == AnnotationKind.Sticker && (paletteChanged || shadeChanged))
+        {
+            stickerRenumberChoice = await PromptStickerRenumberAsync();
+            if (stickerRenumberChoice is null)
+            {
+                return;
+            }
+        }
+        else if (_currentDocument.ResetStickerNumberOnColorChange && (paletteChanged || shadeChanged))
+        {
+            stickerRenumberChoice = true;
+        }
+
+        ApplyPaletteSelection(key, shadeIndex, updateDocument: true, updateSelectedAnnotation: true);
+
+        if (stickerRenumberChoice == true)
+        {
+            RenumberStickers(_currentDocument);
+        }
+
+        MarkDocumentDirty(_currentDocument);
+        RenderAnnotations(_currentDocument);
+        if (_selectedAnnotation is not null)
+        {
+            SelectAnnotation(_selectedAnnotation);
+        }
         UpdateStickerSequenceText(_currentDocument);
+        UpdateLegendList();
+        UpdateAnnotationCount(_currentDocument);
         UpdateStatus();
     }
 
-    private void ApplyPaletteSelection(string key, bool updateDocument, bool resetStickerCounter)
+    private void ApplyPaletteSelection(string key, int shadeIndex, bool updateDocument, bool updateSelectedAnnotation)
     {
         if (!_palettes.TryGetValue(key, out var palette))
         {
@@ -366,29 +495,90 @@ public sealed partial class MainWindow : Window
             pair.Value.BorderBrush = GetBrush(isSelected ? "ToolSelectedBrush" : "ShellStrokeBrush");
         }
 
-        PaletteSummaryText.Text = $"Palette active : {palette.DisplayName}";
+        PaletteSummaryText.Text = string.Format(CultureInfo.CurrentCulture, T("Palette active : {0}", "Active palette: {0}"), palette.DisplayName);
 
         if (_currentDocument is not null && updateDocument)
         {
             _currentDocument.SelectedPaletteKey = key;
+            _currentDocument.SelectedPaletteShadeIndex = Math.Clamp(shadeIndex, 0, 6);
             _currentDocument.PaletteDisplayName = palette.DisplayName;
-
-            if (resetStickerCounter)
-            {
-                _currentDocument.NextStickerIndex = 1;
-            }
         }
+
+        if (updateSelectedAnnotation && _selectedAnnotation is not null)
+        {
+            _selectedAnnotation.PaletteKey = key;
+            _selectedAnnotation.PaletteShadeIndex = Math.Clamp(shadeIndex, 0, 6);
+        }
+
+        RefreshShadeStrip();
+    }
+
+    private async Task<bool?> PromptStickerRenumberAsync()
+    {
+        if (RootGrid.XamlRoot is null)
+        {
+            return null;
+        }
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = RootGrid.XamlRoot,
+            Title = T("Changer la couleur de la gommette ?", "Change sticker color?"),
+            Content = T("Voulez-vous renuméroter les gommettes après ce changement de couleur ?", "Do you want to renumber the stickers after this color change?"),
+            PrimaryButtonText = T("Renuméroter", "Renumber"),
+            SecondaryButtonText = T("Continuer", "Keep numbering"),
+            CloseButtonText = T("Annuler", "Cancel"),
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        var result = await dialog.ShowAsync();
+        return result switch
+        {
+            ContentDialogResult.Primary => true,
+            ContentDialogResult.Secondary => false,
+            _ => null
+        };
     }
 
     private void AnnotationTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (_isApplyingDocumentState || _currentDocument is null)
+        if (_isApplyingDocumentState || _isSyncingAnnotationSelectionUi || _currentDocument is null)
         {
             return;
         }
 
-        _currentDocument.AnnotationText = AnnotationTextBox.Text;
+        if (_selectedAnnotation is not null)
+        {
+            if (_selectedAnnotation.Kind == AnnotationKind.Text)
+            {
+                _selectedAnnotation.Text = AnnotationTextBox.Text;
+                RenderAnnotations(_currentDocument);
+                SelectAnnotation(_selectedAnnotation);
+            }
+        }
+        else
+        {
+            _currentDocument.AnnotationText = AnnotationTextBox.Text;
+        }
+
         UpdateStickerSequenceText(_currentDocument);
+        UpdateLegendList();
+    }
+
+    private void StickerLegendTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (_isApplyingDocumentState || _isSyncingAnnotationSelectionUi || _currentDocument is null)
+        {
+            return;
+        }
+
+        if (_selectedAnnotation?.Kind == AnnotationKind.Sticker)
+        {
+            _selectedAnnotation.LegendText = StickerLegendTextBox.Text;
+            MarkDocumentDirty(_currentDocument);
+            UpdateLegendList();
+            UpdateStatus();
+        }
     }
 
     private void StickerModeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -398,15 +588,23 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        _currentDocument.StickerModeIndex = StickerModeComboBox.SelectedIndex;
+        _currentDocument.StickerModeIndex = StickerModeComboBox.SelectedIndex == 1 ? 1 : 0;
         UpdateStickerSequenceText(_currentDocument);
     }
 
     private void StrokeThicknessSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        if (_currentDocument is not null)
+        if (_currentDocument is null || _isApplyingDocumentState || _isSyncingAnnotationSelectionUi)
         {
-            _currentDocument.StrokeThickness = StrokeThicknessSlider.Value;
+            return;
+        }
+
+        _currentDocument.StrokeThickness = StrokeThicknessSlider.Value;
+        if (_selectedAnnotation is not null)
+        {
+            _selectedAnnotation.StrokeThickness = StrokeThicknessSlider.Value;
+            RenderAnnotations(_currentDocument);
+            SelectAnnotation(_selectedAnnotation);
         }
 
         StrokeSummaryText.Text = $"Trait actuel : {StrokeThicknessSlider.Value:0} px";
@@ -424,10 +622,9 @@ public sealed partial class MainWindow : Window
 
     private void UpdateStickerSequenceText(ScreenshotDocument document)
     {
-        var nextLabel = document.StickerModeIndex switch
+        var nextLabel = GetStickerModeIndex(document) switch
         {
             1 => ToAlphabetic(document.NextStickerIndex),
-            2 when !string.IsNullOrWhiteSpace(document.AnnotationText) => document.AnnotationText.Trim(),
             _ => document.NextStickerIndex.ToString()
         };
 
@@ -471,7 +668,7 @@ public sealed partial class MainWindow : Window
     private void NewDemoTabButton_Click(object sender, RoutedEventArgs e)
     {
         AddDocument(CreateDemoDocument(), select: true);
-        StatusText.Text = "Nouvel onglet de demonstration cree.";
+        StatusText.Text = "Nouvelle planche de demonstration creee.";
     }
 
     private async void CloseDocumentButton_Click(object sender, RoutedEventArgs e)
@@ -540,13 +737,26 @@ public sealed partial class MainWindow : Window
             return;
         }
 
+        if (ReferenceEquals(sender, ExportCurrentButton))
+        {
+            var format = App.Preferences.DefaultExportFormat;
+            if (format == ExportFormatChoice.Png)
+            {
+                await SaveDocumentAsync(_currentDocument);
+            }
+            else
+            {
+                await ExportGuideAsync(format);
+            }
+
+            return;
+        }
+
         await SaveDocumentAsync(_currentDocument);
     }
 
     private async Task<bool> SaveDocumentAsync(ScreenshotDocument document)
     {
-        await LoadDocumentAsync(document);
-
         StorageFile? file = null;
         if (!string.IsNullOrWhiteSpace(document.SavedPath))
         {
@@ -577,16 +787,7 @@ public sealed partial class MainWindow : Window
             }
         }
 
-        var renderTarget = new RenderTargetBitmap();
-        var width = Math.Max(1, (int)Math.Round(PreviewViewport.Width));
-        var height = Math.Max(1, (int)Math.Round(PreviewViewport.Height));
-        await renderTarget.RenderAsync(PreviewViewport, width, height);
-        var pixels = (await renderTarget.GetPixelsAsync()).ToArray();
-
-        using var stream = await file.OpenAsync(FileAccessMode.ReadWrite);
-        var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-        encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)width, (uint)height, 96, 96, pixels);
-        await encoder.FlushAsync();
+        GuideImageRenderer.SaveDocumentImage(document, _palettes, file.Path);
 
         document.SavedPath = file.Path;
         document.IsDirty = false;
@@ -658,11 +859,10 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        PreviewViewport.Width = SceneWidth;
-        PreviewViewport.Height = SceneHeight;
+        ApplyDocumentSceneSize(document);
         SceneTransform.X = 0;
         SceneTransform.Y = 0;
-        UpdateViewportClip(SceneWidth, SceneHeight);
+        UpdateViewportClip(GetSceneWidth(document), GetSceneHeight(document));
         CropStateText.Text = document.PendingCropRect is Rect pendingCrop
             ? $"Crop en attente : {pendingCrop.Width:0} x {pendingCrop.Height:0}px."
             : "Aucun crop applique pour le moment.";
@@ -680,6 +880,33 @@ public sealed partial class MainWindow : Window
         ApplyCropButton.IsEnabled = document.PendingCropRect is not null;
     }
 
+    private void ApplyDocumentSceneSize(ScreenshotDocument document)
+    {
+        PreviewViewport.Width = GetSceneWidth(document);
+        PreviewViewport.Height = GetSceneHeight(document);
+        UpdateViewportClip(PreviewViewport.Width, PreviewViewport.Height);
+    }
+
+    private static double GetSceneWidth(ScreenshotDocument document)
+    {
+        if (document.AppliedCropRect is Rect appliedCrop)
+        {
+            return Math.Max(1, appliedCrop.Width);
+        }
+
+        return document.SourcePixelWidth > 0 ? document.SourcePixelWidth : SceneWidth;
+    }
+
+    private static double GetSceneHeight(ScreenshotDocument document)
+    {
+        if (document.AppliedCropRect is Rect appliedCrop)
+        {
+            return Math.Max(1, appliedCrop.Height);
+        }
+
+        return document.SourcePixelHeight > 0 ? document.SourcePixelHeight : SceneHeight;
+    }
+
     private void UpdateViewportClip(double width, double height)
     {
         if (PreviewViewport.Clip is RectangleGeometry clip)
@@ -690,13 +917,23 @@ public sealed partial class MainWindow : Window
 
     private void InteractionSurface_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
-        if (_currentDocument is null)
+        var document = _currentDocument;
+        if (document is null)
         {
             return;
         }
 
-        var point = e.GetCurrentPoint(SceneRoot).Position;
-        if (point.X < 0 || point.Y < 0 || point.X > SceneWidth || point.Y > SceneHeight)
+        var point = e.GetCurrentPoint(InteractionSurface).Position;
+        var sceneWidth = GetSceneWidth(document);
+        var sceneHeight = GetSceneHeight(document);
+        if (e.GetCurrentPoint(InteractionSurface).Properties.IsRightButtonPressed)
+        {
+            ClearSelection();
+            e.Handled = true;
+            return;
+        }
+
+        if (point.X < 0 || point.Y < 0 || point.X > sceneWidth || point.Y > sceneHeight)
         {
             return;
         }
@@ -737,7 +974,7 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var point = e.GetCurrentPoint(SceneRoot).Position;
+        var point = e.GetCurrentPoint(InteractionSurface).Position;
         if (_currentTool == EditorTool.Crop)
         {
             ShowCropOverlay(NormalizeRect(_dragStart, point));
@@ -754,7 +991,7 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var point = e.GetCurrentPoint(SceneRoot).Position;
+        var point = e.GetCurrentPoint(InteractionSurface).Position;
 
         if (_currentTool == EditorTool.Crop)
         {
@@ -777,31 +1014,145 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        FinalizeDraggedAnnotation(_currentDocument, point);
+        if (Distance(_dragStart, point) < 6)
+        {
+            FinalizeClickedAnnotation(_currentDocument, point);
+        }
+        else
+        {
+            FinalizeDraggedAnnotation(_currentDocument, point);
+        }
         FinishDrag(e);
+    }
+
+    private void ClearSelection()
+    {
+        SelectAnnotation(null);
+        UpdateStatus();
+    }
+
+    private void FinalizeClickedAnnotation(ScreenshotDocument document, Point point)
+    {
+        if (_activeElement is not null)
+        {
+            AnnotationCanvas.Children.Remove(_activeElement);
+            _activeElement = null;
+        }
+
+        AnnotationModel? annotation = _currentTool switch
+        {
+            EditorTool.Rectangle => new AnnotationModel
+            {
+                Kind = AnnotationKind.Rectangle,
+                Bounds = new Rect(point.X - 90, point.Y - 60, 180, 120),
+                PaletteKey = document.SelectedPaletteKey,
+                PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                StrokeThickness = document.StrokeThickness,
+                Opacity = document.DefaultOpacity
+            },
+            EditorTool.Ellipse => new AnnotationModel
+            {
+                Kind = AnnotationKind.Ellipse,
+                Bounds = new Rect(point.X - 90, point.Y - 60, 180, 120),
+                PaletteKey = document.SelectedPaletteKey,
+                PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                StrokeThickness = document.StrokeThickness,
+                Opacity = document.DefaultOpacity
+            },
+            EditorTool.Focus => new AnnotationModel
+            {
+                Kind = AnnotationKind.Focus,
+                Bounds = new Rect(point.X - 100, point.Y - 70, 200, 140),
+                PaletteKey = document.SelectedPaletteKey,
+                PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                StrokeThickness = Math.Max(3, document.StrokeThickness),
+                Opacity = document.DefaultOpacity
+            },
+            EditorTool.Mask => new AnnotationModel
+            {
+                Kind = AnnotationKind.Mask,
+                Bounds = new Rect(point.X - 100, point.Y - 70, 200, 140),
+                PaletteKey = document.SelectedPaletteKey,
+                PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                StrokeThickness = 2,
+                Opacity = document.DefaultOpacity
+            },
+            EditorTool.ArrowStraight => new AnnotationModel
+            {
+                Kind = AnnotationKind.ArrowStraight,
+                StartPoint = point,
+                EndPoint = new Point(point.X + 140, point.Y - 40),
+                PaletteKey = document.SelectedPaletteKey,
+                PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                StrokeThickness = document.StrokeThickness,
+                Opacity = document.DefaultOpacity
+            },
+            EditorTool.ArrowCurved => new AnnotationModel
+            {
+                Kind = AnnotationKind.ArrowCurved,
+                StartPoint = point,
+                EndPoint = new Point(point.X + 140, point.Y - 40),
+                PaletteKey = document.SelectedPaletteKey,
+                PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                StrokeThickness = document.StrokeThickness,
+                Opacity = document.DefaultOpacity
+            },
+            _ => null
+        };
+
+        if (annotation is null)
+        {
+            return;
+        }
+
+        document.Annotations.Add(annotation);
+        MarkDocumentDirty(document);
+        RenderAnnotations(document);
+        UpdateAnnotationCount(document);
+        UpdateStatus();
     }
 
     private FrameworkElement? CreateTemporaryElement(ScreenshotDocument document)
     {
-        var stroke = CreateGradientBrush(document.SelectedPaletteKey);
+        var stroke = CreateGradientBrush(document.SelectedPaletteKey, document.SelectedPaletteShadeIndex);
         return _currentTool switch
         {
             EditorTool.Rectangle => new Rectangle
             {
                 Stroke = stroke,
-                Fill = CreateHighlightFill(document.SelectedPaletteKey, 36),
+                Fill = CreateHighlightFill(document.SelectedPaletteKey, 36, document.SelectedPaletteShadeIndex),
                 RadiusX = 24,
                 RadiusY = 24,
-                StrokeThickness = document.StrokeThickness
+                StrokeThickness = document.StrokeThickness,
+                Opacity = document.DefaultOpacity
             },
             EditorTool.Ellipse => new Ellipse
             {
                 Stroke = stroke,
-                Fill = CreateHighlightFill(document.SelectedPaletteKey, 30),
-                StrokeThickness = document.StrokeThickness
+                Fill = CreateHighlightFill(document.SelectedPaletteKey, 30, document.SelectedPaletteShadeIndex),
+                StrokeThickness = document.StrokeThickness,
+                Opacity = document.DefaultOpacity
             },
             EditorTool.ArrowStraight => CreateArrowPath(stroke, document.StrokeThickness),
             EditorTool.ArrowCurved => CreateArrowPath(stroke, document.StrokeThickness),
+            EditorTool.Focus => new Rectangle
+            {
+                Stroke = stroke,
+                Fill = CreateHighlightFill(document.SelectedPaletteKey, 72, document.SelectedPaletteShadeIndex),
+                RadiusX = 24,
+                RadiusY = 24,
+                StrokeThickness = Math.Max(3, document.StrokeThickness),
+                Opacity = document.DefaultOpacity
+            },
+            EditorTool.Mask => new Rectangle
+            {
+                Stroke = new SolidColorBrush(ColorHelper.FromArgb(255, 18, 18, 18)),
+                Fill = new SolidColorBrush(ColorHelper.FromArgb(215, 18, 18, 18)),
+                RadiusX = 20,
+                RadiusY = 20,
+                StrokeThickness = 2,
+                Opacity = document.DefaultOpacity
+            },
             _ => null
         };
     }
@@ -873,7 +1224,9 @@ public sealed partial class MainWindow : Window
                     Kind = AnnotationKind.Rectangle,
                     Bounds = bounds,
                     PaletteKey = document.SelectedPaletteKey,
-                    StrokeThickness = document.StrokeThickness
+                    PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                    StrokeThickness = document.StrokeThickness,
+                    Opacity = document.DefaultOpacity
                 });
                 break;
             }
@@ -890,7 +1243,9 @@ public sealed partial class MainWindow : Window
                     Kind = AnnotationKind.Ellipse,
                     Bounds = bounds,
                     PaletteKey = document.SelectedPaletteKey,
-                    StrokeThickness = document.StrokeThickness
+                    PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                    StrokeThickness = document.StrokeThickness,
+                    Opacity = document.DefaultOpacity
                 });
                 break;
             }
@@ -907,7 +1262,9 @@ public sealed partial class MainWindow : Window
                     StartPoint = _dragStart,
                     EndPoint = point,
                     PaletteKey = document.SelectedPaletteKey,
-                    StrokeThickness = document.StrokeThickness
+                    PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                    StrokeThickness = document.StrokeThickness,
+                    Opacity = document.DefaultOpacity
                 });
                 break;
             }
@@ -924,7 +1281,47 @@ public sealed partial class MainWindow : Window
                     StartPoint = _dragStart,
                     EndPoint = point,
                     PaletteKey = document.SelectedPaletteKey,
-                    StrokeThickness = document.StrokeThickness
+                    PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                    StrokeThickness = document.StrokeThickness,
+                    Opacity = document.DefaultOpacity
+                });
+                break;
+            }
+            case EditorTool.Focus:
+            {
+                var bounds = NormalizeRect(_dragStart, point);
+                if (bounds.Width < 8 || bounds.Height < 8)
+                {
+                    return;
+                }
+
+                document.Annotations.Add(new AnnotationModel
+                {
+                    Kind = AnnotationKind.Focus,
+                    Bounds = bounds,
+                    PaletteKey = document.SelectedPaletteKey,
+                    PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                    StrokeThickness = Math.Max(3, document.StrokeThickness),
+                    Opacity = document.DefaultOpacity
+                });
+                break;
+            }
+            case EditorTool.Mask:
+            {
+                var bounds = NormalizeRect(_dragStart, point);
+                if (bounds.Width < 8 || bounds.Height < 8)
+                {
+                    return;
+                }
+
+                document.Annotations.Add(new AnnotationModel
+                {
+                    Kind = AnnotationKind.Mask,
+                    Bounds = bounds,
+                    PaletteKey = document.SelectedPaletteKey,
+                    PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+                    StrokeThickness = 2,
+                    Opacity = document.DefaultOpacity
                 });
                 break;
             }
@@ -941,10 +1338,12 @@ public sealed partial class MainWindow : Window
         document.Annotations.Add(new AnnotationModel
         {
             Kind = AnnotationKind.Text,
-            Bounds = new Rect(point.X, point.Y, 0, 0),
+            Bounds = new Rect(point.X, point.Y, 220, 60),
             PaletteKey = document.SelectedPaletteKey,
             Text = string.IsNullOrWhiteSpace(document.AnnotationText) ? "Note rapide" : document.AnnotationText.Trim(),
-            StrokeThickness = document.StrokeThickness
+            PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+            StrokeThickness = document.StrokeThickness,
+            Opacity = document.DefaultOpacity
         });
 
         MarkDocumentDirty(document);
@@ -960,7 +1359,11 @@ public sealed partial class MainWindow : Window
             Kind = AnnotationKind.Sticker,
             Bounds = new Rect(point.X - (StickerSize / 2), point.Y - (StickerSize / 2), StickerSize, StickerSize),
             PaletteKey = document.SelectedPaletteKey,
-            Text = BuildStickerLabel(document)
+            PaletteShadeIndex = document.SelectedPaletteShadeIndex,
+            Text = BuildStickerLabel(document),
+            StickerIndex = document.NextStickerIndex - 1,
+            LegendText = string.Empty,
+            Opacity = document.DefaultOpacity
         });
 
         MarkDocumentDirty(document);
@@ -977,12 +1380,16 @@ public sealed partial class MainWindow : Window
 
     private string BuildStickerLabel(ScreenshotDocument document)
     {
-        return document.StickerModeIndex switch
+        return GetStickerModeIndex(document) switch
         {
             1 => AdvanceAlphabeticSticker(document),
-            2 when !string.IsNullOrWhiteSpace(document.AnnotationText) => document.AnnotationText.Trim(),
             _ => AdvanceNumericSticker(document)
         };
+    }
+
+    private static int GetStickerModeIndex(ScreenshotDocument document)
+    {
+        return document.StickerModeIndex == 1 ? 1 : 0;
     }
 
     private static string AdvanceNumericSticker(ScreenshotDocument document)
@@ -1011,22 +1418,25 @@ public sealed partial class MainWindow : Window
                     var border = new Border
                     {
                         Background = new SolidColorBrush(ColorHelper.FromArgb(235, 255, 255, 255)),
-                        BorderBrush = CreateGradientBrush(annotation.PaletteKey),
+                        BorderBrush = CreateGradientBrush(annotation.PaletteKey, annotation.PaletteShadeIndex),
                         BorderThickness = new Thickness(2),
                         CornerRadius = new CornerRadius(14),
                         Padding = new Thickness(14, 10, 14, 10),
+                        MinWidth = Math.Max(220, annotation.Bounds.Width),
+                        MinHeight = Math.Max(60, annotation.Bounds.Height),
+                        Opacity = annotation.Opacity,
                         Child = new TextBlock
                         {
                             Text = annotation.Text,
                             FontFamily = new FontFamily("Bahnschrift SemiBold SemiConden"),
                             FontSize = 28,
-                            Foreground = CreateGradientBrush(annotation.PaletteKey)
+                            Foreground = CreateGradientBrush(annotation.PaletteKey, annotation.PaletteShadeIndex)
                         }
                     };
 
+                    AttachAnnotationInteraction(border, annotation);
                     AnnotationCanvas.Children.Add(border);
-                    Canvas.SetLeft(border, annotation.Bounds.X);
-                    Canvas.SetTop(border, annotation.Bounds.Y);
+                    SetCanvasPosition(border, annotation.Bounds);
                     break;
                 }
                 case AnnotationKind.Sticker:
@@ -1039,6 +1449,7 @@ public sealed partial class MainWindow : Window
                         BorderBrush = new SolidColorBrush(Colors.White),
                         BorderThickness = new Thickness(3),
                         CornerRadius = new CornerRadius(annotation.Bounds.Width / 2),
+                        Opacity = annotation.Opacity,
                         Child = new TextBlock
                         {
                             Text = annotation.Text,
@@ -1050,9 +1461,9 @@ public sealed partial class MainWindow : Window
                         }
                     };
 
+                    AttachAnnotationInteraction(sticker, annotation);
                     AnnotationCanvas.Children.Add(sticker);
-                    Canvas.SetLeft(sticker, annotation.Bounds.X);
-                    Canvas.SetTop(sticker, annotation.Bounds.Y);
+                    SetCanvasPosition(sticker, annotation.Bounds);
                     break;
                 }
                 case AnnotationKind.Rectangle:
@@ -1063,14 +1474,15 @@ public sealed partial class MainWindow : Window
                         Height = annotation.Bounds.Height,
                         RadiusX = 24,
                         RadiusY = 24,
-                        Stroke = CreateGradientBrush(annotation.PaletteKey),
-                        Fill = CreateHighlightFill(annotation.PaletteKey, 36),
-                        StrokeThickness = annotation.StrokeThickness
+                        Stroke = CreateGradientBrush(annotation.PaletteKey, annotation.PaletteShadeIndex),
+                        Fill = CreateHighlightFill(annotation.PaletteKey, 36, annotation.PaletteShadeIndex),
+                        StrokeThickness = annotation.StrokeThickness,
+                        Opacity = annotation.Opacity
                     };
 
+                    AttachAnnotationInteraction(rectangle, annotation);
                     AnnotationCanvas.Children.Add(rectangle);
-                    Canvas.SetLeft(rectangle, annotation.Bounds.X);
-                    Canvas.SetTop(rectangle, annotation.Bounds.Y);
+                    SetCanvasPosition(rectangle, annotation.Bounds);
                     break;
                 }
                 case AnnotationKind.Ellipse:
@@ -1079,62 +1491,133 @@ public sealed partial class MainWindow : Window
                     {
                         Width = annotation.Bounds.Width,
                         Height = annotation.Bounds.Height,
-                        Stroke = CreateGradientBrush(annotation.PaletteKey),
-                        Fill = CreateHighlightFill(annotation.PaletteKey, 30),
-                        StrokeThickness = annotation.StrokeThickness
+                        Stroke = CreateGradientBrush(annotation.PaletteKey, annotation.PaletteShadeIndex),
+                        Fill = CreateHighlightFill(annotation.PaletteKey, 30, annotation.PaletteShadeIndex),
+                        StrokeThickness = annotation.StrokeThickness,
+                        Opacity = annotation.Opacity
                     };
 
+                    AttachAnnotationInteraction(ellipse, annotation);
                     AnnotationCanvas.Children.Add(ellipse);
-                    Canvas.SetLeft(ellipse, annotation.Bounds.X);
-                    Canvas.SetTop(ellipse, annotation.Bounds.Y);
+                    SetCanvasPosition(ellipse, annotation.Bounds);
+                    break;
+                }
+                case AnnotationKind.Focus:
+                {
+                    var rectangle = new Rectangle
+                    {
+                        Width = annotation.Bounds.Width,
+                        Height = annotation.Bounds.Height,
+                        RadiusX = 24,
+                        RadiusY = 24,
+                        Stroke = CreateGradientBrush(annotation.PaletteKey, annotation.PaletteShadeIndex),
+                        Fill = CreateHighlightFill(annotation.PaletteKey, 72, annotation.PaletteShadeIndex),
+                        StrokeThickness = Math.Max(3, annotation.StrokeThickness),
+                        Opacity = annotation.Opacity
+                    };
+
+                    AttachAnnotationInteraction(rectangle, annotation);
+                    AnnotationCanvas.Children.Add(rectangle);
+                    SetCanvasPosition(rectangle, annotation.Bounds);
+                    break;
+                }
+                case AnnotationKind.Mask:
+                {
+                    var rectangle = new Rectangle
+                    {
+                        Width = annotation.Bounds.Width,
+                        Height = annotation.Bounds.Height,
+                        RadiusX = 20,
+                        RadiusY = 20,
+                        Stroke = new SolidColorBrush(ColorHelper.FromArgb(255, 18, 18, 18)),
+                        Fill = new SolidColorBrush(ColorHelper.FromArgb(215, 18, 18, 18)),
+                        StrokeThickness = 2,
+                        Opacity = annotation.Opacity
+                    };
+
+                    AttachAnnotationInteraction(rectangle, annotation);
+                    AnnotationCanvas.Children.Add(rectangle);
+                    SetCanvasPosition(rectangle, annotation.Bounds);
                     break;
                 }
                 case AnnotationKind.ArrowStraight:
                 {
-                    AnnotationCanvas.Children.Add(new XamlPath
+                    var path = new XamlPath
                     {
-                        Stroke = CreateGradientBrush(annotation.PaletteKey),
+                        Stroke = CreateGradientBrush(annotation.PaletteKey, annotation.PaletteShadeIndex),
                         StrokeThickness = annotation.StrokeThickness,
                         StrokeLineJoin = PenLineJoin.Round,
                         StrokeStartLineCap = PenLineCap.Round,
                         StrokeEndLineCap = PenLineCap.Round,
-                        Data = BuildStraightArrowGeometry(annotation.StartPoint, annotation.EndPoint, annotation.StrokeThickness)
-                    });
+                        Data = BuildStraightArrowGeometry(annotation.StartPoint, annotation.EndPoint, annotation.StrokeThickness),
+                        Opacity = annotation.Opacity,
+                    };
+
+                    AttachAnnotationInteraction(path, annotation);
+                    AnnotationCanvas.Children.Add(path);
                     break;
                 }
                 case AnnotationKind.ArrowCurved:
                 {
-                    AnnotationCanvas.Children.Add(new XamlPath
+                    var path = new XamlPath
                     {
-                        Stroke = CreateGradientBrush(annotation.PaletteKey),
+                        Stroke = CreateGradientBrush(annotation.PaletteKey, annotation.PaletteShadeIndex),
                         StrokeThickness = annotation.StrokeThickness,
                         StrokeLineJoin = PenLineJoin.Round,
                         StrokeStartLineCap = PenLineCap.Round,
                         StrokeEndLineCap = PenLineCap.Round,
-                        Data = BuildCurvedArrowGeometry(annotation.StartPoint, annotation.EndPoint, annotation.StrokeThickness)
-                    });
+                        Data = BuildCurvedArrowGeometry(annotation.StartPoint, annotation.EndPoint, annotation.StrokeThickness),
+                        Opacity = annotation.Opacity,
+                    };
+
+                    AttachAnnotationInteraction(path, annotation);
+                    AnnotationCanvas.Children.Add(path);
                     break;
                 }
             }
         }
+
+        AnnotationCanvas.Children.Add(SelectionOutline);
+        AnnotationCanvas.Children.Add(CropPreview);
+        AnnotationCanvas.Children.Add(CropBadge);
     }
 
-    private Brush CreateGradientBrush(string paletteKey)
+    private static void SetCanvasPosition(FrameworkElement element, Rect bounds)
+    {
+        Canvas.SetLeft(element, bounds.X);
+        Canvas.SetTop(element, bounds.Y);
+    }
+
+    private void AttachAnnotationInteraction(FrameworkElement element, AnnotationModel annotation)
+    {
+        element.Tag = annotation;
+        element.PointerPressed += AnnotationElement_PointerPressed;
+        element.PointerMoved += AnnotationElement_PointerMoved;
+        element.PointerReleased += AnnotationElement_PointerReleased;
+        element.PointerCaptureLost += AnnotationElement_PointerCaptureLost;
+    }
+
+    private Brush CreateGradientBrush(string paletteKey, int shadeIndex = 3)
     {
         var palette = _palettes[paletteKey];
+        var index = Math.Clamp(shadeIndex, 0, Math.Max(0, palette.Shades.Count - 1));
+        var shade = palette.Shades.Count > 0 ? palette.Shades[index] : palette.StartColor;
+        var highlight = InterpolateColor(shade, palette.EndColor, 0.25);
         var brush = new LinearGradientBrush
         {
             StartPoint = new Point(0, 0),
             EndPoint = new Point(1, 1)
         };
-        brush.GradientStops.Add(new GradientStop { Color = palette.StartColor, Offset = 0 });
-        brush.GradientStops.Add(new GradientStop { Color = palette.EndColor, Offset = 1 });
+        brush.GradientStops.Add(new GradientStop { Color = shade, Offset = 0 });
+        brush.GradientStops.Add(new GradientStop { Color = highlight, Offset = 1 });
         return brush;
     }
 
-    private Brush CreateHighlightFill(string paletteKey, byte alpha)
+    private Brush CreateHighlightFill(string paletteKey, byte alpha, int shadeIndex = 3)
     {
-        var color = _palettes[paletteKey].StartColor;
+        var palette = _palettes[paletteKey];
+        var index = Math.Clamp(shadeIndex, 0, Math.Max(0, palette.Shades.Count - 1));
+        var color = palette.Shades.Count > 0 ? palette.Shades[index] : palette.StartColor;
         return new SolidColorBrush(ColorHelper.FromArgb(alpha, color.R, color.G, color.B));
     }
 
@@ -1228,11 +1711,11 @@ public sealed partial class MainWindow : Window
         if (_currentDocument is null)
         {
             StatusText.Text = "Aucun document selectionne.";
+            AnnotationCountText.Text = string.Empty;
             return;
         }
 
-        StatusText.Text = $"{_toolHints[_currentTool]} Palette active : {_currentDocument.PaletteDisplayName}. Onglets ouverts : {_documents.Count}.";
-        FooterText.Text = "Chaque capture Win + Shift + S cree un nouvel onglet.";
+        StatusText.Text = $"{_toolHints[_currentTool]} Palette active : {_currentDocument.PaletteDisplayName}. Zoom : {_currentZoom * 100:0} %. Onglets ouverts : {_documents.Count}.";
     }
 
     private SolidColorBrush GetBrush(string key)
@@ -1242,38 +1725,56 @@ public sealed partial class MainWindow : Window
 
     private async void Clipboard_ContentChanged(object? sender, object e)
     {
-        if (_isProcessingClipboard)
-        {
-            return;
-        }
-
         DispatcherQueue.TryEnqueue(async () =>
         {
-            if (_isProcessingClipboard)
-            {
-                return;
-            }
-
-            _isProcessingClipboard = true;
-            try
-            {
-                await TryImportClipboardCaptureAsync();
-            }
-            finally
-            {
-                _isProcessingClipboard = false;
-            }
+            await TryImportClipboardCaptureAsync();
         });
     }
 
-    private async Task TryImportClipboardCaptureAsync()
+    private async void ClipboardPollTimer_Tick(DispatcherQueueTimer sender, object args)
+    {
+        await TryImportClipboardCaptureAsync();
+    }
+
+    private void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
+        _clipboardPollTimer.Stop();
+        Clipboard.ContentChanged -= Clipboard_ContentChanged;
+    }
+
+    private async Task PrimeClipboardWatcherAsync()
     {
         try
         {
+            var bytes = await ReadClipboardBitmapBytesAsync();
+            if (bytes is { Length: > 0 })
+            {
+                _lastClipboardFingerprint = await CreateClipboardFingerprintAsync(bytes);
+            }
+        }
+        catch
+        {
+            // Best effort only.
+        }
+        finally
+        {
+            _clipboardWatcherPrimed = true;
+        }
+    }
+
+    private async Task<byte[]?> ReadClipboardBitmapBytesAsync()
+    {
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            if (attempt > 0)
+            {
+                await Task.Delay(150);
+            }
+
             var dataPackage = Clipboard.GetContent();
             if (!dataPackage.Contains(StandardDataFormats.Bitmap))
             {
-                return;
+                continue;
             }
 
             var streamReference = await dataPackage.GetBitmapAsync();
@@ -1282,28 +1783,84 @@ public sealed partial class MainWindow : Window
             await stream.AsStreamForRead().CopyToAsync(memory);
 
             var bytes = memory.ToArray();
-            if (bytes.Length == 0)
+            if (bytes.Length > 0)
+            {
+                return bytes;
+            }
+        }
+
+        return null;
+    }
+
+    private static async Task<string> CreateClipboardFingerprintAsync(byte[] bytes)
+    {
+        using var stream = new InMemoryRandomAccessStream();
+        await stream.WriteAsync(bytes.AsBuffer());
+        stream.Seek(0);
+
+        try
+        {
+            var decoder = await BitmapDecoder.CreateAsync(stream);
+            var pixelData = await decoder.GetPixelDataAsync(
+                BitmapPixelFormat.Bgra8,
+                BitmapAlphaMode.Premultiplied,
+                new BitmapTransform(),
+                ExifOrientationMode.IgnoreExifOrientation,
+                ColorManagementMode.ColorManageToSRgb);
+
+            var pixels = pixelData.DetachPixelData();
+            var fingerprintBytes = new byte[8 + pixels.Length];
+            global::System.Buffer.BlockCopy(BitConverter.GetBytes((int)decoder.PixelWidth), 0, fingerprintBytes, 0, 4);
+            global::System.Buffer.BlockCopy(BitConverter.GetBytes((int)decoder.PixelHeight), 0, fingerprintBytes, 4, 4);
+            global::System.Buffer.BlockCopy(pixels, 0, fingerprintBytes, 8, pixels.Length);
+            return Convert.ToHexString(SHA256.HashData(fingerprintBytes));
+        }
+        catch
+        {
+            return Convert.ToHexString(SHA256.HashData(bytes));
+        }
+    }
+
+    private async Task TryImportClipboardCaptureAsync()
+    {
+        try
+        {
+            if (!App.Preferences.AutoImportClipboard || !_clipboardWatcherPrimed)
             {
                 return;
             }
 
-            var hash = Convert.ToHexString(SHA256.HashData(bytes));
-            var now = DateTimeOffset.Now;
-            if (string.Equals(hash, _lastClipboardHash, StringComparison.Ordinal) &&
-                (now - _lastClipboardImportAt) < TimeSpan.FromSeconds(2))
+            if (_isProcessingClipboard)
             {
                 return;
             }
 
-            _lastClipboardHash = hash;
-            _lastClipboardImportAt = now;
+            _isProcessingClipboard = true;
+            var bytes = await ReadClipboardBitmapBytesAsync();
 
-            AddDocument(CreateDocumentFromClipboard(bytes), select: true);
-            StatusText.Text = "Nouvelle capture Win + Shift + S importee dans un nouvel onglet.";
+            if (bytes is null || bytes.Length == 0)
+            {
+                return;
+            }
+
+            var fingerprint = await CreateClipboardFingerprintAsync(bytes);
+            if (string.Equals(fingerprint, _lastClipboardFingerprint, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _lastClipboardFingerprint = fingerprint;
+
+            AddDocument(await CreateDocumentFromClipboardAsync(bytes), select: true);
+            StatusText.Text = "Nouvelle capture importee.";
         }
         catch
         {
             StatusText.Text = "Impossible de lire la derniere capture depuis le presse-papiers.";
+        }
+        finally
+        {
+            _isProcessingClipboard = false;
         }
     }
 }

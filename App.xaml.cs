@@ -7,6 +7,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Microsoft.Windows.Globalization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -27,6 +28,8 @@ namespace SnapSlate;
 public partial class App : Application
 {
     private Window? _window;
+
+    public static AppPreferences Preferences { get; private set; } = null!;
     
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -34,6 +37,7 @@ public partial class App : Application
     /// </summary>
     public App()
     {
+        Preferences = AppPreferences.Load();
         InitializeComponent();
         UnhandledException += App_UnhandledException;
     }

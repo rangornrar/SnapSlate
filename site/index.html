@@ -1,16 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SnapSlate - Fast visual procedures for Windows | Archi-IT Labs</title>
+    <title>SnapSlate - Turn Windows captures into polished procedures | Archi-IT Labs</title>
     <meta
       name="description"
-      content="SnapSlate turns Windows screenshots into clean, exportable procedures with annotations, sticker legends, and PNG, PDF, DOCX, Markdown, and HTML export."
+      content="SnapSlate turns Windows screenshots into polished procedures with OCR, annotations, project saving, export and publication-ready workflows."
+    />
+    <meta
+      name="keywords"
+      content="Windows screenshot annotation, procedure builder, OCR for screenshots, screenshot to document, technical documentation tool, support guide, QA documentation, Win Shift S"
     />
     <meta name="robots" content="index,follow,max-image-preview:large" />
-    <meta name="theme-color" content="#020617" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#f3f7fc" />
+    <meta name="color-scheme" content="light" />
     <link rel="canonical" href="https://snapslate.archi-it.fr/" />
     <link rel="alternate" hreflang="en" href="https://snapslate.archi-it.fr/" />
     <link rel="alternate" hreflang="fr" href="https://snapslate.archi-it.fr/?lang=fr" />
@@ -18,50 +22,45 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="SnapSlate" />
     <meta property="og:locale" content="en_US" />
-    <meta
-      property="og:title"
-      content="SnapSlate - Fast visual procedures for Windows | Archi-IT Labs"
-    />
-    <meta
-      property="og:description"
-      content="Capture, annotate, and export Windows procedures with SnapSlate, an Archi-IT Labs tool."
-    />
+    <meta property="og:title" content="SnapSlate - Turn Windows captures into polished procedures | Archi-IT Labs" />
+    <meta property="og:description" content="Capture screens, annotate them, keep steps organized and export polished procedures ready for documentation workflows." />
     <meta property="og:url" content="https://snapslate.archi-it.fr/" />
-    <meta property="og:image" content="https://snapslate.archi-it.fr/og-image.svg" />
-    <meta
-      property="og:image:alt"
-      content="SnapSlate, a modern interface for turning a Windows capture into an exportable procedure."
-    />
+    <meta property="og:image" content="https://snapslate.archi-it.fr/og-image.png" />
+    <meta property="og:image:alt" content="SnapSlate showing a polished procedure workspace with a canvas-first layout, floating tools and step panels." />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta
-      name="twitter:title"
-      content="SnapSlate - Fast visual procedures for Windows | Archi-IT Labs"
-    />
-    <meta
-      name="twitter:description"
-      content="Turn a Windows capture into a clean, exportable visual procedure."
-    />
-    <meta name="twitter:image" content="https://snapslate.archi-it.fr/og-image.svg" />
+    <meta name="twitter:title" content="SnapSlate - Turn Windows captures into polished procedures | Archi-IT Labs" />
+    <meta name="twitter:description" content="Turn annotated Windows screenshots into exportable procedures, support guides and manuals." />
+    <meta name="twitter:image" content="https://snapslate.archi-it.fr/og-image.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
     <script src="./app.js" defer></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "SnapSlate",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Windows 10, Windows 11",
+        "description": "SnapSlate turns Windows screenshots into polished procedures with OCR, annotations, project saving, export and publication-ready workflows.",
+        "softwareVersion": "2026.04.29.001",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+        "creator": {"@type": "Organization", "name": "Archi-IT Labs", "url": "https://archi-it.fr/"},
+        "downloadUrl": "https://github.com/rangornrar/SnapSlate/releases/download/2026.04.29.001/SnapSlate-Setup.exe",
+        "codeRepository": "https://github.com/rangornrar/SnapSlate"
+      }
+    </script>
   </head>
   <body>
     <header class="site-header">
       <div class="site-shell header-inner">
-        <a class="brand" href="#home">
-          SnapSlate <span>Archi-IT Labs</span>
-        </a>
+        <a class="brand" href="#home">SnapSlate <span>Archi-IT Labs</span></a>
         <nav class="nav-links" aria-label="Primary navigation" data-i18n="ui.navLabel" data-i18n-attr="aria-label">
-          <a href="#why" data-i18n="nav.why">Why</a>
+          <a href="#document" data-i18n="nav.document">Document</a>
           <a href="#captures" data-i18n="nav.captures">Screenshots</a>
           <a href="#workflow" data-i18n="nav.workflow">Workflow</a>
-          <a href="#suite" data-i18n="nav.suite">Suite</a>
+          <a href="#download" data-i18n="nav.download">Download</a>
           <a href="#faq" data-i18n="nav.faq">FAQ</a>
         </nav>
         <div class="header-actions">
@@ -70,16 +69,8 @@
             <button class="lang-chip" type="button" data-lang-button="en" aria-label="English">EN</button>
             <button class="lang-chip" type="button" data-lang-button="fr" aria-label="Français">FR</button>
           </div>
-          <a class="button button-ghost" href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer" data-i18n="header.kofi">Ko-fi</a>
-          <a
-            class="button button-primary"
-            href="https://github.com/rangornrar/SnapSlate"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-i18n="header.repo"
-          >
-            Repository
-          </a>
+          <a class="button button-ghost" href="https://ko-fi.com/rangornrar" target="_blank" rel="noopener noreferrer" data-i18n="header.kofi">Ko-fi</a>
+          <a class="button button-primary" href="https://github.com/rangornrar/SnapSlate" target="_blank" rel="noopener noreferrer" data-i18n="header.repo">GitHub</a>
         </div>
       </div>
     </header>
@@ -88,377 +79,213 @@
       <section class="hero" id="home">
         <div class="site-shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow" data-i18n="hero.badge">Archi-IT Labs · V2026.04.26.001</p>
-            <h1 data-i18n="hero.title">Turn a Windows capture into a clean procedure.</h1>
-            <p class="lead" data-i18n="hero.lead">
-              SnapSlate follows Win + Shift + S, creates one step per capture, and keeps the
-              canvas centered so you can annotate, label, and export without distraction.
-            </p>
+            <p class="eyebrow" data-i18n="hero.badge">Archi-IT Labs · V2026.04.29.001</p>
+            <h1 data-i18n="hero.title">Build real user manuals from Windows screenshots.</h1>
+            <p class="lead" data-i18n="hero.lead">SnapSlate turns captures, notes, arrows, stickers, masks and explanations into a structured document you can export for manuals, support guides, onboarding material or technical procedures.</p>
             <div class="hero-actions">
-              <a
-                class="button button-primary"
-                href="https://github.com/rangornrar/SnapSlate"
-                target="_blank"
-                rel="noopener noreferrer"
-                data-i18n="hero.primary"
-              >
-                Browse repository
-              </a>
-              <a class="button button-secondary" href="#workflow" data-i18n="hero.secondary">See how it works</a>
-              <a
-                class="button button-ghost"
-                href="https://ko-fi.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                data-i18n="hero.kofi"
-              >
-                Support on Ko-fi
-              </a>
+              <a class="button button-primary" href="https://github.com/rangornrar/SnapSlate/releases/download/2026.04.29.001/SnapSlate-Setup.exe" target="_blank" rel="noopener noreferrer" data-i18n="hero.primary">Download installer</a>
+              <a class="button button-secondary" href="https://github.com/rangornrar/SnapSlate" target="_blank" rel="noopener noreferrer" data-i18n="hero.secondary">Open GitHub</a>
             </div>
             <div class="pill-row" aria-label="Highlights" data-i18n="hero.pillAria" data-i18n-attr="aria-label">
-              <span class="pill" data-i18n="hero.pill1">Win + Shift + S</span>
-              <span class="pill" data-i18n="hero.pill2">One step per capture</span>
-              <span class="pill" data-i18n="hero.pill3">Canvas first</span>
-              <span class="pill" data-i18n="hero.pill4">PNG, PDF, DOCX, Markdown, HTML</span>
+              <span class="pill" data-i18n="hero.pill1">Screenshot to document</span>
+              <span class="pill" data-i18n="hero.pill2">User manuals</span>
+              <span class="pill" data-i18n="hero.pill3">Support guides</span>
+              <span class="pill" data-i18n="hero.pill4">PNG · PDF · DOCX · Markdown · HTML</span>
             </div>
+            <p class="hero-note" data-i18n="hero.limit">Current behavior: SnapSlate imports Win + Shift + S captures while the application is open.</p>
           </div>
-
-          <aside class="hero-panel" aria-label="SnapSlate preview" data-i18n-attr="aria-label" data-i18n="hero.panelAria">
+          <aside class="hero-panel" aria-label="SnapSlate document preview" data-i18n-attr="aria-label" data-i18n="hero.panelAria">
             <div class="hero-panel__frame">
-              <img
-                class="hero-panel__image"
-                src="./shots/procedure.png"
-                alt="SnapSlate procedure view"
-                loading="eager"
-                data-i18n-attr="alt"
-                data-i18n="hero.panelAlt"
-              />
+                <button class="shot-preview shot-preview--hero" type="button" data-lightbox-src="./shots/procedure.png">
+                <img class="hero-panel__image" src="./shots/procedure.png" alt="SnapSlate document view with steps and annotations" loading="eager" data-i18n-attr="alt" data-i18n="hero.panelAlt" />
+                <span class="shot-preview__hint" data-i18n="ui.previewHint">Click to enlarge</span>
+              </button>
             </div>
             <div class="hero-panel__stats" aria-label="Quick summary" data-i18n-attr="aria-label" data-i18n="hero.statsAria">
-              <div class="mini-stat">
-                <strong>1</strong>
-                <span data-i18n="hero.stat1">capture = 1 step</span>
-              </div>
-              <div class="mini-stat">
-                <strong>10</strong>
-                <span data-i18n="hero.stat2">visual palettes</span>
-              </div>
-              <div class="mini-stat">
-                <strong>5</strong>
-                <span data-i18n="hero.stat3">export formats</span>
-              </div>
+              <div class="mini-stat"><strong>1</strong><span data-i18n="hero.stat1">canvas-first workspace</span></div>
+              <div class="mini-stat"><strong>4</strong><span data-i18n="hero.stat2">featured screens</span></div>
+              <div class="mini-stat"><strong>10</strong><span data-i18n="hero.stat3">annotation tools</span></div>
             </div>
           </aside>
         </div>
       </section>
 
-      <section class="section" id="why">
+      <section class="section section--tight" id="document">
         <div class="site-shell">
-          <div class="section-heading">
-            <div>
-              <span class="eyebrow" data-i18n="why.eyebrow">Why SnapSlate</span>
-              <h2 data-i18n="why.title">A focused tool that stays fast without becoming heavy.</h2>
-            </div>
-            <p data-i18n="why.lead">
-              The goal is not to add an endless tool suite, but to save time on the real path:
-              capture, explain, export.
-            </p>
+          <div class="section-heading section-heading--compact">
+            <div><span class="eyebrow" data-i18n="document.eyebrow">From capture to document</span><h2 data-i18n="document.title">The goal is not a pretty screenshot. The goal is a usable document.</h2></div>
+            <p data-i18n="document.lead">SnapSlate helps you produce the material that usually ends up in manuals, support pages, test evidence, training documents and operational procedures.</p>
           </div>
-          <div class="card-grid">
-            <article class="feature-card">
-              <div class="feature-card__icon">01</div>
-              <h3 data-i18n="why.card1Title">Fast</h3>
-              <p data-i18n="why.card1Text">
-                A Windows capture becomes a new step almost immediately, without jumping to
-                another tool.
-              </p>
-            </article>
-            <article class="feature-card">
-              <div class="feature-card__icon">02</div>
-              <h3 data-i18n="why.card2Title">Readable</h3>
-              <p data-i18n="why.card2Text">
-                The canvas stays central, the toolbar stays compact, and the property panel
-                stays contextual.
-              </p>
-            </article>
-            <article class="feature-card">
-              <div class="feature-card__icon">03</div>
-              <h3 data-i18n="why.card3Title">Exportable</h3>
-              <p data-i18n="why.card3Text">
-                Captures become ready-made material for a manual, guide, ticket, or report.
-              </p>
-            </article>
+          <div class="document-flow">
+            <article class="document-card document-card--strong card"><span class="document-card__tag" data-i18n="document.card1Tag">01 · Capture</span><h3 data-i18n="document.card1Title">Start from the real screen</h3><p data-i18n="document.card1Text">Each screenshot becomes a document step. No blank page syndrome, no manual copy-paste marathon.</p></article>
+            <article class="document-card card"><span class="document-card__tag" data-i18n="document.card2Tag">02 · Explain</span><h3 data-i18n="document.card2Title">Add meaning, not decoration</h3><p data-i18n="document.card2Text">Add arrows, frames, numbered stickers, text notes, masks and visual emphasis so the reader knows exactly where to look.</p></article>
+            <article class="document-card card"><span class="document-card__tag" data-i18n="document.card3Tag">03 · Structure</span><h3 data-i18n="document.card3Title">Build a step-by-step document</h3><p data-i18n="document.card3Text">Reorder steps, rename them, keep explanations close to the screen, and make the whole procedure readable.</p></article>
           </div>
         </div>
       </section>
 
-      <section class="section" id="captures">
+      <section class="section section--tight" id="captures">
         <div class="site-shell">
-          <div class="section-heading">
-            <div>
-              <span class="eyebrow" data-i18n="captures.eyebrow">Screenshots</span>
-              <h2 data-i18n="captures.title">Real SnapSlate screenshots, captured from the app itself.</h2>
-            </div>
-            <p data-i18n="captures.lead">
-              The page shows the software as it is actually used: procedure, help, export, and
-              settings.
-            </p>
+          <div class="section-heading section-heading--compact">
+            <div><span class="eyebrow" data-i18n="captures.eyebrow">Real screenshots</span><h2 data-i18n="captures.title">The screenshots keep their real proportions.</h2></div>
+            <p data-i18n="captures.lead">Each capture opens larger with one click, and the site preserves the original aspect ratio instead of cropping the frame.</p>
           </div>
           <div class="shot-grid">
             <figure class="shot-card shot-card--wide">
-              <img
-                src="./shots/procedure.png"
-                alt="SnapSlate procedure view"
-                loading="lazy"
-                data-i18n-attr="alt"
-                data-i18n="captures.procedureAlt"
-              />
-              <figcaption>
-                <h3 data-i18n="captures.procedureTitle">Procedure</h3>
-                <p data-i18n="captures.procedureText">
-                  The main view keeps steps on the left, the canvas in the center, and the
-                  contextual panel on the right.
-                </p>
-              </figcaption>
+                <button class="shot-preview" type="button" data-lightbox-src="./shots/procedure.png">
+                <img src="./shots/procedure.png" alt="SnapSlate document view" loading="lazy" data-i18n-attr="alt" data-i18n="captures.procedureAlt" />
+                <span class="shot-preview__hint" data-i18n="ui.previewHint">Click to enlarge</span>
+              </button>
+              <figcaption><h3 data-i18n="captures.procedureTitle">Document procedure</h3><p data-i18n="captures.procedureText">Steps on the left, canvas in the center, contextual properties on the right.</p></figcaption>
             </figure>
             <figure class="shot-card">
-              <img
-                src="./shots/capture.png"
-                alt="SnapSlate capture help view"
-                loading="lazy"
-                data-i18n-attr="alt"
-                data-i18n="captures.helpAlt"
-              />
-              <figcaption>
-                <h3 data-i18n="captures.helpTitle">Capture / Help</h3>
-                <p data-i18n="captures.helpText">
-                  A short, practical page that explains automatic import and the main
-                  shortcuts.
-                </p>
-              </figcaption>
+                <button class="shot-preview" type="button" data-lightbox-src="./shots/capture.png">
+                <img src="./shots/capture.png" alt="SnapSlate capture help view" loading="lazy" data-i18n-attr="alt" data-i18n="captures.helpAlt" />
+                <span class="shot-preview__hint" data-i18n="ui.previewHint">Click to enlarge</span>
+              </button>
+              <figcaption><h3 data-i18n="captures.helpTitle">Capture / Help</h3><p data-i18n="captures.helpText">A short page that explains automatic import and the main shortcuts.</p></figcaption>
             </figure>
             <figure class="shot-card">
-              <img
-                src="./shots/export.png"
-                alt="SnapSlate export view"
-                loading="lazy"
-                data-i18n-attr="alt"
-                data-i18n="captures.exportAlt"
-              />
-              <figcaption>
-                <h3 data-i18n="captures.exportTitle">Export</h3>
-                <p data-i18n="captures.exportText">
-                  Document settings, export folder, and formats stay in a clear, compact
-                  screen.
-                </p>
-              </figcaption>
+                <button class="shot-preview" type="button" data-lightbox-src="./shots/export.png">
+                <img src="./shots/export.png" alt="SnapSlate export view" loading="lazy" data-i18n-attr="alt" data-i18n="captures.exportAlt" />
+                <span class="shot-preview__hint" data-i18n="ui.previewHint">Click to enlarge</span>
+              </button>
+              <figcaption><h3 data-i18n="captures.exportTitle">Export</h3><p data-i18n="captures.exportText">Document settings, export folder and formats stay in a clear, compact screen.</p></figcaption>
             </figure>
             <figure class="shot-card">
-              <img
-                src="./shots/settings.png"
-                alt="SnapSlate settings view"
-                loading="lazy"
-                data-i18n-attr="alt"
-                data-i18n="captures.settingsAlt"
-              />
-              <figcaption>
-                <h3 data-i18n="captures.settingsTitle">Settings</h3>
-                <p data-i18n="captures.settingsText">
-                  Theme, language, capture behavior, and default export stay visible without
-                  clutter.
-                </p>
-              </figcaption>
+                <button class="shot-preview" type="button" data-lightbox-src="./shots/settings.png">
+                <img src="./shots/settings.png" alt="SnapSlate settings view" loading="lazy" data-i18n-attr="alt" data-i18n="captures.settingsAlt" />
+                <span class="shot-preview__hint" data-i18n="ui.previewHint">Click to enlarge</span>
+              </button>
+              <figcaption><h3 data-i18n="captures.settingsTitle">Settings</h3><p data-i18n="captures.settingsText">Theme, language, capture behavior and default export remain easy to find.</p></figcaption>
             </figure>
           </div>
         </div>
       </section>
 
-      <section class="section" id="workflow">
+      <section class="section section--tight" id="workflow">
         <div class="site-shell">
-          <div class="section-heading">
-            <div>
-              <span class="eyebrow" data-i18n="workflow.eyebrow">Workflow</span>
-              <h2 data-i18n="workflow.title">A short path: capture, annotate, export.</h2>
-            </div>
-            <p data-i18n="workflow.lead">
-              SnapSlate keeps the flow simple: the capture arrives, the procedure is built,
-              and the guide is exported in the right format.
-            </p>
+          <div class="section-heading section-heading--compact">
+            <div><span class="eyebrow" data-i18n="workflow.eyebrow">Workflow</span><h2 data-i18n="workflow.title">Capture, annotate, add legends and publish HTML.</h2></div>
+            <p data-i18n="workflow.lead">A four-step editorial flow, shown through full Lorem Ipsum screens.</p>
           </div>
-          <div class="workflow-grid">
-            <article class="workflow-card">
-              <span>01</span>
-              <h3 data-i18n="workflow.step1Title">Capture</h3>
-              <p data-i18n="workflow.step1Text">
-                The user launches Win + Shift + S and SnapSlate watches the clipboard while the
-                app is open.
-              </p>
+          <div class="workflow-editorial">
+            <article class="workflow-intro card">
+              <span class="workflow-intro__tag" data-i18n="workflow.storyTag">Editorial sequence</span>
+              <h3 data-i18n="workflow.storyTitle">From raw screen to polished handoff</h3>
+              <p data-i18n="workflow.storyText">The layout keeps one story per step, with screenshots shown at their natural size and a direct path to the final publication.</p>
+              <ol class="workflow-intro__steps">
+                <li><span>01</span><strong data-i18n="workflow.step1Title">Capture</strong></li>
+                <li><span>02</span><strong data-i18n="workflow.step2Title">Annotate</strong></li>
+                <li><span>03</span><strong data-i18n="workflow.step3Title">Legends</strong></li>
+                <li><span>04</span><strong data-i18n="workflow.step4Title">HTML publication</strong></li>
+              </ol>
             </article>
-            <article class="workflow-card">
-              <span>02</span>
-              <h3 data-i18n="workflow.step2Title">Create a step</h3>
-              <p data-i18n="workflow.step2Text">
-                Each new capture becomes a step with its own title, note, and annotations.
-              </p>
-            </article>
-            <article class="workflow-card">
-              <span>03</span>
-              <h3 data-i18n="workflow.step3Title">Annotate</h3>
-              <p data-i18n="workflow.step3Text">
-                Tools stay compact, colors are quick to pick, and items remain editable after
-                placement.
-              </p>
-            </article>
-            <article class="workflow-card">
-              <span>04</span>
-              <h3 data-i18n="workflow.step4Title">Organize</h3>
-              <p data-i18n="workflow.step4Text">
-                Steps can move, renumber, and keep a readable legend without taking over the
-                layout.
-              </p>
-            </article>
-            <article class="workflow-card">
-              <span>05</span>
-              <h3 data-i18n="workflow.step5Title">Export</h3>
-              <p data-i18n="workflow.step5Text">
-                The document can go to PNG, PDF, DOCX, Markdown, or HTML depending on the
-                audience.
-              </p>
-            </article>
+            <div class="workflow-grid workflow-grid--editorial">
+              <article class="workflow-shot card">
+                <button class="shot-preview shot-preview--workflow" type="button" data-lightbox-src="./shots/workflow-capture.png">
+                  <img src="./shots/workflow-capture.png" alt="Lorem Ipsum capture screen" loading="lazy" data-i18n-attr="alt" data-i18n="workflow.step1Alt" />
+                  <span class="shot-preview__hint" data-i18n="ui.previewHint">Click to enlarge</span>
+                </button>
+                <div class="workflow-shot__body">
+                  <span class="workflow-shot__tag" data-i18n="workflow.step1Tag">01 · Capture</span>
+                  <h3 data-i18n="workflow.step1Title">Capture</h3>
+                  <p data-i18n="workflow.step1Text">Start from a Lorem Ipsum screen and keep the original proportions intact.</p>
+                </div>
+              </article>
+              <article class="workflow-shot card">
+                <button class="shot-preview shot-preview--workflow" type="button" data-lightbox-src="./shots/workflow-annotate.png">
+                  <img src="./shots/workflow-annotate.png" alt="Lorem Ipsum annotated screen" loading="lazy" data-i18n-attr="alt" data-i18n="workflow.step2Alt" />
+                  <span class="shot-preview__hint" data-i18n="ui.previewHint">Click to enlarge</span>
+                </button>
+                <div class="workflow-shot__body">
+                  <span class="workflow-shot__tag" data-i18n="workflow.step2Tag">02 · Annotate</span>
+                  <h3 data-i18n="workflow.step2Title">Annotate</h3>
+                  <p data-i18n="workflow.step2Text">Add arrows, callouts, highlights, stickers and masks without losing the page context.</p>
+                </div>
+              </article>
+              <article class="workflow-shot card">
+                <button class="shot-preview shot-preview--workflow" type="button" data-lightbox-src="./shots/workflow-legends.png">
+                  <img src="./shots/workflow-legends.png" alt="Lorem Ipsum legends screen" loading="lazy" data-i18n-attr="alt" data-i18n="workflow.step3Alt" />
+                  <span class="shot-preview__hint" data-i18n="ui.previewHint">Click to enlarge</span>
+                </button>
+                <div class="workflow-shot__body">
+                  <span class="workflow-shot__tag" data-i18n="workflow.step3Tag">03 · Legends</span>
+                  <h3 data-i18n="workflow.step3Title">Legends</h3>
+                  <p data-i18n="workflow.step3Text">Write multi-line sticker legends in the properties panel and keep them readable.</p>
+                </div>
+              </article>
+              <article class="workflow-shot card">
+                <button class="shot-preview shot-preview--workflow" type="button" data-lightbox-src="./shots/workflow-publish.png">
+                  <img src="./shots/workflow-publish.png" alt="Lorem Ipsum HTML publication screen" loading="lazy" data-i18n-attr="alt" data-i18n="workflow.step4Alt" />
+                  <span class="shot-preview__hint" data-i18n="ui.previewHint">Click to enlarge</span>
+                </button>
+                <div class="workflow-shot__body">
+                  <span class="workflow-shot__tag" data-i18n="workflow.step4Tag">04 · Publish HTML</span>
+                  <h3 data-i18n="workflow.step4Title">HTML publication</h3>
+                  <p data-i18n="workflow.step4Text">Turn the procedure into a clean HTML page for sharing or reuse.</p>
+                </div>
+              </article>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="section" id="suite">
+      <section class="section section--tight" id="faq">
         <div class="site-shell">
-          <div class="section-heading">
-            <div>
-              <span class="eyebrow" data-i18n="suite.eyebrow">Archi-IT Labs suite</span>
-              <h2 data-i18n="suite.title">A coherent suite built around useful, sober tools.</h2>
-            </div>
-            <p data-i18n="suite.lead">
-              The visual style, CTAs, and presentation logic follow the same family as the
-              other Archi-IT Labs projects.
-            </p>
+          <div class="section-heading section-heading--compact">
+            <div><span class="eyebrow" data-i18n="faq.eyebrow">Before you install</span><h2 data-i18n="faq.title">Short answers, no detours.</h2></div>
+            <p data-i18n="faq.lead">You can see at a glance how SnapSlate fits into a production workflow.</p>
           </div>
-          <div class="suite-grid">
-            <article class="suite-card">
-              <h3 data-i18n="suite.card1Title">SnapSlate</h3>
-              <p data-i18n="suite.card1Text">Screenshots, procedures, annotations, and fast export for Windows.</p>
-            </article>
-            <article class="suite-card">
-              <h3 data-i18n="suite.card2Title">WallCraft Pro</h3>
-              <p data-i18n="suite.card2Text">The visual companion in the suite for multi-monitor wallpapers.</p>
-              <a href="https://wallcraft.archi-it.fr/" target="_blank" rel="noopener noreferrer" data-i18n="suite.card2Link">See WallCraft</a>
-            </article>
-            <article class="suite-card">
-              <h3 data-i18n="suite.card3Title">archi-it.fr</h3>
-              <p data-i18n="suite.card3Text">The main hub for projects, services, and references.</p>
-              <a href="https://archi-it.fr/" target="_blank" rel="noopener noreferrer" data-i18n="suite.card3Link">Open archi-it.fr</a>
-            </article>
-            <article class="suite-card">
-              <h3 data-i18n="suite.card4Title">Ko-fi</h3>
-              <p data-i18n="suite.card4Text">A support link to keep the suite alive and keep shipping.</p>
-              <a href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer" data-i18n="suite.card4Link">Support me</a>
-            </article>
+          <div class="faq-grid faq-grid--compact">
+            <details class="faq-card" open><summary data-i18n="faq.q1">Does SnapSlate create a real document?</summary><p data-i18n="faq.a1">Yes. Captures become ordered steps with titles, notes and annotations, then the full result can be exported.</p></details>
+            <details class="faq-card"><summary data-i18n="faq.q2">Which formats can I export?</summary><p data-i18n="faq.a2">PNG, PDF, DOCX, Markdown and HTML depending on the documentation target.</p></details>
+            <details class="faq-card"><summary data-i18n="faq.q3">Can steps be reordered?</summary><p data-i18n="faq.a3">Yes. Steps can be moved, reordered and renumbered without losing the document logic.</p></details>
+            <details class="faq-card"><summary data-i18n="faq.q4">Does SnapSlate replace Win + Shift + S?</summary><p data-i18n="faq.a4">No. It uses the Windows capture flow and watches the clipboard while SnapSlate is running.</p></details>
           </div>
         </div>
       </section>
 
-      <section class="section" id="faq">
+      <section class="section section--tight" id="download">
         <div class="site-shell">
-          <div class="section-heading">
-            <div>
-              <span class="eyebrow" data-i18n="faq.eyebrow">Before you download</span>
-              <h2 data-i18n="faq.title">Short answers, no detours.</h2>
-            </div>
-            <p data-i18n="faq.lead">
-              The goal is to understand at a glance how SnapSlate fits into a production
-              workflow.
-            </p>
-          </div>
-          <div class="faq-grid">
-            <details class="faq-card" open>
-              <summary data-i18n="faq.q1">Does SnapSlate replace Win + Shift + S?</summary>
-              <p data-i18n="faq.a1">
-                No. It relies on the Windows flow and watches the clipboard while it runs, so
-                the capture stays familiar.
-              </p>
-            </details>
-            <details class="faq-card">
-              <summary data-i18n="faq.q2">Which formats can I export?</summary>
-              <p data-i18n="faq.a2">
-                The guide can go to PNG, PDF, DOCX, Markdown, or HTML depending on the
-                documentation need.
-              </p>
-            </details>
-            <details class="faq-card">
-              <summary data-i18n="faq.q3">Can steps be reordered?</summary>
-              <p data-i18n="faq.a3">
-                Yes. Steps can be moved, reordered, and renumbered without losing the document
-                logic.
-              </p>
-            </details>
-            <details class="faq-card">
-              <summary data-i18n="faq.q4">Why Archi-IT Labs?</summary>
-              <p data-i18n="faq.a4">
-                SnapSlate belongs to a suite of tools designed as one coherent set: same
-                visual language, same product logic, same clarity.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="download">
-        <div class="site-shell">
-          <div class="labs-callout">
-            <div>
-              <span class="eyebrow" data-i18n="cta.eyebrow">Ready to try it?</span>
-              <h2 data-i18n="cta.title">See the code, follow the updates, or support Archi-IT Labs.</h2>
-              <p data-i18n="cta.lead">
-                SnapSlate is still a production tool. The site gives you the context, the
-                screenshots, and the right links to integrate it into your suite.
-              </p>
-            </div>
+          <div class="download-panel">
+            <div><span class="eyebrow" data-i18n="cta.eyebrow">Ready to document properly?</span><h2 data-i18n="cta.title">Download SnapSlate and turn your next capture set into a usable manual.</h2><p data-i18n="cta.lead">Install the Windows app, capture a flow, add explanations, then export the document in the right format.</p></div>
             <div class="hero-actions">
-              <a
-                class="button button-primary"
-                href="https://github.com/rangornrar/SnapSlate"
-                target="_blank"
-                rel="noopener noreferrer"
-                data-i18n="cta.primary"
-              >
-                GitHub
-              </a>
-              <a
-                class="button button-secondary"
-                href="https://ko-fi.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                data-i18n="cta.secondary"
-              >
-                Ko-fi
-              </a>
+              <a class="button button-primary" href="https://github.com/rangornrar/SnapSlate/releases/download/2026.04.29.001/SnapSlate-Setup.exe" target="_blank" rel="noopener noreferrer" data-i18n="cta.primary">Download installer</a>
+              <a class="button button-secondary" href="https://github.com/rangornrar/SnapSlate" target="_blank" rel="noopener noreferrer" data-i18n="cta.secondary">Open GitHub</a>
             </div>
           </div>
         </div>
       </section>
     </main>
 
+    <div class="lightbox" hidden data-lightbox-root>
+      <button class="lightbox__backdrop" type="button" data-lightbox-close data-i18n="ui.lightboxClose" data-i18n-attr="aria-label" data-i18n-no-text></button>
+      <div class="lightbox__dialog" role="dialog" aria-modal="true" aria-labelledby="lightbox-title">
+        <div class="lightbox__toolbar">
+          <p class="lightbox__title" id="lightbox-title" data-lightbox-title data-i18n="ui.lightboxTitle">Enlarged preview</p>
+          <button class="button button-secondary lightbox__close" type="button" data-lightbox-close data-i18n="ui.lightboxClose">Close</button>
+        </div>
+        <div class="lightbox__body">
+          <img class="lightbox__image" data-lightbox-image alt="" />
+          <p class="lightbox__caption" data-lightbox-caption></p>
+        </div>
+      </div>
+    </div>
+
     <footer class="site-footer">
       <div class="site-shell footer-inner">
-        <p data-i18n="footer.copy">
-          SnapSlate · fast capture, annotation, and export. An Archi-IT Labs tool built to
-          complement the suite.
-        </p>
+        <p data-i18n="footer.copy">SnapSlate helps you turn Windows screenshots into structured, exportable documentation. Part of Archi-IT Labs.</p>
         <div class="footer-links">
           <a href="https://archi-it.fr/" target="_blank" rel="noopener noreferrer" data-i18n="footer.archi">Archi-IT</a>
           <a href="https://wallcraft.archi-it.fr/" target="_blank" rel="noopener noreferrer" data-i18n="footer.wallcraft">WallCraft</a>
           <a href="https://github.com/rangornrar/SnapSlate" target="_blank" rel="noopener noreferrer" data-i18n="footer.github">GitHub</a>
-          <a href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer" data-i18n="footer.kofi">Ko-fi</a>
+          <button class="kofi-widget-anchor" type="button" data-kofi-launch data-i18n="footer.kofi">Ko-fi</button>
         </div>
       </div>
     </footer>
+
+    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+    <script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'D1D21VSKW5');kofiwidget2.draw();</script>
   </body>
 </html>

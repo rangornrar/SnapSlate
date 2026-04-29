@@ -38,7 +38,7 @@ public sealed class AnnotationModel : INotifyPropertyChanged
 
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    public AnnotationKind Kind { get; init; }
+    public AnnotationKind Kind { get; set; }
 
     public string PaletteKey
     {

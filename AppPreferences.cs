@@ -51,9 +51,25 @@ public sealed class AppPreferences
 
     public ExportFormatChoice DefaultExportFormat { get; set; } = ExportFormatChoice.Png;
 
+    public string NotionParentPageId { get; set; } = string.Empty;
+
+    public string ConfluenceBaseUrl { get; set; } = string.Empty;
+
+    public string ConfluenceSpaceKey { get; set; } = string.Empty;
+
+    public string ConfluenceParentPageId { get; set; } = string.Empty;
+
+    public string ConfluenceEmail { get; set; } = string.Empty;
+
+    public string SharePointSyncFolder { get; set; } = string.Empty;
+
     public bool AutoImportClipboard { get; set; } = true;
 
     public bool CollapseStepsPane { get; set; } = false;
+
+    public double FloatingToolRailLeft { get; set; } = 16;
+
+    public double FloatingToolRailTop { get; set; } = 16;
 
     public static AppPreferences Load()
     {
@@ -106,6 +122,45 @@ public sealed class AppPreferences
             ThemeChoice.Dark => ElementTheme.Dark,
             _ => ElementTheme.Default
         };
+    }
+
+    public AppPreferences Clone()
+    {
+        return new AppPreferences
+        {
+            Theme = Theme,
+            Language = Language,
+            ExportFolder = ExportFolder,
+            DefaultExportFormat = DefaultExportFormat,
+            NotionParentPageId = NotionParentPageId,
+            ConfluenceBaseUrl = ConfluenceBaseUrl,
+            ConfluenceSpaceKey = ConfluenceSpaceKey,
+            ConfluenceParentPageId = ConfluenceParentPageId,
+            ConfluenceEmail = ConfluenceEmail,
+            SharePointSyncFolder = SharePointSyncFolder,
+            AutoImportClipboard = AutoImportClipboard,
+            CollapseStepsPane = CollapseStepsPane,
+            FloatingToolRailLeft = FloatingToolRailLeft,
+            FloatingToolRailTop = FloatingToolRailTop
+        };
+    }
+
+    public void CopyFrom(AppPreferences source)
+    {
+        Theme = source.Theme;
+        Language = source.Language;
+        ExportFolder = source.ExportFolder;
+        DefaultExportFormat = source.DefaultExportFormat;
+        NotionParentPageId = source.NotionParentPageId;
+        ConfluenceBaseUrl = source.ConfluenceBaseUrl;
+        ConfluenceSpaceKey = source.ConfluenceSpaceKey;
+        ConfluenceParentPageId = source.ConfluenceParentPageId;
+        ConfluenceEmail = source.ConfluenceEmail;
+        SharePointSyncFolder = source.SharePointSyncFolder;
+        AutoImportClipboard = source.AutoImportClipboard;
+        CollapseStepsPane = source.CollapseStepsPane;
+        FloatingToolRailLeft = source.FloatingToolRailLeft;
+        FloatingToolRailTop = source.FloatingToolRailTop;
     }
 
     private static string GetPreferencesPath()

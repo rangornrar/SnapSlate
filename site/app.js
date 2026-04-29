@@ -1,161 +1,162 @@
-const SUPPORTED_LANGUAGES = new Set(["en", "fr"]);
+﻿const SUPPORTED_LANGUAGES = new Set(["en", "fr"]);
 
 const translations = {
   en: {
     meta: {
-      title: "SnapSlate - Fast visual procedures for Windows | Archi-IT Labs",
+      title: "SnapSlate - Turn Windows captures into polished procedures | Archi-IT Labs",
       description:
-        "SnapSlate turns Windows screenshots into clean, exportable procedures with annotations, sticker legends, and PNG, PDF, DOCX, Markdown, and HTML export.",
-      ogTitle: "SnapSlate - Fast visual procedures for Windows | Archi-IT Labs",
+        "SnapSlate turns Windows screenshots into polished procedures with OCR, annotations, project saving, export and publication-ready workflows.",
+      keywords:
+        "Windows screenshot annotation, procedure builder, OCR for screenshots, screenshot to document, technical documentation tool, support guide, QA documentation, Win Shift S",
+      ogTitle: "SnapSlate - Turn Windows captures into polished procedures | Archi-IT Labs",
       ogDescription:
-        "Capture, annotate, and export Windows procedures with SnapSlate, an Archi-IT Labs tool.",
+        "Capture screens, annotate them, keep steps organized and export polished procedures ready for documentation workflows.",
       ogImageAlt:
-        "SnapSlate, a modern interface for turning a Windows capture into an exportable procedure.",
-      twitterTitle: "SnapSlate - Fast visual procedures for Windows | Archi-IT Labs",
+        "SnapSlate showing a polished procedure workspace with a canvas-first layout, floating tools and step panels.",
+      twitterTitle: "SnapSlate - Turn Windows captures into polished procedures | Archi-IT Labs",
       twitterDescription:
-        "Turn a Windows capture into a clean, exportable visual procedure.",
+        "Turn annotated Windows screenshots into exportable procedures, support guides and manuals.",
       locale: "en_US",
     },
     ui: {
       navLabel: "Primary navigation",
       languageSelector: "Language selector",
       languageLabel: "Language",
+      previewHint: "Click to enlarge",
+      lightboxTitle: "Enlarged preview",
+      lightboxClose: "Close",
     },
     nav: {
-      why: "Why",
+      document: "Document",
       captures: "Screenshots",
       workflow: "Workflow",
-      suite: "Suite",
+      download: "Download",
       faq: "FAQ",
     },
     header: {
       kofi: "Ko-fi",
-      repo: "Repository",
+      repo: "GitHub",
     },
     hero: {
-      badge: "Archi-IT Labs · V2026.04.26.001",
-      title: "Turn a Windows capture into a clean procedure.",
+      badge: "Archi-IT Labs · V2026.04.29.001",
+      title: "Turn Windows captures into polished procedures.",
       lead:
-        "SnapSlate follows Win + Shift + S, creates one step per capture, and keeps the canvas centered so you can annotate, label, and export without distraction.",
-      primary: "Browse repository",
-      secondary: "See how it works",
-      kofi: "Support on Ko-fi",
+        "SnapSlate keeps the canvas central, the tools compact and the document ready to export.",
+      primary: "Download installer",
+      secondary: "Open GitHub",
       pillAria: "Highlights",
-      pill1: "Win + Shift + S",
-      pill2: "One step per capture",
-      pill3: "Canvas first",
-      pill4: "PNG, PDF, DOCX, Markdown, HTML",
-      panelAria: "SnapSlate preview",
-      panelAlt: "SnapSlate procedure view",
+      pill1: "Canvas-first workspace",
+      pill2: "OCR and annotations",
+      pill3: "Projects and demos",
+      pill4: "PNG · PDF · DOCX · Markdown · HTML",
+      limit:
+        "Current behavior: SnapSlate imports Win + Shift + S captures while the application is open.",
+      panelAria: "SnapSlate procedure preview",
+      panelAlt: "SnapSlate procedure workspace with canvas, floating tools and contextual panels",
       statsAria: "Quick summary",
-      stat1: "capture = 1 step",
-      stat2: "visual palettes",
-      stat3: "export formats",
+      stat1: "canvas-first workspace",
+      stat2: "featured screens",
+      stat3: "annotation tools",
     },
-    why: {
-      eyebrow: "Why SnapSlate",
-      title: "A focused tool that stays fast without becoming heavy.",
+    document: {
+      eyebrow: "From capture to document",
+      title: "Built for production, not for decoration.",
       lead:
-        "The goal is not to add an endless tool suite, but to save time on the real path: capture, explain, export.",
-      card1Title: "Fast",
+        "SnapSlate keeps the canvas, steps and exports visible without turning the interface into a dashboard.",
+      card1Tag: "01 · Capture",
+      card1Title: "Start from the screen",
       card1Text:
-        "A Windows capture becomes a new step almost immediately, without jumping to another tool.",
-      card2Title: "Readable",
+        "Each screenshot becomes a step in the procedure. The real screen stays at the center of the workflow.",
+      card2Tag: "02 · Explain",
+      card2Title: "Add meaning",
       card2Text:
-        "The canvas stays central, the toolbar stays compact, and the property panel stays contextual.",
-      card3Title: "Exportable",
+        "Use arrows, OCR, frames, stickers, masks and notes to make each step instantly readable.",
+      card3Tag: "03 · Structure",
+      card3Title: "Keep it tidy",
       card3Text:
-        "Captures become ready-made material for a manual, guide, ticket, or report.",
+        "Reorder steps, rename them and keep the document clear from first capture to final export.",
     },
     captures: {
-      eyebrow: "Screenshots",
-      title: "Real SnapSlate screenshots, captured from the app itself.",
+      eyebrow: "Product shots",
+      title: "The screenshots keep their real proportions.",
       lead:
-        "The page shows the software as it is actually used: procedure, help, export, and settings.",
-      procedureAlt: "SnapSlate procedure view",
+        "Every capture opens larger with one click, and the site preserves the original aspect ratio instead of cropping the frame.",
+      procedureAlt: "SnapSlate procedure screen",
       procedureTitle: "Procedure",
       procedureText:
-        "The main view keeps steps on the left, the canvas in the center, and the contextual panel on the right.",
-      helpAlt: "SnapSlate capture help view",
+        "Canvas-first, floating tools and contextual panels keep the workspace readable.",
+      helpAlt: "SnapSlate help screen",
       helpTitle: "Capture / Help",
       helpText:
-        "A short, practical page that explains automatic import and the main shortcuts.",
-      exportAlt: "SnapSlate export view",
+        "A compact help view for capture flows, OCR and keyboard shortcuts.",
+      exportAlt: "SnapSlate export screen",
       exportTitle: "Export",
       exportText:
-        "Document settings, export folder, and formats stay in a clear, compact screen.",
-      settingsAlt: "SnapSlate settings view",
+        "Outputs, destinations and document settings stay easy to find.",
+      settingsAlt: "SnapSlate settings screen",
       settingsTitle: "Settings",
       settingsText:
-        "Theme, language, capture behavior, and default export stay visible without clutter.",
+        "Theme, language, capture behavior and defaults stay under control.",
     },
     workflow: {
-      eyebrow: "Workflow",
-      title: "A short path: capture, annotate, export.",
+      eyebrow: "Complete workflow",
+      title: "Capture, annotate, add legends and publish HTML.",
       lead:
-        "SnapSlate keeps the flow simple: the capture arrives, the procedure is built, and the guide is exported in the right format.",
+        "A four-step editorial flow, shown through full Lorem Ipsum screens.",
+      storyTag: "Editorial sequence",
+      storyTitle: "From raw screen to polished handoff",
+      storyText:
+        "The layout keeps one story per step, with screenshots shown at their natural size and a direct path to the final publication.",
+      step1Tag: "01 · Capture",
       step1Title: "Capture",
       step1Text:
-        "The user launches Win + Shift + S and SnapSlate watches the clipboard while the app is open.",
-      step2Title: "Create a step",
+        "Start from a Lorem Ipsum screen and keep the original proportions intact.",
+      step1Alt: "Lorem Ipsum capture screen",
+      step2Tag: "02 · Annotate",
+      step2Title: "Annotate",
       step2Text:
-        "Each new capture becomes a step with its own title, note, and annotations.",
-      step3Title: "Annotate",
+        "Add arrows, callouts, highlights, stickers and masks without losing the page context.",
+      step2Alt: "Lorem Ipsum annotated screen",
+      step3Tag: "03 · Legends",
+      step3Title: "Legends",
       step3Text:
-        "Tools stay compact, colors are quick to pick, and items remain editable after placement.",
-      step4Title: "Organize",
+        "Write multi-line sticker legends in the properties panel and keep them readable.",
+      step3Alt: "Lorem Ipsum legends screen",
+      step4Tag: "04 · Publish HTML",
+      step4Title: "HTML publication",
       step4Text:
-        "Steps can move, renumber, and keep a readable legend without taking over the layout.",
-      step5Title: "Export",
-      step5Text:
-        "The document can go to PNG, PDF, DOCX, Markdown, or HTML depending on the audience.",
-    },
-    suite: {
-      eyebrow: "Archi-IT Labs suite",
-      title: "A coherent suite built around useful, sober tools.",
-      lead:
-        "The visual style, CTAs, and presentation logic follow the same family as the other Archi-IT Labs projects.",
-      card1Title: "SnapSlate",
-      card1Text: "Screenshots, procedures, annotations, and fast export for Windows.",
-      card2Title: "WallCraft Pro",
-      card2Text: "The visual companion in the suite for multi-monitor wallpapers.",
-      card2Link: "See WallCraft",
-      card3Title: "archi-it.fr",
-      card3Text: "The main hub for projects, services, and references.",
-      card3Link: "Open archi-it.fr",
-      card4Title: "Ko-fi",
-      card4Text: "A support link to keep the suite alive and keep shipping.",
-      card4Link: "Support me",
+        "Turn the procedure into a clean HTML page for sharing or reuse.",
+      step4Alt: "Lorem Ipsum HTML publication screen",
     },
     faq: {
-      eyebrow: "Before you download",
+      eyebrow: "Before you install",
       title: "Short answers, no detours.",
       lead:
-        "The goal is to understand at a glance how SnapSlate fits into a production workflow.",
-      q1: "Does SnapSlate replace Win + Shift + S?",
+        "You can see how SnapSlate fits a production workflow.",
+      q1: "Does SnapSlate support OCR?",
       a1:
-        "No. It relies on the Windows flow and watches the clipboard while it runs, so the capture stays familiar.",
-      q2: "Which formats can I export?",
+        "Yes. OCR can add editable text to the current screen and to your notes.",
+      q2: "Can I save and reopen a project?",
       a2:
-        "The guide can go to PNG, PDF, DOCX, Markdown, or HTML depending on the documentation need.",
-      q3: "Can steps be reordered?",
+        "Yes. Projects, demo content and document state can be saved and loaded.",
+      q3: "Are publications included?",
       a3:
-        "Yes. Steps can be moved, reordered, and renumbered without losing the document logic.",
-      q4: "Why Archi-IT Labs?",
+        "Yes. Publication flows cover Notion, Confluence and SharePoint targets.",
+      q4: "Does the canvas stay dominant?",
       a4:
-        "SnapSlate belongs to a suite of tools designed as one coherent set: same visual language, same product logic, same clarity.",
+        "Yes. The layout was redesigned so the canvas stays at the center of the screen.",
     },
     cta: {
-      eyebrow: "Ready to try it?",
-      title: "See the code, follow the updates, or support Archi-IT Labs.",
+      eyebrow: "Ready to document properly?",
+      title: "Download SnapSlate and turn your next captures into a usable manual.",
       lead:
-        "SnapSlate is still a production tool. The site gives you the context, the screenshots, and the right links to integrate it into your suite.",
-      primary: "GitHub",
-      secondary: "Ko-fi",
+        "Install the Windows app, capture a flow, add explanations, then export in the right format.",
+      primary: "Download installer",
+      secondary: "Open GitHub",
     },
     footer: {
       copy:
-        "SnapSlate · fast capture, annotation, and export. An Archi-IT Labs tool built to complement the suite.",
+        "SnapSlate turns Windows screenshots into structured, exportable documentation. Part of Archi-IT Labs.",
       archi: "Archi-IT",
       wallcraft: "WallCraft",
       github: "GitHub",
@@ -164,159 +165,160 @@ const translations = {
   },
   fr: {
     meta: {
-      title: "SnapSlate - Procédures visuelles rapides pour Windows | Archi-IT Labs",
+      title: "SnapSlate - Transformer des captures Windows en procédures soignées | Archi-IT Labs",
       description:
-        "SnapSlate transforme les captures Windows en procédures propres et exportables avec annotations, légendes de gommettes et export PNG, PDF, DOCX, Markdown et HTML.",
-      ogTitle: "SnapSlate - Procédures visuelles rapides pour Windows | Archi-IT Labs",
+        "SnapSlate transforme les captures Windows en procédures soignées avec OCR, annotations, sauvegarde du projet, export et publications prêtes à l'emploi.",
+      keywords:
+        "annotation capture Windows, générateur de procédures, OCR capture écran, capture vers document, outil documentation technique, guide support, documentation QA, Win Shift S",
+      ogTitle: "SnapSlate - Transformer des captures Windows en procédures soignées | Archi-IT Labs",
       ogDescription:
-        "Capture, annotation et export de procédures Windows avec SnapSlate, un outil Archi-IT Labs.",
+        "Capturez des écrans, annotez-les, gardez vos étapes organisées et exportez des procédures prêtes pour vos workflows de documentation.",
       ogImageAlt:
-        "SnapSlate, une interface moderne pour transformer une capture Windows en procédure exportable.",
-      twitterTitle: "SnapSlate - Procédures visuelles rapides pour Windows | Archi-IT Labs",
+        "SnapSlate montrant un espace de procédure soigné avec canvas central, outils flottants et panneaux d'étapes.",
+      twitterTitle: "SnapSlate - Transformer des captures Windows en procédures soignées | Archi-IT Labs",
       twitterDescription:
-        "Transformez une capture Windows en procédure visuelle propre et exportable.",
+        "Transformez des captures Windows annotées en procédures, guides support et manuels exportables.",
       locale: "fr_FR",
     },
     ui: {
       navLabel: "Navigation principale",
       languageSelector: "Sélecteur de langue",
       languageLabel: "Langue",
+      previewHint: "Cliquer pour agrandir",
+      lightboxTitle: "Aperçu agrandi",
+      lightboxClose: "Fermer",
     },
     nav: {
-      why: "Pourquoi",
+      document: "Document",
       captures: "Captures",
       workflow: "Workflow",
-      suite: "Suite",
+      download: "Télécharger",
       faq: "FAQ",
     },
     header: {
       kofi: "Ko-fi",
-      repo: "Dépôt",
+      repo: "GitHub",
     },
     hero: {
-      badge: "Archi-IT Labs · V2026.04.26.001",
-      title: "Transformez une capture Windows en procédure propre.",
+      badge: "Archi-IT Labs · V2026.04.29.001",
+      title: "Transformez des captures Windows en procédures soignées.",
       lead:
-        "SnapSlate suit Win + Shift + S, crée une étape par capture et garde le canvas au centre pour annoter, légender et exporter sans détour.",
-      primary: "Consulter le dépôt",
-      secondary: "Voir le fonctionnement",
-      kofi: "Me soutenir sur Ko-fi",
+        "SnapSlate garde le canvas au centre, les outils compacts et le document prêt à exporter.",
+      primary: "Télécharger l’installateur",
+      secondary: "Ouvrir GitHub",
       pillAria: "Points forts",
-      pill1: "Win + Shift + S",
-      pill2: "Une étape par capture",
-      pill3: "Canvas prioritaire",
-      pill4: "PNG, PDF, DOCX, Markdown, HTML",
-      panelAria: "Aperçu SnapSlate",
-      panelAlt: "Vue Procédure de SnapSlate",
+      pill1: "Espace centré sur le canvas",
+      pill2: "OCR et annotations",
+      pill3: "Projets et démos",
+      pill4: "PNG · PDF · DOCX · Markdown · HTML",
+      limit:
+        "Comportement actuel : SnapSlate importe les captures Win + Shift + S lorsque l’application est ouverte.",
+      panelAria: "Aperçu de procédure SnapSlate",
+      panelAlt: "Espace de procédure SnapSlate avec canvas, outils flottants et panneaux contextuels",
       statsAria: "Résumé rapide",
-      stat1: "capture = 1 étape",
-      stat2: "palettes visuelles",
-      stat3: "formats d'export",
+      stat1: "espace centré sur le canvas",
+      stat2: "écrans clés",
+      stat3: "outils d’annotation",
     },
-    why: {
-      eyebrow: "Pourquoi SnapSlate",
-      title: "Un outil ciblé pour aller vite sans alourdir l’usage.",
+    document: {
+      eyebrow: "De la capture à la procédure",
+      title: "Conçu pour produire, pas pour décorer.",
       lead:
-        "L'objectif n'est pas d'ajouter une suite sans fin de fonctions, mais de faire gagner du temps sur le vrai trajet: capturer, expliquer, exporter.",
-      card1Title: "Rapide",
+        "SnapSlate garde visibles le canvas, les étapes et les exports sans transformer l’interface en tableau de bord.",
+      card1Tag: "01 · Capturer",
+      card1Title: "Partir de l’écran réel",
       card1Text:
-        "Une capture Windows devient une nouvelle étape presque immédiatement, sans repasser par un logiciel intermédiaire.",
-      card2Title: "Lisible",
+        "Chaque capture devient une étape de la procédure. L’écran réel reste au centre du flux.",
+      card2Tag: "02 · Annoter",
+      card2Title: "Ajouter du sens",
       card2Text:
-        "Le canvas reste au centre, la barre d'outils reste compacte et le panneau de propriétés reste contextuel.",
-      card3Title: "Exportable",
+        "Utilisez flèches, OCR, cadres, gommettes, masques et notes pour rendre chaque étape immédiatement lisible.",
+      card3Tag: "03 · Structurer",
+      card3Title: "Rester lisible",
       card3Text:
-        "Les captures servent directement de matière à un manuel, un guide, un ticket ou un compte rendu.",
+        "Réordonnez les étapes, renommez-les et gardez un document clair de la première capture à l’export final.",
     },
     captures: {
-      eyebrow: "Captures d'écran",
-      title: "De vraies captures SnapSlate, prises dans l'application.",
+      eyebrow: "Captures produit",
+      title: "Les captures conservent leurs proportions réelles.",
       lead:
-        "La page montre le logiciel tel qu’il est réellement utilisé: procédure, aide, export et réglages.",
-      procedureAlt: "Vue Procédure de SnapSlate",
-      procedureTitle: "Procédure",
+        "Chaque visuel s’ouvre en grand d’un clic, sans recadrage artificiel.",
+      procedureAlt: "Écran Procédure de SnapSlate",
+      procedureTitle: "Document de procédure",
       procedureText:
-        "La vue principale concentre les étapes à gauche, le canvas au centre et le panneau contextuel à droite.",
-      helpAlt: "Vue Aide de SnapSlate",
+        "Canvas d’abord, outils flottants et panneaux contextuels gardent le workspace lisible.",
+      helpAlt: "Écran Aide de SnapSlate",
       helpTitle: "Capturer / Aide",
       helpText:
-        "Une page courte et utile pour expliquer l'import automatique et les raccourcis principaux.",
-      exportAlt: "Vue Export de SnapSlate",
+        "Une vue compacte pour les flux de capture, l’OCR et les raccourcis clavier.",
+      exportAlt: "Écran Export de SnapSlate",
       exportTitle: "Export",
       exportText:
-        "Les paramètres du document, le dossier d’export et les formats restent dans un écran clair.",
-      settingsAlt: "Vue Réglages de SnapSlate",
+        "Les sorties, destinations et réglages du document restent faciles à trouver.",
+      settingsAlt: "Écran Réglages de SnapSlate",
       settingsTitle: "Réglages",
       settingsText:
-        "Thème, langue, capture et export par défaut restent visibles sans surcharge.",
+        "Thème, langue, capture et paramètres par défaut restent sous contrôle.",
     },
     workflow: {
-      eyebrow: "Workflow",
-      title: "Un trajet court: capturer, annoter, exporter.",
+      eyebrow: "Workflow complet",
+      title: "Capturer, annoter, ajouter les légendes et publier en HTML.",
       lead:
-        "SnapSlate suit une logique simple: la capture arrive, la procédure se construit, puis le guide part vers le bon format.",
+        "Un flux éditorial en quatre étapes, illustré par de vraies captures Lorem Ipsum.",
+      storyTag: "Séquence éditoriale",
+      storyTitle: "De l’écran brut à la livraison soignée",
+      storyText:
+        "La mise en page raconte une seule action par étape, avec des captures à leur taille naturelle et une sortie HTML finale claire.",
+      step1Tag: "01 · Capturer",
       step1Title: "Capturer",
       step1Text:
-        "L'utilisateur lance Win + Shift + S et SnapSlate surveille le presse-papiers quand l'application est ouverte.",
-      step2Title: "Créer une étape",
+        "Démarrez sur un écran Lorem Ipsum et gardez les proportions d’origine.",
+      step1Alt: "Capture Lorem Ipsum",
+      step2Tag: "02 · Annoter",
+      step2Title: "Annoter",
       step2Text:
-        "Chaque nouvelle capture devient une étape avec son titre, sa note et ses annotations propres.",
-      step3Title: "Annoter",
+        "Ajoutez flèches, encadrés, surlignages, gommettes et masques sans perdre le contexte.",
+      step2Alt: "Capture Lorem Ipsum annotée",
+      step3Tag: "03 · Légendes",
+      step3Title: "Légendes",
       step3Text:
-        "Les outils restent compacts, les couleurs sont rapides à choisir et les items restent modifiables après placement.",
-      step4Title: "Organiser",
+        "Rédigez des légendes de gommettes multi-lignes dans le panneau de propriétés.",
+      step3Alt: "Panneau des légendes Lorem Ipsum",
+      step4Tag: "04 · Publication HTML",
+      step4Title: "Publication HTML",
       step4Text:
-        "Les étapes se déplacent, se renumérotent et gardent une légende lisible sans bloquer l'espace.",
-      step5Title: "Exporter",
-      step5Text:
-        "Le document part en PNG, PDF, DOCX, Markdown ou HTML selon le besoin.",
-    },
-    suite: {
-      eyebrow: "Suite Archi-IT Labs",
-      title: "Une suite cohérente, pensée pour des outils utiles et sobres.",
-      lead:
-        "La charte, les CTA et la logique de présentation suivent la même famille visuelle que les autres projets Archi-IT Labs.",
-      card1Title: "SnapSlate",
-      card1Text: "Captures, procédures, annotations et export rapide pour Windows.",
-      card2Title: "WallCraft Pro",
-      card2Text: "Le compagnon visuel de la suite pour les fonds d'écran multi-écrans.",
-      card2Link: "Voir WallCraft",
-      card3Title: "archi-it.fr",
-      card3Text: "Le hub principal pour retrouver les projets, les services et les références.",
-      card3Link: "Ouvrir archi-it.fr",
-      card4Title: "Ko-fi",
-      card4Text: "Un lien de soutien pour garder la suite vivante et continuer les livraisons.",
-      card4Link: "Me soutenir",
+        "Transformez la procédure en page HTML propre pour le partage ou la réutilisation.",
+      step4Alt: "Publication HTML Lorem Ipsum",
     },
     faq: {
-      eyebrow: "Questions avant téléchargement",
+      eyebrow: "Avant d’installer",
       title: "Des réponses courtes, sans détour.",
       lead:
-        "L'idée est de savoir en un coup d'œil comment SnapSlate s'insère dans un vrai usage de production.",
-      q1: "SnapSlate remplace-t-il Win + Shift + S ?",
+        "Vous voyez comment SnapSlate s’insère dans un vrai workflow de production.",
+      q1: "SnapSlate gère-t-il l’OCR ?",
       a1:
-        "Non. Il s'appuie sur le flux Windows et lit le presse-papiers pendant qu'il tourne, donc la capture reste familière.",
-      q2: "Quels formats peut-on exporter ?",
+        "Oui. L’OCR peut ajouter du texte modifiable sur l’écran courant et dans vos notes.",
+      q2: "Peut-on sauvegarder et rouvrir un projet ?",
       a2:
-        "Le guide peut partir en PNG, PDF, DOCX, Markdown ou HTML selon le besoin documentaire.",
-      q3: "Les étapes restent-elles réordonnables ?",
+        "Oui. Les projets, la démo et l’état du document peuvent être sauvegardés et rechargés.",
+      q3: "Les publications sont-elles incluses ?",
       a3:
-        "Oui. Les étapes peuvent être déplacées, réordonnées et renumérotées sans perdre la logique du document.",
-      q4: "Pourquoi Archi-IT Labs ?",
+        "Oui. Les flux de publication couvrent Notion, Confluence et SharePoint.",
+      q4: "Le canvas reste-t-il dominant ?",
       a4:
-        "SnapSlate s'inscrit dans une suite d'outils pensée comme un ensemble cohérent: mêmes codes visuels, même logique produit, même lisibilité.",
+        "Oui. La mise en page a été repensée pour garder le canvas au centre de l’écran.",
     },
     cta: {
-      eyebrow: "Prêt à tester ?",
-      title: "Voir le code, suivre les mises à jour, ou soutenir Archi-IT Labs.",
+      eyebrow: "Prêt à documenter proprement ?",
+      title: "Téléchargez SnapSlate et transformez vos prochaines captures en manuel utilisable.",
       lead:
-        "SnapSlate reste un outil de production. Le site te donne le contexte, les captures et les bons liens pour l'intégrer dans ta suite.",
-      primary: "GitHub",
-      secondary: "Ko-fi",
+        "Installez l’application Windows, capturez un parcours, ajoutez vos explications, puis exportez le document au bon format.",
+      primary: "Télécharger l’installateur",
+      secondary: "Ouvrir GitHub",
     },
     footer: {
       copy:
-        "SnapSlate · capture, annotation et export rapide. Un outil Archi-IT Labs pensé pour compléter la suite.",
+        "SnapSlate transforme des captures Windows en documentation structurée et exportable. Fait partie d’Archi-IT Labs.",
       archi: "Archi-IT",
       wallcraft: "WallCraft",
       github: "GitHub",
@@ -325,106 +327,59 @@ const translations = {
   },
 };
 
-function normalizeLanguage(candidate) {
-  if (!candidate) {
-    return null;
-  }
+function normalizeLanguage(candidate) { if (!candidate) return null; const normalized = candidate.toLowerCase().slice(0, 2); return SUPPORTED_LANGUAGES.has(normalized) ? normalized : null; }
+function detectBrowserLanguage() { const candidates = Array.isArray(navigator.languages) && navigator.languages.length > 0 ? navigator.languages : [navigator.language]; for (const candidate of candidates) { const normalized = normalizeLanguage(candidate); if (normalized) return normalized; } return "en"; }
+function getInitialLanguage() { const url = new URL(window.location.href); const explicit = normalizeLanguage(url.searchParams.get("lang")); if (explicit) return explicit; return detectBrowserLanguage(); }
+function setMeta(selector, value) { const element = document.querySelector(selector); if (element) element.setAttribute("content", value); }
+function resolve(dictionary, key) { return key.split(".").reduce((value, part) => value?.[part], dictionary); }
+function updateLanguageButtons(activeLanguage) { document.querySelectorAll("[data-lang-button]").forEach((button) => { const isActive = button.dataset.langButton === activeLanguage; button.classList.toggle("is-active", isActive); button.setAttribute("aria-pressed", String(isActive)); }); }
+function applyLanguage(language, persist = true) { const dictionary = translations[language] ?? translations.en; document.documentElement.lang = language; document.title = dictionary.meta.title; setMeta('meta[name="description"]', dictionary.meta.description); setMeta('meta[name="keywords"]', dictionary.meta.keywords); setMeta('meta[property="og:locale"]', dictionary.meta.locale); setMeta('meta[property="og:title"]', dictionary.meta.ogTitle); setMeta('meta[property="og:description"]', dictionary.meta.ogDescription); setMeta('meta[property="og:image:alt"]', dictionary.meta.ogImageAlt); setMeta('meta[name="twitter:title"]', dictionary.meta.twitterTitle); setMeta('meta[name="twitter:description"]', dictionary.meta.twitterDescription); document.querySelectorAll("[data-i18n]").forEach((element) => { const translation = resolve(dictionary, element.dataset.i18n); if (element.hasAttribute("data-i18n-no-text")) { element.textContent = ""; return; } if (translation !== undefined && translation !== null && element.childElementCount === 0) element.textContent = translation; }); document.querySelectorAll("[data-i18n-attr]").forEach((element) => { const attribute = element.dataset.i18nAttr; const translation = resolve(dictionary, element.dataset.i18n); if (attribute && translation !== undefined && translation !== null) element.setAttribute(attribute, translation); }); updateLanguageButtons(language); if (persist) { const url = new URL(window.location.href); url.searchParams.set("lang", language); history.replaceState({}, "", url); } }
+function wireLanguageButtons() { document.querySelectorAll("[data-lang-button]").forEach((button) => { button.addEventListener("click", () => { const language = normalizeLanguage(button.dataset.langButton) ?? "en"; applyLanguage(language, true); }); }); }
+function wireLightbox() {
+  const root = document.querySelector("[data-lightbox-root]");
+  if (!root) return;
+  const image = root.querySelector("[data-lightbox-image]");
+  const caption = root.querySelector("[data-lightbox-caption]");
+  const triggers = document.querySelectorAll("[data-lightbox-src]");
+  let lastTrigger = null;
 
-  const normalized = candidate.toLowerCase().slice(0, 2);
-  return SUPPORTED_LANGUAGES.has(normalized) ? normalized : null;
-}
+  const close = () => {
+    root.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    if (lastTrigger && typeof lastTrigger.focus === "function") lastTrigger.focus();
+  };
 
-function detectBrowserLanguage() {
-  const candidates = Array.isArray(navigator.languages) && navigator.languages.length > 0
-    ? navigator.languages
-    : [navigator.language];
+  const open = (trigger) => {
+    if (!(image instanceof HTMLImageElement)) return;
+    const img = trigger.querySelector("img");
+    const source = trigger.dataset.lightboxSrc || img?.getAttribute("src") || "";
+    const label = img?.getAttribute("alt") || "";
+    image.src = source;
+    image.alt = label;
+    if (caption) caption.textContent = label;
+    root.hidden = false;
+    document.body.classList.add("lightbox-open");
+    const closeButton = root.querySelector(".lightbox__close");
+    if (closeButton instanceof HTMLElement) closeButton.focus();
+  };
 
-  for (const candidate of candidates) {
-    const normalized = normalizeLanguage(candidate);
-    if (normalized) {
-      return normalized;
-    }
-  }
-
-  return "en";
-}
-
-function getInitialLanguage() {
-  const url = new URL(window.location.href);
-  const explicit = normalizeLanguage(url.searchParams.get("lang"));
-  if (explicit) {
-    return explicit;
-  }
-
-  return detectBrowserLanguage();
-}
-
-function setMeta(selector, value) {
-  const element = document.querySelector(selector);
-  if (element) {
-    element.setAttribute("content", value);
-  }
-}
-
-function resolve(dictionary, key) {
-  return key.split(".").reduce((value, part) => value?.[part], dictionary);
-}
-
-function updateLanguageButtons(activeLanguage) {
-  document.querySelectorAll("[data-lang-button]").forEach((button) => {
-    const isActive = button.dataset.langButton === activeLanguage;
-    button.classList.toggle("is-active", isActive);
-    button.setAttribute("aria-pressed", String(isActive));
-  });
-}
-
-function applyLanguage(language, persist = true) {
-  const dictionary = translations[language] ?? translations.en;
-
-  document.documentElement.lang = language;
-  document.title = dictionary.meta.title;
-  setMeta('meta[name="description"]', dictionary.meta.description);
-  setMeta('meta[property="og:locale"]', dictionary.meta.locale);
-  setMeta('meta[property="og:title"]', dictionary.meta.ogTitle);
-  setMeta('meta[property="og:description"]', dictionary.meta.ogDescription);
-  setMeta('meta[property="og:image:alt"]', dictionary.meta.ogImageAlt);
-  setMeta('meta[name="twitter:title"]', dictionary.meta.twitterTitle);
-  setMeta('meta[name="twitter:description"]', dictionary.meta.twitterDescription);
-
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    const translation = resolve(dictionary, element.dataset.i18n);
-    if (translation !== undefined && translation !== null && element.childElementCount === 0) {
-      element.textContent = translation;
-    }
-  });
-
-  document.querySelectorAll("[data-i18n-attr]").forEach((element) => {
-    const attribute = element.dataset.i18nAttr;
-    const translation = resolve(dictionary, element.dataset.i18n);
-    if (attribute && translation !== undefined && translation !== null) {
-      element.setAttribute(attribute, translation);
-    }
-  });
-
-  updateLanguageButtons(language);
-
-  if (persist) {
-    const url = new URL(window.location.href);
-    url.searchParams.set("lang", language);
-    history.replaceState({}, "", url);
-  }
-}
-
-function wireLanguageButtons() {
-  document.querySelectorAll("[data-lang-button]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const language = normalizeLanguage(button.dataset.langButton) ?? "en";
-      applyLanguage(language, true);
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      lastTrigger = trigger;
+      open(trigger);
     });
   });
-}
 
-document.addEventListener("DOMContentLoaded", () => {
-  wireLanguageButtons();
-  applyLanguage(getInitialLanguage(), false);
-});
+  root.querySelectorAll("[data-lightbox-close]").forEach((button) => {
+    button.addEventListener("click", close);
+  });
+
+  root.addEventListener("click", (event) => {
+    if (event.target === root) close();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (!root.hidden && event.key === "Escape") close();
+  });
+}
+document.addEventListener("DOMContentLoaded", () => { wireLanguageButtons(); wireLightbox(); applyLanguage(getInitialLanguage(), false); });

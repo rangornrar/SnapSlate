@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Foundation;
 
@@ -22,6 +23,7 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
     private int _selectedPaletteShadeIndex = 3;
     private string _paletteDisplayName = "sunset note";
     private string _annotationText = "Note rapide";
+    private int _stepNumber = 1;
     private GuideTemplateType _templateType = GuideTemplateType.UserManual;
     private string _audience = "Utilisateurs finaux";
     private string _author = "SnapSlate";
@@ -38,11 +40,11 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public Guid Id { get; } = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.NewGuid();
 
-    public DocumentOrigin Origin { get; init; } = DocumentOrigin.Demo;
+    public DocumentOrigin Origin { get; set; } = DocumentOrigin.Demo;
 
-    public List<AnnotationModel> Annotations { get; } = [];
+    public List<AnnotationModel> Annotations { get; set; } = [];
 
     public string BaseTitle
     {
@@ -111,6 +113,7 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
         set => SetField(ref _imageBytes, value);
     }
 
+    [JsonIgnore]
     public BitmapImage? ThumbnailSource
     {
         get => _thumbnailSource;
@@ -139,6 +142,12 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
     {
         get => _annotationText;
         set => SetField(ref _annotationText, value);
+    }
+
+    public int StepNumber
+    {
+        get => _stepNumber;
+        set => SetField(ref _stepNumber, value);
     }
 
     public GuideTemplateType TemplateType
@@ -207,6 +216,7 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
         set => SetField(ref _appliedCropRect, value);
     }
 
+    [JsonIgnore]
     public string? SavedPath
     {
         get => _savedPath;
@@ -229,6 +239,49 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
     public string TabTitle => IsDirty ? $"{BaseTitle} *" : BaseTitle;
 
     public string TabSubtitle => IsDirty ? "A sauvegarder" : OriginLabel;
+
+    public ScreenshotDocument CloneForHistory()
+    {
+        var clone = new ScreenshotDocument
+        {
+            Id = Id,
+            BaseTitle = BaseTitle,
+            StepNote = StepNote,
+            Origin = Origin,
+            OriginLabel = OriginLabel,
+            SourceLabel = SourceLabel,
+            FileNameLabel = FileNameLabel,
+            SourcePixelWidth = SourcePixelWidth,
+            SourcePixelHeight = SourcePixelHeight,
+            ImageBytes = ImageBytes,
+            ThumbnailSource = ThumbnailSource,
+            SelectedPaletteKey = SelectedPaletteKey,
+            SelectedPaletteShadeIndex = SelectedPaletteShadeIndex,
+            PaletteDisplayName = PaletteDisplayName,
+            AnnotationText = AnnotationText,
+            StepNumber = StepNumber,
+            TemplateType = TemplateType,
+            Audience = Audience,
+            Author = Author,
+            DocumentVersion = DocumentVersion,
+            StickerModeIndex = StickerModeIndex,
+            StrokeThickness = StrokeThickness,
+            DefaultOpacity = DefaultOpacity,
+            NextStickerIndex = NextStickerIndex,
+            ResetStickerNumberOnColorChange = ResetStickerNumberOnColorChange,
+            PendingCropRect = PendingCropRect,
+            AppliedCropRect = AppliedCropRect,
+            SavedPath = SavedPath,
+            IsDirty = IsDirty
+        };
+
+        foreach (var annotation in Annotations)
+        {
+            clone.Annotations.Add(annotation.Clone());
+        }
+
+        return clone;
+    }
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {

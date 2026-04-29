@@ -231,7 +231,18 @@ public static class GuideExporter
         }
 
         run.Append(runProperties);
-        run.Append(new Text(text ?? string.Empty) { Space = SpaceProcessingModeValues.Preserve });
+        var normalizedText = (text ?? string.Empty).Replace("\r\n", "\n").Replace('\r', '\n');
+        var lines = normalizedText.Split('\n');
+        for (var i = 0; i < lines.Length; i++)
+        {
+            if (i > 0)
+            {
+                run.Append(new Break());
+            }
+
+            run.Append(new Text(lines[i]) { Space = SpaceProcessingModeValues.Preserve });
+        }
+
         return run;
     }
 

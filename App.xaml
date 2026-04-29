@@ -11,22 +11,22 @@
             </ResourceDictionary.MergedDictionaries>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="ShellBackgroundBrush" Color="#FFF6F1E8" />
-                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#F9FFFDFC" />
-                    <SolidColorBrush x:Key="ShellPanelAltBrush" Color="#FFF0E7DA" />
-                    <SolidColorBrush x:Key="ShellStrokeBrush" Color="#1F46352A" />
-                    <SolidColorBrush x:Key="ShellMutedTextBrush" Color="#A3655849" />
-                    <SolidColorBrush x:Key="ShellStrongTextBrush" Color="#FF1F1B17" />
-                    <SolidColorBrush x:Key="CanvasBackdropBrush" Color="#FFF4F7FB" />
-                    <SolidColorBrush x:Key="CanvasChromeBrush" Color="#FFE3EAF5" />
-                    <SolidColorBrush x:Key="CanvasPatternBrush" Color="#FFF0F4FA" />
+                    <SolidColorBrush x:Key="ShellBackgroundBrush" Color="#FFF7F8FB" />
+                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="ShellPanelAltBrush" Color="#FFF4F7FB" />
+                    <SolidColorBrush x:Key="ShellStrokeBrush" Color="#1A5E6B7A" />
+                    <SolidColorBrush x:Key="ShellMutedTextBrush" Color="#FF667085" />
+                    <SolidColorBrush x:Key="ShellStrongTextBrush" Color="#FF101828" />
+                    <SolidColorBrush x:Key="CanvasBackdropBrush" Color="#FFF5F7FA" />
+                    <SolidColorBrush x:Key="CanvasChromeBrush" Color="#FFE6EBF2" />
+                    <SolidColorBrush x:Key="CanvasPatternBrush" Color="#FFF1F5F9" />
                     <SolidColorBrush x:Key="SelectionSurfaceBrush" Color="#1A112E46" />
                     <SolidColorBrush x:Key="OverlayBadgeBrush" Color="#F31B2730" />
                     <SolidColorBrush x:Key="OverlayBadgeTextBrush" Color="#FFF8FBFD" />
                     <SolidColorBrush x:Key="ToolSelectedBrush" Color="#FF112E46" />
                     <SolidColorBrush x:Key="ToolSelectedTextBrush" Color="#FFF5FBFF" />
                     <SolidColorBrush x:Key="ToolUnselectedTextBrush" Color="#FF1E1B18" />
-                    <SolidColorBrush x:Key="PrimaryActionBrush" Color="#FF143753" />
+                    <SolidColorBrush x:Key="PrimaryActionBrush" Color="#FF12304A" />
                     <SolidColorBrush x:Key="PrimaryActionTextBrush" Color="#FFF7FBFD" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">

@@ -2,6 +2,7 @@ namespace SnapSlate;
 
 public enum EditorTool
 {
+    Select,
     Crop,
     Text,
     Sticker,

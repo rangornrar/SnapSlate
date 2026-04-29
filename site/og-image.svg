@@ -1,30 +1,48 @@
 <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#020617"/>
-      <stop offset="1" stop-color="#0F172A"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7FBFF"/>
+      <stop offset="1" stop-color="#EAF1FB"/>
     </linearGradient>
-    <linearGradient id="a" x1="180" y1="140" x2="980" y2="510" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#38BDF8"/>
-      <stop offset="1" stop-color="#2563EB"/>
+    <linearGradient id="accent" x1="120" y1="420" x2="1060" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#14B8A6"/>
     </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
   </defs>
-  <rect width="1200" height="630" rx="36" fill="url(#g)"/>
-  <circle cx="980" cy="110" r="180" fill="#38BDF8" fill-opacity="0.12"/>
-  <circle cx="220" cy="520" r="220" fill="#2563EB" fill-opacity="0.14"/>
-  <rect x="84" y="84" width="1032" height="462" rx="28" stroke="rgba(148,163,184,0.22)"/>
-  <text x="120" y="184" fill="#7DD3FC" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="4">ARCHI-IT LABS</text>
-  <text x="120" y="274" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="84" font-weight="900">SnapSlate</text>
-  <text x="120" y="348" fill="#E2E8F0" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="500">Capture, annotate, and export Windows procedures</text>
-  <text x="120" y="416" fill="#94A3B8" font-family="Inter, Arial, sans-serif" font-size="27">Win + Shift + S · étapes · légendes · PDF / DOCX / Markdown / HTML</text>
-  <rect x="120" y="462" width="220" height="10" rx="5" fill="url(#a)"/>
-  <rect x="780" y="132" width="244" height="292" rx="22" fill="#E5E7EB" stroke="rgba(148,163,184,0.28)"/>
-  <rect x="804" y="156" width="196" height="26" rx="10" fill="#0F172A"/>
-  <rect x="804" y="200" width="128" height="12" rx="6" fill="#0F172A"/>
-  <rect x="804" y="226" width="164" height="10" rx="5" fill="#94A3B8"/>
-  <rect x="804" y="252" width="184" height="10" rx="5" fill="#CBD5E1"/>
-  <rect x="804" y="290" width="154" height="52" rx="18" fill="#38BDF8"/>
-  <text x="826" y="322" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800">Procedure</text>
-  <rect x="1036" y="174" width="52" height="52" rx="16" fill="#2563EB"/>
-  <text x="1053" y="207" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="900">1</text>
+
+  <rect width="1200" height="630" rx="36" fill="url(#bg)"/>
+  <circle cx="970" cy="112" r="170" fill="#2563EB" fill-opacity="0.10"/>
+  <circle cx="208" cy="510" r="220" fill="#14B8A6" fill-opacity="0.12"/>
+
+  <rect x="56" y="56" width="1088" height="518" rx="30" fill="#FFFFFF" filter="url(#shadow)"/>
+  <rect x="56" y="56" width="1088" height="76" rx="30" fill="#FBF7F0"/>
+  <circle cx="92" cy="94" r="10" fill="#2563EB"/>
+  <rect x="88" y="89" width="10" height="10" rx="2" fill="#FFFFFF"/>
+  <text x="124" y="100" fill="#0F172A" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="800">SnapSlate</text>
+  <text x="124" y="156" fill="#14B8A6" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="3">ARCHI-IT LABS</text>
+  <text x="124" y="240" fill="#0F172A" font-family="Segoe UI, Arial, sans-serif" font-size="78" font-weight="900">Turn captures</text>
+  <text x="124" y="316" fill="#0F172A" font-family="Segoe UI, Arial, sans-serif" font-size="78" font-weight="900">into polished</text>
+  <text x="124" y="392" fill="#0F172A" font-family="Segoe UI, Arial, sans-serif" font-size="78" font-weight="900">procedures.</text>
+  <text x="124" y="446" fill="#6B7280" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="500">Canvas-first annotation, OCR, project saving and export-ready workflows.</text>
+  <rect x="124" y="482" width="240" height="12" rx="6" fill="url(#accent)"/>
+
+  <rect x="760" y="134" width="312" height="304" rx="26" fill="#F8FBFF" stroke="#DCE5F2"/>
+  <rect x="784" y="158" width="264" height="54" rx="14" fill="#EDF2FA"/>
+  <text x="806" y="190" fill="#0F172A" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="800">Procedure</text>
+  <rect x="784" y="232" width="232" height="138" rx="20" fill="#FFFFFF" stroke="#E2E8F3"/>
+  <rect x="808" y="256" width="188" height="12" rx="6" fill="#DCE5F2"/>
+  <rect x="808" y="282" width="160" height="12" rx="6" fill="#DCE5F2"/>
+  <rect x="808" y="308" width="176" height="12" rx="6" fill="#DCE5F2"/>
+  <rect x="808" y="334" width="120" height="12" rx="6" fill="#DCE5F2"/>
+  <rect x="1002" y="256" width="28" height="28" rx="8" fill="#2563EB"/>
+  <rect x="1010" y="264" width="12" height="12" rx="3" fill="#FFFFFF"/>
+  <circle cx="1068" cy="176" r="24" fill="#14B8A6"/>
+  <text x="1059" y="183" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="800">1</text>
+
+  <rect x="760" y="458" width="312" height="80" rx="20" fill="#F8FBF9" stroke="#DCE8DD"/>
+  <text x="784" y="492" fill="#0F172A" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">OCR · Export · Démos</text>
+  <text x="784" y="520" fill="#6B7280" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="500">Un produit qui reste centré sur le canvas.</text>
 </svg>

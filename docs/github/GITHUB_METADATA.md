@@ -37,15 +37,19 @@ Point important a garder dans la description publique:
 - le flux `Win + Shift + S` fonctionne tant que l'application est ouverte
 - le remplacement complet du raccourci systeme quand l'app est fermee fait partie de la roadmap, pas de la version actuelle
 
-## Release note actuelle
+## Release note et procedure de deploiement
 
 La release note prete a copier dans GitHub est ici:
 
-- `docs/github/RELEASE_v2026.04.26_001.md`
+- `docs/github/RELEASE_v2026.04.29_001.md`
+
+La procedure de branchement, merge et publication est ici:
+
+- `docs/github/GIT_DEPLOY_v2026.04.29_001.md`
 
 ### Titre conseille
 
-`v2026.04.26_001 - SnapSlate production update`
+`SnapSlate v2026.04.29.001`
 
 ### Fichier a attacher a la release
 

@@ -4,6 +4,20 @@ Tous les changements notables de ce projet seront documentes ici.
 
 Le format est volontairement simple et oriente publication GitHub.
 
+## [2026.04.29.001] - 2026-04-29
+
+### Ajoute
+
+- Nouveau workflow Git de release et deploiement documente en Markdown
+- Site public aligne sur la nouvelle version et le nouvel asset de release
+- Refonte de la galerie de captures avec de vraies captures SnapSlate
+- Workflow editorial public avec captures, annotations, legendes et publication HTML
+
+### Notes
+
+- La release GitHub doit utiliser l'asset `SnapSlate-Setup.exe`
+- Le tag de release conseille est `2026.04.29.001`
+
 ## [1.0.0] - 2026-04-23
 
 ### Ajoute

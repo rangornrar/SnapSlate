@@ -23,7 +23,7 @@ if (-not (Test-Path $innoScript)) {
     throw "Missing Inno Setup script: $innoScript"
 }
 
-& $buildInstallerScript -Configuration $Configuration -Platform $Platform
+& $buildInstallerScript -Configuration Debug -Platform $Platform
 
 $iscc = Get-Command ISCC.exe -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source -ErrorAction SilentlyContinue
 if (-not $iscc) {

@@ -1,8 +1,8 @@
 # SnapSlate Installer
 
-This folder contains everything needed to generate and install a signed SnapSlate package.
+This folder contains the scripts used to build the SnapSlate desktop installer.
 
-## Build a single Setup.exe
+## Build the installer
 
 From `C:\Users\user\Documents\Freelance\programmation\screenshot\SnapSlate`:
 
@@ -10,43 +10,26 @@ From `C:\Users\user\Documents\Freelance\programmation\screenshot\SnapSlate`:
 .\installer\Build-SetupExe.ps1
 ```
 
-This creates:
+This will:
 
-- `installer\release\SnapSlate-Setup.exe`
-
-## Build a fresh installer
-
-From `C:\Users\user\Documents\Freelance\programmation\screenshot\SnapSlate`:
-
-```powershell
-.\installer\Build-Installer.ps1
-```
-
-The script will:
-
-- create or reuse a local signing certificate in `installer\private`
-- publish a signed MSIX package
-- stage a ready-to-share installer in `installer\dist`
+- build SnapSlate in the self-contained Debug configuration
+- stage the app files in `installer\dist\app`
+- create `installer\release\SnapSlate-Setup.exe`
 - create `installer\SnapSlate-Installer-x64.zip`
 
 ## Install on a machine
 
-Open `installer\dist\Install-SnapSlate.cmd` as administrator.
-
-For a simpler user-facing install, use:
+Run:
 
 - `installer\release\SnapSlate-Setup.exe`
 
 The installer will:
 
-- trust the bundled signing certificate
-- install the MSIX package and its Windows App SDK dependencies
-- launch SnapSlate when the install is complete
+- copy SnapSlate files into the chosen install folder
+- create a Start Menu entry
+- optionally create a desktop icon
+- launch SnapSlate when installation completes
 
 ## Uninstall
 
-Run:
-
-```powershell
-.\installer\dist\Uninstall-SnapSlate.ps1
-```
+Use the Windows uninstall entry for SnapSlate from Apps & features.

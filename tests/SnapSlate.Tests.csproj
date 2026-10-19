@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MSTest" Version="4.1.0" />
+    <!-- Link the exact production services, without starting WinUI or MSIX. -->
+    <Compile Include="..\ProjectJson.cs" Link="Production\ProjectJson.cs" />
+    <Compile Include="..\GuideTextExporter.cs" Link="Production\GuideTextExporter.cs" />
+    <Compile Include="..\GuideExportModels.cs" Link="Production\GuideExportModels.cs" />
+  </ItemGroup>
+</Project>

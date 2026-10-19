@@ -1,95 +1,64 @@
 # SnapSlate
 
-SnapSlate est une application Windows de capture et d'annotation construite avec WinUI 3 et le Windows App SDK.
+[![Build](https://github.com/rangornrar/SnapSlate/actions/workflows/build.yml/badge.svg)](https://github.com/rangornrar/SnapSlate/actions/workflows/build.yml)
 
-L'objectif du projet est simple: recuperer les captures faites avec `Win + Shift + S`, les ouvrir dans un nouvel onglet, puis permettre un travail d'annotation rapide sans passer par plusieurs outils.
+Application Windows en C# / WinUI 3 pour transformer des captures d’écran en guides illustrés.
 
-## Fonctionnalites
+![Interface de création d’une procédure](site/shots/procedure.png)
 
-- Import automatique des captures `Win + Shift + S` tant que l'application est ouverte
-- Un nouvel onglet par capture
-- Fermeture d'onglet avec proposition d'enregistrement si le contenu n'a pas encore ete exporte
-- Crop interactif avec application et reinitialisation
-- Ajout de texte libre
-- Gommettes numerotees ou alphabetiques
-- Option pour reinitialiser la numerotation des gommettes au changement de couleur
-- Fleches droites et fleches courbes
-- Encadrement de zones avec rectangles et ovales
-- 10 palettes de couleurs en degrade
-- Export PNG
+## Utilisation
 
-## Limitation actuelle
+1. Télécharger `SnapSlate-Setup.exe` depuis les [versions publiées](https://github.com/rangornrar/SnapSlate/releases/latest).
+2. Installer puis ouvrir SnapSlate.
+3. Réaliser une capture avec `Win + Shift + S` : lorsque SnapSlate est ouverte, la capture est importée dans un nouvel onglet.
+4. Ajouter textes, flèches, gommettes, cadres, zones de focus ou de masquage.
+5. Enregistrer le projet `.snapslate` ou exporter les documents.
 
-Aujourd'hui, `SnapSlate` ecoute le presse-papiers Windows pendant qu'il est deja lance.
+L’application doit être ouverte pour importer les captures du presse-papiers. Elle ne remplace pas le raccourci système lorsqu’elle est fermée.
 
-Concretement:
+## Formats et fonctionnalités
 
-- `Win + Shift + S` cree bien un nouvel onglet si `SnapSlate` est ouverte
-- `SnapSlate` ne remplace pas encore le raccourci systeme au niveau Windows quand l'application est fermee
+- Recadrage, palettes, réglage d’opacité et légendes de gommettes.
+- Plusieurs captures/étapes, annulation et rétablissement.
+- Projets JSON `.snapslate` incluant l’état des documents.
+- Export d’images PNG et de guides PDF, DOCX, Markdown et HTML.
+- Interface français / anglais.
 
-Cette limite est volontairement documentee ici pour eviter toute ambiguite.
+Les exports HTML et Markdown référencent le sous-dossier `images/` : conserver le dossier exporté complet lors du partage.
 
-## Installation
+## Développement sous Windows
 
-### Option la plus simple
+Prérequis : Windows 10/11, SDK .NET 10 et outils Windows/WinUI avec le SDK Windows ciblé par `SnapSlate.csproj`.
 
-Genere ou telecharge le setup puis lance:
-
-- `installer/release/SnapSlate-Setup.exe`
-
-Le setup embarque:
-
-- le package MSIX de l'application
-- le certificat de signature necessaire a l'installation locale
-- les dependances Windows App SDK utiles a l'installation
-
-### Installation depuis les scripts du repo
-
-Si tu veux rester sur le package MSIX et les scripts fournis:
-
-1. Lance `installer/Build-Installer.ps1`
-2. Ouvre `installer/dist/Install-SnapSlate.cmd` en administrateur
-
-## Developpement local
-
-### Prerequis
-
-- Windows 10 ou Windows 11
-- .NET 10 SDK
-- Workload WinUI / Windows App SDK
-
-### Build
+Depuis la racine du dépôt :
 
 ```powershell
-dotnet build .\SnapSlate.csproj -p:Platform=x64
+dotnet restore .\SnapSlate.csproj -p:Configuration=Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false
+dotnet build .\SnapSlate.csproj -c Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false --no-restore
+dotnet test .\tests\SnapSlate.Tests.csproj -c Release
 ```
 
-### Lancement en local
-
-Le projet est packe en MSIX. Le lancement fiable en local passe donc par l'enregistrement du manifeste puis par l'app Windows enregistree:
+Pour préparer les fichiers exécutables sans packaging MSIX :
 
 ```powershell
-Add-AppxPackage -Register .\bin\x64\Debug\net10.0-windows10.0.26100.0\win-x64\AppxManifest.xml -ForceApplicationShutdown
-Start-Process explorer.exe "shell:AppsFolder\E3C7A4ED-2E83-45C8-852A-A0469B8C2291_1z32rh13vfry6!App"
+.\installer\Build-Installer.ps1 -Configuration Debug
 ```
 
-## Build d'un vrai Setup.exe
+Les fichiers sont placés dans `installer/dist/app/`. Lancer `SnapSlate.exe` depuis ce dossier sous Windows. Les scripts historiques `Install-SnapSlate.ps1` concernent un autre parcours MSIX ; ils ne sont pas le point d’entrée de ce staging exécutable.
+
+Pour produire le setup avec Inno Setup 6 installé :
 
 ```powershell
 .\installer\Build-SetupExe.ps1
 ```
 
-Sortie produite:
+Résultat : `installer/release/SnapSlate-Setup.exe`. La compilation CI ne produit pas une nouvelle version distribuée et ne valide pas l’installation interactive.
 
-- `installer/release/SnapSlate-Setup.exe`
+## Architecture et qualité
 
-## Structure du projet
+- [Architecture et limites actuelles](docs/ARCHITECTURE.md)
+- [Décisions de conception](docs/decisions/README.md)
+- [Périmètre des tests et vérifications manuelles](docs/QUALITY.md)
+- [Contribuer](CONTRIBUTING.md) · [Sécurité](SECURITY.md)
 
-- `MainWindow.xaml` et `MainWindow.xaml.cs`: shell principal, onglets, outils d'annotation, import, export, crop
-- `ScreenshotDocument.cs`: etat de chaque onglet
-- `AnnotationModel.cs`: modele des annotations
-- `GradientPaletteDefinition.cs`: definition des palettes degradees
-- `installer/`: scripts de packaging, MSIX, Setup.exe et documentation d'installation
-- `.github/workflows/build.yml`: CI Windows pour verifier que le projet compile
-
-
+Le code source et les binaires ne disposent pas actuellement d’un fichier de licence général dans ce dépôt. Les dépendances ont leurs propres conditions d’utilisation.

@@ -23,7 +23,7 @@ if (-not (Test-Path $innoScript)) {
     throw "Missing Inno Setup script: $innoScript"
 }
 
-& $buildInstallerScript -Configuration Debug -Platform $Platform
+& $buildInstallerScript -Configuration $Configuration -Platform $Platform
 
 $iscc = Get-Command ISCC.exe -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source -ErrorAction SilentlyContinue
 if (-not $iscc) {
@@ -46,7 +46,7 @@ if (-not $iscc) {
 
 if (Test-Path $releaseDir) {
     $resolvedReleaseDir = (Resolve-Path $releaseDir).Path
-    if ($resolvedReleaseDir -notlike "$scriptDir*") {
+    if (-not $resolvedReleaseDir.StartsWith($scriptDir + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
         throw "Refusing to clean unexpected directory: $resolvedReleaseDir"
     }
 
@@ -56,6 +56,7 @@ if (Test-Path $releaseDir) {
 New-Item -ItemType Directory -Force -Path $releaseDir | Out-Null
 
 & $iscc $innoScript
+if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed with exit code $LASTEXITCODE." }
 
 $setupPath = Join-Path $releaseDir "SnapSlate-Setup.exe"
 if (-not (Test-Path $setupPath)) {

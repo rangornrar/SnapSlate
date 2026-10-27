@@ -55,13 +55,13 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            File.WriteAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SnapSlate-startup.log"), ex.ToString());
+            AppDiagnostics.Record(ex);
             throw;
         }
     }
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        File.WriteAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SnapSlate-unhandled.log"), e.Exception.ToString());
+        AppDiagnostics.Record(e.Exception);
     }
 }

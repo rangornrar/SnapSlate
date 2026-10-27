@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet("Release", "Debug")]
-    [string]$Configuration = "Debug",
+    [string]$Configuration = "Release",
 
     [ValidateSet("x64")]
     [string]$Platform = "x64"
@@ -16,7 +16,7 @@ $projectPath = Join-Path $projectDir "SnapSlate.csproj"
 $distDir = Join-Path $installerDir "dist"
 $distAppDir = Join-Path $distDir "app"
 $zipPath = Join-Path $installerDir "SnapSlate-Installer-x64.zip"
-$buildOutputDir = Join-Path $projectDir "bin\$Platform\$Configuration\net10.0-windows10.0.26100.0\win-$Platform"
+$buildOutputDir = Join-Path $installerDir "publish"
 
 function Remove-DirectorySafely {
     param([string]$Path)
@@ -26,20 +26,26 @@ function Remove-DirectorySafely {
     }
 
     $resolvedPath = (Resolve-Path $Path).Path
-    if ($resolvedPath -notlike "$installerDir*") {
+    if (-not $resolvedPath.StartsWith($installerDir + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
         throw "Refusing to remove unexpected path: $resolvedPath"
     }
 
     Remove-Item -LiteralPath $resolvedPath -Recurse -Force
 }
 
-Write-Host "Building SnapSlate ($Configuration, $Platform)..."
-dotnet build $projectPath `
+Remove-DirectorySafely -Path $buildOutputDir
+Write-Host "Publishing SnapSlate ($Configuration, $Platform)..."
+dotnet publish $projectPath `
     -c $Configuration `
     -p:Platform=$Platform `
     -p:WindowsPackageType=None `
     -p:WindowsAppSDKSelfContained=true `
-    -p:PublishReadyToRun=false
+    -p:PublishReadyToRun=false `
+    -r "win-$Platform" `
+    --self-contained true `
+    -o $buildOutputDir
+
+if ($LASTEXITCODE -ne 0) { throw "Publish failed with exit code $LASTEXITCODE." }
 
 if (-not (Test-Path $buildOutputDir)) {
     throw "The build output folder was not found: $buildOutputDir"

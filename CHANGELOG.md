@@ -4,6 +4,24 @@ Tous les changements notables de ce projet seront documentes ici.
 
 Le format est volontairement simple et oriente publication GitHub.
 
+## [2026.10.27.001] - 2026-10-27
+
+### Corrige
+
+- Confirmation de sauvegarde du projet à la fermeture de la fenêtre.
+- Séparation entre export PNG et sauvegarde du projet, y compris après annulation/rétablissement.
+- Masques opaques à l’export, indépendants de l’opacité, sans coins arrondis ni transparence.
+- Validation des projets, images et géométries avant remplacement de la session.
+- Écriture atomique avec conservation de la version précédente dans un fichier `.bak`.
+- Gestion des erreurs d’import/export sans acquitter les modifications du projet.
+- HTTPS obligatoire pour Confluence, sans redirection HTTP automatique.
+- Installateur produit en Release autonome ; versions et dépendances Windows fixées.
+
+### Verification
+
+- 41 tests automatisés de persistance, intégrité des fichiers, état de sauvegarde, masquage, publication et exports texte.
+- Contrôle manuel des dialogues de fermeture interrompu par l’utilisateur ; installation interactive non validée.
+
 ## [2026.04.29.001] - 2026-04-29
 
 ### Ajoute

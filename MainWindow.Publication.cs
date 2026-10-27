@@ -26,7 +26,7 @@ namespace SnapSlate;
 
 public sealed partial class MainWindow
 {
-    internal static readonly HttpClient PublicationHttpClient = new()
+    internal static readonly HttpClient PublicationHttpClient = new(new HttpClientHandler { AllowAutoRedirect = false })
     {
         Timeout = TimeSpan.FromSeconds(90)
     };
@@ -218,6 +218,12 @@ public sealed partial class MainWindow
         var spaceKey = ConfluenceSpaceKeyTextBox.Text.Trim();
         var email = ConfluenceEmailTextBox.Text.Trim();
         var token = ConfluenceTokenPasswordBox.Password.Trim();
+        try { PublicationEndpoint.Confluence(baseUrl); }
+        catch (ArgumentException)
+        {
+            StatusText.Text = SafetyText("HttpsRequired");
+            return;
+        }
         var parentPageText = ConfluenceParentPageIdTextBox.Text.Trim();
 
         if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(spaceKey) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
@@ -314,76 +320,85 @@ public sealed partial class MainWindow
             ? requestedFormats.Distinct().ToArray()
             : new[] { ExportFormatChoice.Markdown, ExportFormatChoice.Html, ExportFormatChoice.Pdf, ExportFormatChoice.Docx };
 
+        var documents = _documents.Select(document => document.CloneForHistory()).ToArray();
+        var sourceDocument = documents.FirstOrDefault(document => document.Id == _currentDocument?.Id) ?? documents[0];
         Directory.CreateDirectory(rootFolder);
-        var packageFolder = Path.Combine(rootFolder, $"SnapSlate-{DateTime.Now:yyyyMMdd-HHmmss}");
-        var imagesFolder = Path.Combine(packageFolder, "images");
-        Directory.CreateDirectory(imagesFolder);
-
-        var exportSteps = new List<GuideExportStep>(_documents.Count);
-        var generatedFormats = new List<string>();
-
-        if (formats.Contains(ExportFormatChoice.Png))
+        var packageFolder = Path.Combine(rootFolder, $"SnapSlate-{DateTime.Now:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}");
+        try
         {
-            generatedFormats.Add("PNG");
-        }
+            var imagesFolder = Path.Combine(packageFolder, "images");
+            Directory.CreateDirectory(imagesFolder);
 
-        for (var i = 0; i < _documents.Count; i++)
+            var exportSteps = new List<GuideExportStep>(documents.Length);
+            var generatedFormats = new List<string>();
+
+            if (formats.Contains(ExportFormatChoice.Png))
+            {
+                generatedFormats.Add("PNG");
+            }
+
+            for (var i = 0; i < documents.Length; i++)
+            {
+                var document = documents[i];
+                var imagePath = Path.Combine(imagesFolder, $"step-{i + 1:00}.png");
+                await Task.Run(() => GuideImageRenderer.SaveDocumentImage(document, _palettes, imagePath));
+
+                exportSteps.Add(new GuideExportStep(
+                    i + 1,
+                    document.BaseTitle,
+                    document.StepNote,
+                    document.OriginLabel,
+                    document.SourceLabel,
+                    imagePath,
+                    document.Annotations
+                        .Where(annotation => annotation.Kind == AnnotationKind.Sticker)
+                        .Select(annotation => new GuideExportLegendItem(
+                            annotation.Text,
+                            string.IsNullOrWhiteSpace(annotation.LegendText) ? T("À compléter", "To fill in") : annotation.LegendText))
+                        .ToArray()));
+            }
+
+            var manifest = new GuideExportManifest(
+                sourceDocument.BaseTitle,
+                GetTemplateLabel(sourceDocument.TemplateType),
+                sourceDocument.Audience,
+                sourceDocument.Author,
+                sourceDocument.DocumentVersion,
+                DateTimeOffset.Now,
+                packageFolder,
+                exportSteps);
+
+            if (formats.Contains(ExportFormatChoice.Markdown))
+            {
+                await File.WriteAllTextAsync(Path.Combine(packageFolder, "guide.md"), BuildMarkdown(manifest), Encoding.UTF8);
+                generatedFormats.Add("Markdown");
+            }
+
+            if (formats.Contains(ExportFormatChoice.Html))
+            {
+                await File.WriteAllTextAsync(Path.Combine(packageFolder, "guide.html"), BuildHtml(manifest), Encoding.UTF8);
+                generatedFormats.Add("HTML");
+            }
+
+            if (formats.Contains(ExportFormatChoice.Pdf))
+            {
+                await GuideExporter.ExportPdfAsync(manifest, Path.Combine(packageFolder, "guide.pdf"));
+                generatedFormats.Add("PDF");
+            }
+
+            if (formats.Contains(ExportFormatChoice.Docx))
+            {
+                await GuideExporter.ExportDocxAsync(manifest, Path.Combine(packageFolder, "guide.docx"));
+                generatedFormats.Add("DOCX");
+            }
+
+            return new GuidePackageResult(packageFolder, manifest, generatedFormats);
+        }
+        catch
         {
-            var document = _documents[i];
-            var imagePath = Path.Combine(imagesFolder, $"step-{i + 1:00}.png");
-            await Task.Run(() => GuideImageRenderer.SaveDocumentImage(document, _palettes, imagePath));
-
-            exportSteps.Add(new GuideExportStep(
-                i + 1,
-                document.BaseTitle,
-                document.StepNote,
-                document.OriginLabel,
-                document.SourceLabel,
-                imagePath,
-                document.Annotations
-                    .Where(annotation => annotation.Kind == AnnotationKind.Sticker)
-                    .Select(annotation => new GuideExportLegendItem(
-                        annotation.Text,
-                        string.IsNullOrWhiteSpace(annotation.LegendText) ? T("À compléter", "To fill in") : annotation.LegendText))
-                    .ToArray()));
+            TryDeleteDirectory(packageFolder);
+            throw;
         }
-
-        var sourceDocument = _currentDocument ?? _documents[0];
-        var manifest = new GuideExportManifest(
-            sourceDocument.BaseTitle,
-            GetTemplateLabel(sourceDocument.TemplateType),
-            sourceDocument.Audience,
-            sourceDocument.Author,
-            sourceDocument.DocumentVersion,
-            DateTimeOffset.Now,
-            packageFolder,
-            exportSteps);
-
-        if (formats.Contains(ExportFormatChoice.Markdown))
-        {
-            await File.WriteAllTextAsync(Path.Combine(packageFolder, "guide.md"), BuildMarkdown(manifest), Encoding.UTF8);
-            generatedFormats.Add("Markdown");
-        }
-
-        if (formats.Contains(ExportFormatChoice.Html))
-        {
-            await File.WriteAllTextAsync(Path.Combine(packageFolder, "guide.html"), BuildHtml(manifest), Encoding.UTF8);
-            generatedFormats.Add("HTML");
-        }
-
-        if (formats.Contains(ExportFormatChoice.Pdf))
-        {
-            await GuideExporter.ExportPdfAsync(manifest, Path.Combine(packageFolder, "guide.pdf"));
-            generatedFormats.Add("PDF");
-        }
-
-        if (formats.Contains(ExportFormatChoice.Docx))
-        {
-            await GuideExporter.ExportDocxAsync(manifest, Path.Combine(packageFolder, "guide.docx"));
-            generatedFormats.Add("DOCX");
-        }
-
-        return new GuidePackageResult(packageFolder, manifest, generatedFormats);
     }
 
     private string BuildPublicationMarkdown(GuideExportManifest manifest)
@@ -531,7 +546,7 @@ internal static class ConfluencePublisher
         string storage,
         long? parentPageId)
     {
-        var endpoint = new Uri($"{baseUrl.TrimEnd('/')}/wiki/rest/api/content/");
+        var endpoint = PublicationEndpoint.Confluence(baseUrl);
         var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
         var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{email}:{token}"));
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", credentials);

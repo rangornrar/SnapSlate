@@ -25,6 +25,13 @@ public sealed partial class MainWindow
     private readonly List<SnapSlateProjectState> _redoHistory = [];
     private readonly Dictionary<TextBox, SnapSlateProjectState> _pendingTextEditSnapshots = new();
 
+    private readonly ProjectSaveTracker _projectSaveTracker = new();
+    private bool _isSavingProject;
+    private bool _isOpeningProject;
+    private bool _isImportingImage;
+    private bool _isProjectDialogOpen;
+    private bool _isCloseConfirmationOpen;
+    private bool _allowClose;
     private string? _currentProjectPath;
     private SnapSlateProjectState? _pendingDragSnapshot;
     private bool _isApplyingProjectState;
@@ -230,11 +237,12 @@ public sealed partial class MainWindow
 
     private bool HasUnsavedProjectChanges()
     {
-        return _documents.Any(document => document.IsDirty);
+        return _projectSaveTracker.HasChanges(CaptureProjectState());
     }
 
     private async Task<bool> CreateNewProjectAsync()
     {
+        if (_isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
         if (!await EnsureProjectCanBeReplacedAsync(T("créer un nouveau projet", "create a new project")))
         {
             return false;
@@ -247,6 +255,7 @@ public sealed partial class MainWindow
 
     private async Task<bool> LoadDemoProjectAsync()
     {
+        if (_isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
         if (!await EnsureProjectCanBeReplacedAsync(T("charger le modèle de démonstration", "load the demo template")))
         {
             return false;
@@ -259,91 +268,129 @@ public sealed partial class MainWindow
 
     private async Task<bool> OpenProjectAsync()
     {
-        if (!await EnsureProjectCanBeReplacedAsync(T("ouvrir un projet", "open a project")))
-        {
-            return false;
-        }
-
-        var picker = new FileOpenPicker();
-        picker.FileTypeFilter.Add(ProjectFileExtension);
-        picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-        InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-
-        var file = await picker.PickSingleFileAsync();
-        if (file is null)
-        {
-            StatusText.Text = T("Ouverture de projet annulée.", "Project open cancelled.");
-            return false;
-        }
-
+        if (_isOpeningProject || _isSavingProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
+        _isOpeningProject = true;
         try
         {
-            var json = await File.ReadAllTextAsync(file.Path);
-            var state = ProjectPersistence.Deserialize(json);
-            if (state is null)
+            if (!await EnsureProjectCanBeReplacedAsync(T("ouvrir un projet", "open a project")))
             {
-                StatusText.Text = T("Le fichier de projet est vide ou invalide.", "The project file is empty or invalid.");
                 return false;
             }
 
-            await ApplyProjectStateAsync(state, file.Path, markDocumentsClean: true, clearHistory: true);
-            StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Projet chargé : {0}", "Project loaded: {0}"), file.Path);
-            return true;
+            var picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(ProjectFileExtension);
+            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+
+            var file = await picker.PickSingleFileAsync();
+            if (file is null)
+            {
+                StatusText.Text = T("Ouverture de projet annulée.", "Project open cancelled.");
+                return false;
+            }
+
+            try
+            {
+                if (new FileInfo(file.Path).Length > ProjectValidator.MaxProjectBytes)
+                {
+                    throw new InvalidDataException("Project file exceeds the supported limit.");
+                }
+                var json = await File.ReadAllTextAsync(file.Path);
+                var state = ProjectPersistence.Deserialize(json);
+                if (state is null)
+                {
+                    StatusText.Text = T("Le fichier de projet est vide ou invalide.", "The project file is empty or invalid.");
+                    return false;
+                }
+
+                await ApplyProjectStateAsync(state, file.Path, markDocumentsClean: true, clearHistory: true);
+                StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Projet chargé : {0}", "Project loaded: {0}"), file.Path);
+                return true;
+            }
+            catch (Exception error)
+            {
+                AppDiagnostics.Record(error);
+                StatusText.Text = SafetyText("ProjectOpenFailed");
+                return false;
+            }
+
         }
-        catch
+        catch (Exception error)
         {
-            StatusText.Text = T("Impossible de charger ce projet.", "Unable to load this project.");
+            AppDiagnostics.Record(error);
+            StatusText.Text = SafetyText("ProjectOpenFailed");
             return false;
+        }
+        finally
+        {
+            _isOpeningProject = false;
         }
     }
 
     private async Task<bool> SaveProjectAsync(bool saveAs = false)
     {
-        CommitPendingTextEdits();
-
-        var targetPath = _currentProjectPath;
-        if (saveAs || string.IsNullOrWhiteSpace(targetPath))
+        if (_isSavingProject || _isApplyingProjectState) return false;
+        _isSavingProject = true;
+        try
         {
-            var picker = new FileSavePicker();
-            picker.FileTypeChoices.Add(T("Projet SnapSlate", "SnapSlate project"), [ProjectFileExtension]);
-            picker.SuggestedFileName = GetSuggestedProjectFileName();
-            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+            CommitPendingTextEdits();
 
-            var file = await picker.PickSaveFileAsync();
-            if (file is null)
+            var targetPath = _currentProjectPath;
+            if (saveAs || string.IsNullOrWhiteSpace(targetPath))
             {
-                StatusText.Text = T("Sauvegarde de projet annulée.", "Project save cancelled.");
+                var picker = new FileSavePicker();
+                picker.FileTypeChoices.Add(T("Projet SnapSlate", "SnapSlate project"), [ProjectFileExtension]);
+                picker.SuggestedFileName = GetSuggestedProjectFileName();
+                InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+
+                var file = await picker.PickSaveFileAsync();
+                if (file is null)
+                {
+                    StatusText.Text = T("Sauvegarde de projet annulée.", "Project save cancelled.");
+                    return false;
+                }
+
+                targetPath = file.Path;
+            }
+
+            if (string.IsNullOrWhiteSpace(targetPath))
+            {
+                StatusText.Text = T("Aucun emplacement de sauvegarde n'est disponible.", "No save location is available.");
                 return false;
             }
 
-            targetPath = file.Path;
-        }
+            var state = CaptureProjectState();
+            foreach (var document in state.Documents)
+            {
+                document.IsDirty = false;
+            }
 
-        if (string.IsNullOrWhiteSpace(targetPath))
+            try
+            {
+                var json = ProjectPersistence.Serialize(state);
+                await AtomicFile.WriteTextAsync(targetPath, json);
+                _currentProjectPath = targetPath;
+                MarkProjectClean(state);
+                StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Projet sauvegardé : {0}", "Project saved: {0}"), targetPath);
+                return true;
+            }
+            catch (Exception error)
+            {
+                AppDiagnostics.Record(error);
+                StatusText.Text = SafetyText("ProjectSaveFailed");
+                return false;
+            }
+
+        }
+        catch (Exception error)
         {
-            StatusText.Text = T("Aucun emplacement de sauvegarde n'est disponible.", "No save location is available.");
+            AppDiagnostics.Record(error);
+            StatusText.Text = SafetyText("ProjectSaveFailed");
             return false;
         }
-
-        var state = CaptureProjectState();
-        foreach (var document in state.Documents)
+        finally
         {
-            document.IsDirty = false;
-        }
-
-        try
-        {
-            var json = ProjectPersistence.Serialize(state);
-            await File.WriteAllTextAsync(targetPath, json);
-            _currentProjectPath = targetPath;
-            MarkProjectClean();
-            StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Projet sauvegardé : {0}", "Project saved: {0}"), targetPath);
-            return true;
-        }
-        catch
-        {
-            StatusText.Text = T("Impossible d'écrire le fichier de projet.", "Unable to write the project file.");
-            return false;
+            _isSavingProject = false;
         }
     }
 
@@ -369,6 +416,7 @@ public sealed partial class MainWindow
 
     private async Task<bool> UndoProjectAsync()
     {
+        if (_isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
         CommitPendingTextEdits();
 
         if (_undoHistory.Count == 0)
@@ -390,6 +438,7 @@ public sealed partial class MainWindow
 
     private async Task<bool> RedoProjectAsync()
     {
+        if (_isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
         CommitPendingTextEdits();
 
         if (_redoHistory.Count == 0)
@@ -426,22 +475,27 @@ public sealed partial class MainWindow
         var dialog = new ContentDialog
         {
             XamlRoot = RootGrid.XamlRoot,
-            Title = string.Format(CultureInfo.CurrentCulture, T("Enregistrer le projet avant de {0} ?", "Save the project before you {0}?"), actionDescription),
-            Content = T("Le projet contient des changements non sauvegardés.", "The project contains unsaved changes."),
-            PrimaryButtonText = T("Enregistrer", "Save"),
-            SecondaryButtonText = T("Ignorer", "Discard"),
-            CloseButtonText = T("Annuler", "Cancel"),
+            Title = string.Format(CultureInfo.CurrentCulture, SafetyText("SavePromptTitle"), actionDescription),
+            Content = SafetyText("SavePromptBody"),
+            PrimaryButtonText = SafetyText("Save"),
+            SecondaryButtonText = SafetyText("Discard"),
+            CloseButtonText = SafetyText("Cancel"),
             DefaultButton = ContentDialogButton.Primary
         };
 
-        var result = await dialog.ShowAsync();
+        if (_isProjectDialogOpen) return false;
+        _isProjectDialogOpen = true;
+        ContentDialogResult result;
+        try { result = await dialog.ShowAsync(); }
+        finally { _isProjectDialogOpen = false; }
         return result switch
         {
-            ContentDialogResult.Primary => await SaveProjectAsync(),
+            ContentDialogResult.Primary => await SaveProjectAsync() && !HasUnsavedProjectChanges(),
             ContentDialogResult.Secondary => true,
             _ => false
         };
     }
+
 
     private async Task ApplyProjectStateAsync(
         SnapSlateProjectState state,
@@ -449,68 +503,41 @@ public sealed partial class MainWindow
         bool markDocumentsClean,
         bool clearHistory)
     {
+        if (_isApplyingProjectState) return;
         _isApplyingProjectState = true;
         try
         {
-            if (clearHistory)
+            ProjectValidator.Validate(state);
+            var prepared = state.Documents.Select(document => document.CloneForHistory()).ToList();
+            if (prepared.Count == 0) prepared.Add(CreateBlankProjectDocument());
+            foreach (var document in prepared)
             {
-                ResetProjectHistory();
+                await EnsureDocumentThumbnailAsync(document);
             }
+            var selected = prepared.FirstOrDefault(document => document.Id == state.SelectedDocumentId) ?? prepared[0];
+            var preparedImage = selected.ImageBytes is { Length: > 0 }
+                ? await CreateBitmapImageAsync(selected.ImageBytes) : null;
+
+            // All external data and image decoding succeeded before touching the live session.
+            if (clearHistory) ResetProjectHistory();
             else
             {
                 _pendingTextEditSnapshots.Clear();
                 _pendingDragSnapshot = null;
             }
-
             _currentProjectPath = projectPath;
             _documents.Clear();
-
-            var sourceDocuments = state.Documents.Count > 0
-                ? state.Documents
-                : [CreateBlankProjectDocument()];
-
-            foreach (var sourceDocument in sourceDocuments)
-            {
-                var document = sourceDocument.CloneForHistory();
-                if (markDocumentsClean)
-                {
-                    document.IsDirty = false;
-                }
-
-                await EnsureDocumentThumbnailAsync(document);
-                _documents.Add(document);
-            }
-
+            foreach (var document in prepared) _documents.Add(document);
             RefreshDocumentCounters();
             RefreshDocumentOrderMetadata();
-
-            var selectedDocument = FindDocumentById(state.SelectedDocumentId) ?? _documents.FirstOrDefault();
-            if (selectedDocument is null)
+            DocumentTabsListView.SelectedItem = selected;
+            await LoadDocumentAsync(selected, preparedImage);
+            if (state.SelectedAnnotationId is Guid annotationId)
             {
-                _currentDocument = null;
-                _selectedAnnotation = null;
-                UpdateUndoRedoButtons();
-                UpdateStatus();
-                return;
+                SelectAnnotation(selected.Annotations.FirstOrDefault(annotation => annotation.Id == annotationId));
             }
-
-            DocumentTabsListView.SelectedItem = selectedDocument;
-            await LoadDocumentAsync(selectedDocument);
-
-            if (state.SelectedAnnotationId is Guid selectedAnnotationId)
-            {
-                var selectedAnnotation = selectedDocument.Annotations.FirstOrDefault(annotation => annotation.Id == selectedAnnotationId);
-                if (selectedAnnotation is not null)
-                {
-                    SelectAnnotation(selectedAnnotation);
-                }
-            }
-
-            if (markDocumentsClean)
-            {
-                MarkProjectClean();
-            }
-
+            if (markDocumentsClean) MarkProjectClean();
+            else RefreshProjectDirtyIndicators();
             UpdateUndoRedoButtons();
         }
         finally
@@ -529,12 +556,15 @@ public sealed partial class MainWindow
         return _documents.FirstOrDefault(document => document.Id == documentId);
     }
 
-    private void MarkProjectClean()
+    private void MarkProjectClean(SnapSlateProjectState? savedState = null)
     {
-        foreach (var document in _documents)
-        {
-            document.IsDirty = false;
-        }
+        _projectSaveTracker.Accept(savedState ?? CaptureProjectState());
+        RefreshProjectDirtyIndicators();
+    }
+
+    private void RefreshProjectDirtyIndicators()
+    {
+        _projectSaveTracker.RefreshIndicators(new SnapSlateProjectState { Documents = _documents.ToList() });
     }
 
     private void RefreshDocumentCounters()

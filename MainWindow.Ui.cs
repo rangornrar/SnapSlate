@@ -184,6 +184,7 @@ public sealed partial class MainWindow
         SetToolButton(ToolbarEllipseButton, EditorTool.Ellipse, T("Ovale", "Ellipse"));
         SetToolButton(ToolbarFocusButton, EditorTool.Focus, T("Focus", "Focus"));
         SetToolButton(ToolbarMaskButton, EditorTool.Mask, T("Masquage", "Mask"));
+        SetButtonTooltip(ToolbarMaskButton, SafetyText("MaskHelp"));
         SetToolButton(ToolbarToolPickerButton, _currentTool, T("Choisir un outil", "Choose a tool"));
 
         SetText(CapturePageTitleText, T("Aide", "Help"));
@@ -1646,7 +1647,7 @@ public sealed partial class MainWindow
         PushUndoState(CaptureProjectState());
         if (_selectedAnnotation is not null)
         {
-            _selectedAnnotation.Opacity = SelectedOpacitySlider.Value;
+            _selectedAnnotation.Opacity = _selectedAnnotation.Kind == AnnotationKind.Mask ? 1 : SelectedOpacitySlider.Value;
             RenderAnnotations(_currentDocument);
             SelectAnnotation(_selectedAnnotation);
             MarkDocumentDirty(_currentDocument);
@@ -2395,99 +2396,22 @@ public sealed partial class MainWindow
 
     private async Task ExportGuideAsync(params ExportFormatChoice[] formats)
     {
-        if (_documents.Count == 0)
+        CommitPendingTextEdits();
+        try
         {
-            StatusText.Text = T("Aucune étape à exporter.", "No steps to export.");
-            return;
+            var rootFolder = App.Preferences.ExportFolder;
+            if (string.IsNullOrWhiteSpace(rootFolder))
+                rootFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SnapSlate-Exports");
+            var package = await BuildGuidePackageAsync(rootFolder, formats);
+            if (package is not null)
+                StatusText.Text = string.Format(CultureInfo.CurrentCulture,
+                    T("Export terminé : {0} dans {1}", "Export complete: {0} in {1}"),
+                    string.Join(", ", package.GeneratedFormats), package.PackageFolder);
         }
-
-        var requestedFormats = formats is { Length: > 0 }
-            ? formats.Distinct().ToArray()
-            : new[] { ExportFormatChoice.Markdown, ExportFormatChoice.Html, ExportFormatChoice.Pdf, ExportFormatChoice.Docx };
-
-        var rootFolder = App.Preferences.ExportFolder;
-        if (string.IsNullOrWhiteSpace(rootFolder))
+        catch (Exception error)
         {
-            rootFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SnapSlate-Exports");
-        }
-
-        Directory.CreateDirectory(rootFolder);
-        var packageFolder = Path.Combine(rootFolder, $"SnapSlate-{DateTime.Now:yyyyMMdd-HHmmss}");
-        var imagesFolder = Path.Combine(packageFolder, "images");
-        Directory.CreateDirectory(imagesFolder);
-
-        var exportSteps = new List<GuideExportStep>(_documents.Count);
-        var generatedFormats = new List<string>();
-        if (requestedFormats.Contains(ExportFormatChoice.Png))
-        {
-            generatedFormats.Add("PNG");
-        }
-
-        for (var i = 0; i < _documents.Count; i++)
-        {
-            var document = _documents[i];
-            var imagePath = Path.Combine(imagesFolder, $"step-{i + 1:00}.png");
-            await Task.Run(() => GuideImageRenderer.SaveDocumentImage(document, _palettes, imagePath));
-
-            exportSteps.Add(new GuideExportStep(
-                i + 1,
-                document.BaseTitle,
-                document.StepNote,
-                document.OriginLabel,
-                document.SourceLabel,
-                imagePath,
-                document.Annotations
-                    .Where(annotation => annotation.Kind == AnnotationKind.Sticker)
-                    .Select(annotation => new GuideExportLegendItem(
-                        annotation.Text,
-                        string.IsNullOrWhiteSpace(annotation.LegendText) ? T("À compléter", "To fill in") : annotation.LegendText))
-                    .ToArray()));
-        }
-
-        var sourceDocument = _currentDocument ?? _documents[0];
-        var manifest = new GuideExportManifest(
-            sourceDocument.BaseTitle,
-            GetTemplateLabel(sourceDocument.TemplateType),
-            sourceDocument.Audience,
-            sourceDocument.Author,
-            sourceDocument.DocumentVersion,
-            DateTimeOffset.Now,
-            packageFolder,
-            exportSteps);
-
-        if (requestedFormats.Contains(ExportFormatChoice.Markdown))
-        {
-            await File.WriteAllTextAsync(Path.Combine(packageFolder, "guide.md"), BuildMarkdown(manifest), Encoding.UTF8);
-            generatedFormats.Add("Markdown");
-        }
-
-        if (requestedFormats.Contains(ExportFormatChoice.Html))
-        {
-            await File.WriteAllTextAsync(Path.Combine(packageFolder, "guide.html"), BuildHtml(manifest), Encoding.UTF8);
-            generatedFormats.Add("HTML");
-        }
-
-        if (requestedFormats.Contains(ExportFormatChoice.Pdf))
-        {
-            await GuideExporter.ExportPdfAsync(manifest, Path.Combine(packageFolder, "guide.pdf"));
-            generatedFormats.Add("PDF");
-        }
-
-        if (requestedFormats.Contains(ExportFormatChoice.Docx))
-        {
-            await GuideExporter.ExportDocxAsync(manifest, Path.Combine(packageFolder, "guide.docx"));
-            generatedFormats.Add("DOCX");
-        }
-
-        var statusMessage = string.Format(
-            CultureInfo.CurrentCulture,
-            T("Export terminé : {0} dans {1}", "Export complete: {0} in {1}"),
-            string.Join(", ", generatedFormats.Count > 0 ? generatedFormats : new[] { "PNG" }),
-            packageFolder);
-
-        if (!string.IsNullOrWhiteSpace(statusMessage))
-        {
-            StatusText.Text = statusMessage;
+            AppDiagnostics.Record(error);
+            StatusText.Text = SafetyText("ExportFailed");
         }
     }
 

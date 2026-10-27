@@ -5,12 +5,32 @@
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
+    <Platforms>x64;x86;ARM64</Platforms>
+    <WindowsPackageType>None</WindowsPackageType>
+    <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MSTest" Version="4.1.0" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.7" />
     <!-- Link the exact production services, without starting WinUI or MSIX. -->
     <Compile Include="..\ProjectJson.cs" Link="Production\ProjectJson.cs" />
     <Compile Include="..\GuideTextExporter.cs" Link="Production\GuideTextExporter.cs" />
     <Compile Include="..\GuideExportModels.cs" Link="Production\GuideExportModels.cs" />
+    <Compile Include="..\AtomicFile.cs" Link="Production\AtomicFile.cs" />
+    <Compile Include="..\ProjectSaveTracker.cs" Link="Production\ProjectSaveTracker.cs" />
+    <Compile Include="..\ProjectPersistence.cs" Link="Production\ProjectPersistence.cs" />
+    <Compile Include="..\ProjectValidator.cs" Link="Production\ProjectValidator.cs" />
+    <Compile Include="..\ImageSafety.cs" Link="Production\ImageSafety.cs" />
+    <Compile Include="..\PublicationEndpoint.cs" Link="Production\PublicationEndpoint.cs" />
+    <Compile Include="..\AnnotationModel.cs" Link="Production\AnnotationModel.cs" />
+    <Compile Include="..\ScreenshotDocument.cs" Link="Production\ScreenshotDocument.cs" />
+    <Compile Include="..\DocumentOrigin.cs" Link="Production\DocumentOrigin.cs" />
+    <Compile Include="..\GuideTemplateType.cs" Link="Production\GuideTemplateType.cs" />
+    <Compile Include="..\GradientPaletteDefinition.cs" Link="Production\GradientPaletteDefinition.cs" />
+    <Compile Include="..\GuideImageRenderer.cs" Link="Production\GuideImageRenderer.cs" />
+    <Compile Include="..\ProjectState.cs" Link="Production\ProjectState.cs" />
   </ItemGroup>
 </Project>

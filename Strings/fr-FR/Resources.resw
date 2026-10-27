@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="CloseAction" xml:space="preserve">
+    <value>fermer l’application</value>
+  </data>
+  <data name="SavePromptTitle" xml:space="preserve">
+    <value>Enregistrer le projet avant de {0} ?</value>
+  </data>
+  <data name="SavePromptBody" xml:space="preserve">
+    <value>Le projet contient des changements non sauvegardés. Le fichier éditable conserve les images originales, y compris les zones masquées.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="Discard" xml:space="preserve">
+    <value>Ignorer</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="OperationFailed" xml:space="preserve">
+    <value>L’opération a échoué. Le projet reste ouvert ; vérifiez le fichier, l’espace disponible et les droits d’accès.</value>
+  </data>
+  <data name="ImportFailed" xml:space="preserve">
+    <value>Impossible de lire cette image. Le projet est conservé.</value>
+  </data>
+  <data name="ExportFailed" xml:space="preserve">
+    <value>L’export a échoué. Le projet reste modifié ; vérifiez la destination et réessayez.</value>
+  </data>
+  <data name="ProjectOpenFailed" xml:space="preserve">
+    <value>Projet invalide ou non pris en charge. La session précédente est conservée.</value>
+  </data>
+  <data name="ProjectSaveFailed" xml:space="preserve">
+    <value>Le projet n’a pas pu être sauvegardé. La version précédente du fichier est conservée.</value>
+  </data>
+  <data name="HttpsRequired" xml:space="preserve">
+    <value>Confluence nécessite une URL HTTPS valide, sans identifiants dans l’URL.</value>
+  </data>
+  <data name="CloseStepTitle" xml:space="preserve">
+    <value>Retirer cette étape du projet ?</value>
+  </data>
+  <data name="CloseStepBody" xml:space="preserve">
+    <value>Enregistrez le projet éditable avant de retirer cette étape. Un export PNG ne sauvegarde pas le projet.</value>
+  </data>
+  <data name="ExportSuccess" xml:space="preserve">
+    <value>PNG exporté : {0}. Le projet éditable doit être enregistré séparément.</value>
+  </data>
+  <data name="MaskHelp" xml:space="preserve">
+    <value>Masquage opaque — les projets éditables conservent l’image originale.</value>
+  </data>
+</root>

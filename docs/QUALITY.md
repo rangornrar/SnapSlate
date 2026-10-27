@@ -3,10 +3,12 @@
 ## Contrôles automatisés
 
 ```powershell
-dotnet test .\tests\SnapSlate.Tests.csproj -c Release
+dotnet test .\tests\SnapSlate.Tests.csproj -c Release -p:Platform=x64
 ```
 
-Sept tests couvrent : aller-retour JSON des coordonnées, champs géométriques inconnus imbriqués, types JSON invalides, échappement des contenus HTML, langue anglaise, notes multilignes et inclusion/exclusion des références d’images Markdown.
+Les sept tests initiaux couvrent : aller-retour JSON des coordonnées, champs géométriques inconnus imbriqués, types JSON invalides, échappement des contenus HTML, langue anglaise, notes multilignes et inclusion/exclusion des références d’images Markdown.
+
+Le lot 1 porte la suite à 41 tests : sauvegarde atomique (y compris panne et verrouillage), état modifié après PNG/Undo/écriture concurrente, validation des projets et géométries, caviardage pixel par pixel pour quatre opacités, conservation d’un export si la source est invalide et validation HTTPS de Confluence.
 
 Le projet de tests utilise les fichiers de production `ProjectJson`, `GuideTextExporter` et `GuideExportModels`, sans mocks de leur logique. Il n’exige ni capture d’écran ni démarrage de WinUI. La CI Windows compile séparément l’application entière puis lance les tests.
 

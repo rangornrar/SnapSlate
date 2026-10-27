@@ -12,7 +12,7 @@ From `C:\Users\user\Documents\Freelance\programmation\screenshot\SnapSlate`:
 
 This will:
 
-- build SnapSlate in the self-contained Debug configuration
+- build SnapSlate in the self-contained Release configuration
 - stage the app files in `installer\dist\app`
 - create `installer\release\SnapSlate-Setup.exe`
 - create `installer\SnapSlate-Installer-x64.zip`

@@ -53,6 +53,15 @@ public sealed class AtomicFileTests
     }
 
     [TestMethod]
+    public void Write_RedactedImageExport_DoesNotLeaveUnredactedBackup()
+    {
+        File.WriteAllText(_path, "unredacted image");
+        AtomicFile.Write(_path, temporary => File.WriteAllText(temporary, "redacted image"), keepBackup: false);
+        Assert.AreEqual("redacted image", File.ReadAllText(_path));
+        Assert.IsFalse(File.Exists(_path + ".bak"));
+    }
+
+    [TestMethod]
     public async Task WriteTextAsync_DestinationLocked_PreservesOriginal()
     {
         File.WriteAllText(_path, "original");

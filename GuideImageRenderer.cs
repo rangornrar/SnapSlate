@@ -20,7 +20,7 @@ public static class GuideImageRenderer
     public static void SaveDocumentImage(ScreenshotDocument document, IReadOnlyDictionary<string, GradientPaletteDefinition> palettes, string outputPath)
     {
         using var bitmap = RenderDocument(document, palettes);
-        AtomicFile.Write(outputPath, temporary => bitmap.Save(temporary, ImageFormat.Png));
+        AtomicFile.Write(outputPath, temporary => bitmap.Save(temporary, ImageFormat.Png), keepBackup: false);
     }
 
     private static Bitmap RenderDocument(ScreenshotDocument document, IReadOnlyDictionary<string, GradientPaletteDefinition> palettes)

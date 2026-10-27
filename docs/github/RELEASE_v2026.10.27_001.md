@@ -16,7 +16,7 @@ Télécharger `SnapSlate-Setup.exe` et lancer l’installateur Windows x64. L’
 
 ## Validation et limites
 
-41 tests automatisés passent. Les builds Debug et Release x64 sont vérifiés. Le contrôle manuel complet des dialogues Windows a été interrompu par la touche Échap ; les tests d’installation interactive, ARM64/x86 et Windows 10 minimum restent à réaliser.
+42 tests automatisés passent. Les builds Debug et Release x64 sont vérifiés. Le contrôle manuel complet des dialogues Windows a été interrompu par la touche Échap ; les tests d’installation interactive, ARM64/x86 et Windows 10 minimum restent à réaliser.
 
 Les fichiers `.snapslate` et leurs sauvegardes `.bak` conservent les images originales : ils ne sont pas expurgés. Pour partager une image masquée, utiliser le PNG ou les images des guides exportés. Cette version ne corrige pas encore tous les écarts de fidélité du rendu, le rail d’outils sur petites images ou les publications distantes sans pièces jointes.
 

@@ -7,13 +7,13 @@ namespace SnapSlate;
 
 internal static class AtomicFile
 {
-    public static void Write(string path, Action<string> writeTemporaryFile)
+    public static void Write(string path, Action<string> writeTemporaryFile, bool keepBackup = true)
     {
         var temporary = CreateTemporaryPath(path);
         try
         {
             writeTemporaryFile(temporary);
-            Commit(temporary, Path.GetFullPath(path));
+            Commit(temporary, Path.GetFullPath(path), keepBackup);
         }
         finally
         {
@@ -33,7 +33,7 @@ internal static class AtomicFile
                 stream.Flush(flushToDisk: true);
             }
 
-            Commit(temporary, Path.GetFullPath(path));
+            Commit(temporary, Path.GetFullPath(path), keepBackup: true);
         }
         finally
         {
@@ -49,11 +49,11 @@ internal static class AtomicFile
         return Path.Combine(directory, $".{Path.GetFileName(absolute)}.{Guid.NewGuid():N}.tmp");
     }
 
-    private static void Commit(string temporary, string destination)
+    private static void Commit(string temporary, string destination, bool keepBackup)
     {
         if (File.Exists(destination))
         {
-            File.Replace(temporary, destination, destination + ".bak", ignoreMetadataErrors: true);
+            File.Replace(temporary, destination, keepBackup ? destination + ".bak" : null, ignoreMetadataErrors: true);
         }
         else
         {

@@ -19,7 +19,7 @@ Le format est volontairement simple et oriente publication GitHub.
 
 ### Verification
 
-- 41 tests automatisés de persistance, intégrité des fichiers, état de sauvegarde, masquage, publication et exports texte.
+- 42 tests automatisés de persistance, intégrité des fichiers, état de sauvegarde, masquage, publication et exports texte.
 - Contrôle manuel des dialogues de fermeture interrompu par l’utilisateur ; installation interactive non validée.
 
 ## [2026.04.29.001] - 2026-04-29

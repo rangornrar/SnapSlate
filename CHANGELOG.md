@@ -4,6 +4,24 @@ Tous les changements notables de ce projet seront documentes ici.
 
 Le format est volontairement simple et oriente publication GitHub.
 
+## [2026.10.27.002] - 2026-10-27
+
+### Corrigé
+
+- Aperçu et exports d’images produits par un moteur commun : texte, graisse, couleurs, opacité, démo et masquage.
+- Recadrage exporté uniquement après confirmation ; sélection provisoire bornée à la source et historisée sans supprimer le recadrage appliqué.
+- Titre, modèle, public, auteur et version portés par le guide ; titres et notes propres à chaque étape.
+- Format de projet v2 ; migration v1 à partir de la première étape, indépendamment de la sélection.
+- Onze outils accessibles sur les petites images grâce à une barre indépendante de la capture et défilante.
+- Chargements obsolètes ignorés ; exports sur instantané, progression et annulation entre étapes/formats, nettoyage des packages partiels.
+- Images PDF/DOCX décodées en mémoire pour éviter les verrous natifs empêchant le nettoyage.
+- Réglages conservés dans un brouillon ; Annuler, Échap et fermeture du panneau abandonnent les modifications. Enregistrer persiste les préférences en arrière-plan.
+
+### Vérification
+
+- 61 tests automatisés, dont migration des métadonnées, état modifié global, recadrage confirmé et identité aperçu/PNG.
+- Contrôles Windows et limites détaillés dans `docs/LOT2_VALIDATION.md`.
+
 ## [2026.10.27.001] - 2026-10-27
 
 ### Corrige

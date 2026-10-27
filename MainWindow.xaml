@@ -440,9 +440,9 @@
                                                 <TextBlock x:Name="ImageSourceText" Grid.Column="1" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" Visibility="Collapsed" />
                                             </Grid>
 
+                                            <Grid x:Name="CanvasWorkspace" Grid.Row="1" SizeChanged="CanvasWorkspace_SizeChanged">
                                             <ScrollViewer
                                                 x:Name="CanvasScrollViewer"
-                                                Grid.Row="1"
                                                 ZoomMode="Enabled"
                                                 MinZoomFactor="0.5"
                                                 MaxZoomFactor="2.0"
@@ -458,129 +458,14 @@
                                                     <Grid x:Name="SceneHost" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent" PointerMoved="SceneHost_PointerMoved" PointerPressed="SceneHost_PointerPressed" PointerReleased="SceneHost_PointerReleased">
                                                         <Grid.RenderTransform>
                                                             <TransformGroup>
-                                                                <ScaleTransform x:Name="SceneScaleTransform" ScaleX="1" ScaleY="1" />
                                                                 <TranslateTransform x:Name="SceneTransform" />
+                                                                <ScaleTransform x:Name="SceneScaleTransform" ScaleX="1" ScaleY="1" />
                                                             </TransformGroup>
                                                         </Grid.RenderTransform>
 
-                                                        <Grid x:Name="PlaceholderPanel" Padding="36" IsHitTestVisible="False">
-                                                            <Border Background="#FFF6F8FC" BorderBrush="#FFDDE4EE" BorderThickness="1" CornerRadius="26" />
-                                                            <Grid Margin="26" RowSpacing="18">
-                                                                <Grid.RowDefinitions>
-                                                                    <RowDefinition Height="Auto" />
-                                                                    <RowDefinition Height="*" />
-                                                                </Grid.RowDefinitions>
-
-                                                                <StackPanel Spacing="10">
-                                                                    <TextBlock Text="Demo documentaire" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                                                    <TextBlock x:Name="PlaceholderTitleText" Text="Lorem Ipsum" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="34" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                                                    <TextBlock x:Name="PlaceholderBodyText" Width="920" Text="Maquette éditoriale complète pour la démonstration et les annotations. La page combine un article, une colonne latérale, un visuel principal et des encadrés pour donner un vrai contexte de production." TextWrapping="Wrap" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="13" />
-                                                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2,0,0">
-                                                                        <Border Background="#FFEAF1FB" BorderBrush="#FFD3DCEC" BorderThickness="1" CornerRadius="999" Padding="10,5">
-                                                                            <TextBlock Text="Article" Foreground="{ThemeResource ShellStrongTextBrush}" FontSize="11" />
-                                                                        </Border>
-                                                                        <Border Background="#FFF1F7FF" BorderBrush="#FFD7E3F5" BorderThickness="1" CornerRadius="999" Padding="10,5">
-                                                                            <TextBlock Text="Guide" Foreground="{ThemeResource ShellStrongTextBrush}" FontSize="11" />
-                                                                        </Border>
-                                                                        <Border Background="#FFF9F2E8" BorderBrush="#FFE8D6BF" BorderThickness="1" CornerRadius="999" Padding="10,5">
-                                                                            <TextBlock Text="Lorem ipsum" Foreground="{ThemeResource ShellStrongTextBrush}" FontSize="11" />
-                                                                        </Border>
-                                                                    </StackPanel>
-                                                                </StackPanel>
-
-                                                                <Grid Grid.Row="1" ColumnSpacing="18" Margin="0,10,0,0">
-                                                                    <Grid.ColumnDefinitions>
-                                                                        <ColumnDefinition Width="2.1*" />
-                                                                        <ColumnDefinition Width="0.9*" />
-                                                                    </Grid.ColumnDefinitions>
-
-                                                                    <Border Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="22" Padding="24">
-                                                                        <Grid RowSpacing="18">
-                                                                            <Grid.RowDefinitions>
-                                                                                <RowDefinition Height="Auto" />
-                                                                                <RowDefinition Height="210" />
-                                                                                <RowDefinition Height="Auto" />
-                                                                                <RowDefinition Height="Auto" />
-                                                                            </Grid.RowDefinitions>
-
-                                                                            <StackPanel Spacing="6">
-                                                                                <TextBlock Text="Article principal" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                                                                <TextBlock Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit." FontSize="22" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" TextWrapping="Wrap" />
-                                                                                <TextBlock Text="Par la rédaction • 29 avril 2026 • 6 min de lecture" FontSize="11" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                                                            </StackPanel>
-
-                                                                            <Grid Grid.Row="1">
-                                                                                <Border Background="#FFF2F5FA" CornerRadius="20" BorderBrush="#FFDDE4EE" BorderThickness="1" />
-                                                                                <Rectangle Margin="14" RadiusX="16" RadiusY="16" Fill="#FFDDE8F9" />
-                                                                                <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="18" Background="#E6FFFFFF" CornerRadius="14" Padding="12,8">
-                                                                                    <StackPanel Spacing="2">
-                                                                                        <TextBlock Text="Visuel de couverture" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                                                                        <TextBlock Text="Espace de contexte pour les annotations et les repères." FontSize="10" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                                                                    </StackPanel>
-                                                                                </Border>
-                                                                            </Grid>
-
-                                                                            <Grid Grid.Row="2" ColumnSpacing="16">
-                                                                                <Grid.ColumnDefinitions>
-                                                                                    <ColumnDefinition Width="*" />
-                                                                                    <ColumnDefinition Width="0.9*" />
-                                                                                </Grid.ColumnDefinitions>
-
-                                                                                <StackPanel Spacing="12">
-                                                                                    <TextBlock Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer mattis, arcu in consequat fermentum, sapien metus consequat justo, et luctus arcu turpis in nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae." TextWrapping="Wrap" Foreground="{ThemeResource ShellStrongTextBrush}" FontSize="12" />
-                                                                                    <TextBlock Text="Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo." TextWrapping="Wrap" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="12" />
-                                                                                </StackPanel>
-
-                                                                                <Border Grid.Column="1" Background="#FFF9FBFE" BorderBrush="#FFDDE4EE" BorderThickness="1" CornerRadius="18" Padding="16">
-                                                                                    <StackPanel Spacing="8">
-                                                                                        <TextBlock Text="Point clé" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                                                                        <TextBlock Text="Une mise en page sobre, dense et annotable, pour représenter un vrai écran de production." TextWrapping="Wrap" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" />
-                                                                                    </StackPanel>
-                                                                                </Border>
-                                                                            </Grid>
-
-                                                                            <Border Grid.Row="3" Background="#FFFEF8F0" BorderBrush="#FFF0D6B6" BorderThickness="1" CornerRadius="18" Padding="16">
-                                                                                <StackPanel Spacing="8">
-                                                                                    <TextBlock Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." TextWrapping="Wrap" Foreground="{ThemeResource ShellStrongTextBrush}" FontSize="12" />
-                                                                                    <TextBlock Text="Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." TextWrapping="Wrap" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" />
-                                                                                </StackPanel>
-                                                                            </Border>
-                                                                        </Grid>
-                                                                    </Border>
-
-                                                                    <Border Grid.Column="1" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="22" Padding="18">
-                                                                        <StackPanel Spacing="14">
-                                                                            <StackPanel Spacing="4">
-                                                                                <TextBlock Text="Repères" FontSize="16" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                                                                <TextBlock Text="Résumé de contexte pour la démo" FontSize="11" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                                                            </StackPanel>
-
-                                                                            <Border Background="#FFF6F9FF" BorderBrush="#FFDDE4EE" BorderThickness="1" CornerRadius="16" Padding="14">
-                                                                                <StackPanel Spacing="6">
-                                                                                    <TextBlock Text="Sommaire" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                                                                    <TextBlock Text="1. Introduction&#x0a;2. Bloc principal&#x0a;3. Encadré latéral&#x0a;4. Conclusion" TextWrapping="Wrap" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" />
-                                                                                </StackPanel>
-                                                                            </Border>
-
-                                                                            <Border Background="#FFF8FBF7" BorderBrush="#FFD8E6D6" BorderThickness="1" CornerRadius="16" Padding="14">
-                                                                                <StackPanel Spacing="6">
-                                                                                    <TextBlock Text="Résumé" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                                                                    <TextBlock Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Une page fictive, dense et crédible, prête pour l'annotation." TextWrapping="Wrap" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" />
-                                                                                </StackPanel>
-                                                                            </Border>
-
-                                                                            <Border Background="#FFFFF9F4" BorderBrush="#FFF0D6B6" BorderThickness="1" CornerRadius="16" Padding="14">
-                                                                                <StackPanel Spacing="6">
-                                                                                    <TextBlock Text="Note" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                                                                    <TextBlock Text="Le contenu Lorem Ipsum sert ici de vrai support visuel pour la démonstration." TextWrapping="Wrap" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" />
-                                                                                </StackPanel>
-                                                                            </Border>
-                                                                        </StackPanel>
-                                                                    </Border>
-                                                                </Grid>
-                                                            </Grid>
-                                                        </Grid>
+                                                        <Grid x:Name="PlaceholderPanel" IsHitTestVisible="False" />
                                                         <Image x:Name="ImportedImage" Stretch="Fill" IsHitTestVisible="False" />
+                                                        <Image x:Name="RenderedSceneImage" Stretch="Fill" IsHitTestVisible="False" AutomationProperties.AccessibilityView="Raw" />
                                                         <Canvas x:Name="AnnotationCanvas">
                                                             <Rectangle
                                                                 x:Name="SelectionOutline"
@@ -612,6 +497,31 @@
                                                         </Canvas>
                                                     </Grid>
 
+
+
+                                                    <Border
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Top"
+                                                        Margin="76,16,0,0"
+                                                        Background="{ThemeResource ShellPanelBrush}"
+                                                        BorderBrush="{ThemeResource ShellStrokeBrush}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="18"
+                                                        Padding="10"
+                                                        Visibility="Collapsed">
+                                                        <StackPanel Spacing="10">
+                                                            <StackPanel Spacing="2">
+                                                                <TextBlock x:Name="PaletteSectionTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="10" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                                                <TextBlock x:Name="PaletteSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="9" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Visibility="Collapsed" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                <TextBlock x:Name="PaletteShadeSectionTitleText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="9" />
+                                                                <StackPanel x:Name="PaletteShadeStrip" Orientation="Horizontal" Spacing="3" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Grid>
+                                            </ScrollViewer>
                                                     <Border
                                                         x:Name="FloatingToolRail"
                                                         HorizontalAlignment="Left"
@@ -652,11 +562,11 @@
                                                         </Border.Resources>
                                                         <Grid RowSpacing="8">
                                                             <Grid.RowDefinitions>
-                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="18" />
                                                                 <RowDefinition Height="*" />
                                                             </Grid.RowDefinitions>
                                                             <primitives:Thumb x:Name="FloatingToolRailDragThumb" Style="{StaticResource FloatingToolRailThumbStyle}" DragDelta="FloatingToolRailDragThumb_DragDelta" DragCompleted="FloatingToolRailDragThumb_DragCompleted" />
-                                                            <StackPanel Grid.Row="1" Spacing="6">
+                                                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="6">
                                                                 <Button x:Name="ToolbarSelectButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Select" />
                                                                 <Button x:Name="ToolbarCropButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Crop" />
                                                                 <Button x:Name="ToolbarOcrButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="OcrButton_Click" />
@@ -668,33 +578,10 @@
                                                                 <Button x:Name="ToolbarEllipseButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Ellipse" />
                                                                 <Button x:Name="ToolbarFocusButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Focus" />
                                                                 <Button x:Name="ToolbarMaskButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Mask" />
-                                                            </StackPanel>
+                                                            </StackPanel></ScrollViewer>
                                                         </Grid>
                                                     </Border>
-
-                                                    <Border
-                                                        HorizontalAlignment="Left"
-                                                        VerticalAlignment="Top"
-                                                        Margin="76,16,0,0"
-                                                        Background="{ThemeResource ShellPanelBrush}"
-                                                        BorderBrush="{ThemeResource ShellStrokeBrush}"
-                                                        BorderThickness="1"
-                                                        CornerRadius="18"
-                                                        Padding="10"
-                                                        Visibility="Collapsed">
-                                                        <StackPanel Spacing="10">
-                                                            <StackPanel Spacing="2">
-                                                                <TextBlock x:Name="PaletteSectionTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="10" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                                                <TextBlock x:Name="PaletteSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="9" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Visibility="Collapsed" />
-                                                            </StackPanel>
-                                                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                                                <TextBlock x:Name="PaletteShadeSectionTitleText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="9" />
-                                                                <StackPanel x:Name="PaletteShadeStrip" Orientation="Horizontal" Spacing="3" />
-                                                            </StackPanel>
-                                                        </StackPanel>
-                                                    </Border>
-                                                </Grid>
-                                            </ScrollViewer>
+                                            </Grid>
                                         </Grid>
                                     </Border>
                                 </Grid>
@@ -723,7 +610,7 @@
                                         <StackPanel Spacing="14">
                                             <StackPanel x:Name="StepDetailsPanel" Spacing="10">
                                                 <TextBlock x:Name="StepTitleLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                                <TextBox x:Name="StepTitleTextBox" TextChanged="DocumentTitleTextBox_TextChanged" />
+                                                <TextBox x:Name="StepTitleTextBox" TextChanged="StepTitleTextBox_TextChanged" />
                                                 <TextBlock x:Name="StepNoteLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
                                                 <TextBox x:Name="StepNoteTextBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="120" MaxHeight="260" ScrollViewer.VerticalScrollBarVisibility="Auto" TextChanged="StepNoteTextBox_TextChanged" />
                                                 <StackPanel x:Name="StepMetadataPanel" Visibility="Collapsed" Spacing="8">
@@ -1077,18 +964,21 @@
                 </Grid>
             </Grid>
 
-        <Border Grid.Row="3" Margin="16,0,16,12" Background="Transparent" BorderThickness="0" Padding="0" IsHitTestVisible="False">
+
+    </Grid>
+
+        <Border Grid.Row="3" Margin="16,0,16,12" Background="Transparent" BorderThickness="0" Padding="0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="StatusText" Foreground="{ThemeResource ShellMutedTextBrush}" TextTrimming="CharacterEllipsis" FontSize="12" IsHitTestVisible="False" />
-                <TextBlock x:Name="AnnotationCountText" Grid.Column="1" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="12" IsHitTestVisible="False" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"><ProgressRing x:Name="ExportProgressRing" Width="18" Height="18" IsActive="False" Visibility="Collapsed" /><Button x:Name="ExportCancelButton" x:Uid="ExportCancel" Visibility="Collapsed" Click="ExportCancelButton_Click" AutomationProperties.AutomationId="ExportCancelButton" />
+                <TextBlock x:Name="AnnotationCountText" Grid.Column="1" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="12" IsHitTestVisible="False" /></StackPanel>
             </Grid>
         </Border>
     </Grid>
-</Grid>
 </Window>
 
 

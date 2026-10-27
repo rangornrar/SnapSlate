@@ -25,3 +25,8 @@ public sealed record GuideExportStep(
 public sealed record GuideExportLegendItem(
     string StickerLabel,
     string Description);
+
+internal sealed record GuidePackageResult(
+    string PackageFolder,
+    GuideExportManifest Manifest,
+    IReadOnlyList<string> GeneratedFormats);

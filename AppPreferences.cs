@@ -20,15 +20,6 @@ public enum LanguageChoice
     English
 }
 
-public enum ExportFormatChoice
-{
-    Png,
-    Html,
-    Markdown,
-    Pdf,
-    Docx
-}
-
 public sealed class AppPreferences
 {
     private static string DefaultExportFolder =>

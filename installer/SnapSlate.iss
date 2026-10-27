@@ -1,5 +1,5 @@
 #define MyAppName "SnapSlate"
-#define MyAppVersion "2026.10.27.1"
+#define MyAppVersion "2026.10.27.2"
 #define MyAppPublisher "SnapSlate"
 #define MyAppSetupName "SnapSlate-Setup"
 

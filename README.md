@@ -20,7 +20,9 @@ L’application doit être ouverte pour importer les captures du presse-papiers.
 
 - Recadrage, palettes, réglage d’opacité et légendes de gommettes.
 - Plusieurs captures/étapes, annulation et rétablissement.
-- Projets JSON `.snapslate` incluant l’état des documents.
+- Projets JSON `.snapslate` v2 : métadonnées du guide indépendantes des titres d’étapes, reprise des projets v1.
+- Aperçu et images exportées issus du même moteur de rendu ; seuls les recadrages confirmés sont exportés.
+- Réglages appliqués avec Enregistrer ou abandonnés avec Annuler/Échap ; progression et annulation des exports.
 - Export d’images PNG et de guides PDF, DOCX, Markdown et HTML.
 - Interface français / anglais.
 

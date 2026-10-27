@@ -19,14 +19,13 @@ public static class GuideImageRenderer
 
     public static void SaveDocumentImage(ScreenshotDocument document, IReadOnlyDictionary<string, GradientPaletteDefinition> palettes, string outputPath)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
         using var bitmap = RenderDocument(document, palettes);
-        bitmap.Save(outputPath, ImageFormat.Png);
+        AtomicFile.Write(outputPath, temporary => bitmap.Save(temporary, ImageFormat.Png), keepBackup: false);
     }
 
     private static Bitmap RenderDocument(ScreenshotDocument document, IReadOnlyDictionary<string, GradientPaletteDefinition> palettes)
     {
-        var sourceImage = LoadSourceImage(document.ImageBytes);
+        using var sourceImage = LoadSourceImage(document.ImageBytes);
         var crop = GetExportCrop(document, sourceImage);
         var width = Math.Max(1, (int)Math.Round(crop.Width > 0 ? crop.Width : sourceImage?.Width ?? DefaultWidth));
         var height = Math.Max(1, (int)Math.Round(crop.Height > 0 ? crop.Height : sourceImage?.Height ?? DefaultHeight));
@@ -76,12 +75,12 @@ public static class GuideImageRenderer
         var cropOffsetX = crop.Width > 0 ? crop.X : 0;
         var cropOffsetY = crop.Height > 0 ? crop.Y : 0;
 
-        foreach (var annotation in document.Annotations)
+        foreach (var annotation in document.Annotations.Where(item => item.Kind != AnnotationKind.Mask)
+            .Concat(document.Annotations.Where(item => item.Kind == AnnotationKind.Mask)))
         {
             DrawAnnotation(graphics, annotation, palettes, cropOffsetX, cropOffsetY);
         }
 
-        sourceImage?.Dispose();
         return bitmap;
     }
 
@@ -92,16 +91,10 @@ public static class GuideImageRenderer
             return null;
         }
 
+        ImageSafety.Validate(bytes);
         using var stream = new MemoryStream(bytes, writable: false);
-        try
-        {
-            using var image = Image.FromStream(stream);
-            return new Bitmap(image);
-        }
-        catch
-        {
-            return null;
-        }
+        using var image = Image.FromStream(stream);
+        return new Bitmap(image);
     }
 
     private static Rect GetExportCrop(ScreenshotDocument document, Image? sourceImage)
@@ -158,7 +151,7 @@ public static class GuideImageRenderer
                 DrawRoundedShape(graphics, annotation.Bounds, strokeColor, fillColor, Math.Max(3, annotation.StrokeThickness), 24, offsetX, offsetY);
                 break;
             case AnnotationKind.Mask:
-                DrawMask(graphics, annotation.Bounds, opacity, offsetX, offsetY);
+                DrawMask(graphics, annotation.Bounds, offsetX, offsetY);
                 break;
             case AnnotationKind.ArrowStraight:
                 DrawArrow(graphics, annotation.StartPoint, annotation.EndPoint, strokeColor, annotation.StrokeThickness, false, offsetX, offsetY);
@@ -239,19 +232,18 @@ public static class GuideImageRenderer
         graphics.DrawEllipse(pen, rect);
     }
 
-    private static void DrawMask(Graphics graphics, Rect bounds, int opacity, double offsetX, double offsetY)
+    private static void DrawMask(Graphics graphics, Rect bounds, double offsetX, double offsetY)
     {
-        var rect = new RectangleF(
-            (float)(bounds.X - offsetX),
-            (float)(bounds.Y - offsetY),
-            (float)Math.Max(1, bounds.Width),
-            (float)Math.Max(1, bounds.Height));
-
-        using var path = CreateRoundedRectanglePath(rect, 20);
-        using var fill = new SolidBrush(Color.FromArgb(Math.Max(150, opacity), 18, 18, 18));
-        using var pen = new Pen(Color.FromArgb(255, 18, 18, 18), 2);
-        graphics.FillPath(fill, path);
-        graphics.DrawPath(pen, path);
+        // Cover every pixel touching the selection, without antialiased/rounded edges.
+        var left = (int)Math.Floor(bounds.X - offsetX);
+        var top = (int)Math.Floor(bounds.Y - offsetY);
+        var right = (int)Math.Ceiling(bounds.Right - offsetX);
+        var bottom = (int)Math.Ceiling(bounds.Bottom - offsetY);
+        var smoothing = graphics.SmoothingMode;
+        graphics.SmoothingMode = SmoothingMode.None;
+        using var fill = new SolidBrush(Color.FromArgb(255, 18, 18, 18));
+        graphics.FillRectangle(fill, left, top, Math.Max(1, right - left), Math.Max(1, bottom - top));
+        graphics.SmoothingMode = smoothing;
     }
 
     private static void DrawArrow(Graphics graphics, FoundationPoint start, FoundationPoint end, Color strokeColor, double thickness, bool curved, double offsetX, double offsetY)

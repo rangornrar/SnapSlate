@@ -9,6 +9,8 @@ internal static class ProjectPersistence
 
     public static SnapSlateProjectState? Deserialize(string json)
     {
-        return ProjectJson.Deserialize<SnapSlateProjectState>(json);
+        var state = ProjectJson.Deserialize<SnapSlateProjectState>(json);
+        if (state is not null) ProjectValidator.Validate(state);
+        return state;
     }
 }

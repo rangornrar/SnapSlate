@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="CloseAction" xml:space="preserve">
+    <value>close the application</value>
+  </data>
+  <data name="SavePromptTitle" xml:space="preserve">
+    <value>Save the project before you {0}?</value>
+  </data>
+  <data name="SavePromptBody" xml:space="preserve">
+    <value>The project has unsaved changes. Editable projects retain original images, including masked areas.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Discard" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="OperationFailed" xml:space="preserve">
+    <value>The operation failed. The project remains open; check the file, free space and access permissions.</value>
+  </data>
+  <data name="ImportFailed" xml:space="preserve">
+    <value>Unable to read this image. The project is preserved.</value>
+  </data>
+  <data name="ExportFailed" xml:space="preserve">
+    <value>Export failed. The project still has changes; check the destination and try again.</value>
+  </data>
+  <data name="ProjectOpenFailed" xml:space="preserve">
+    <value>Invalid or unsupported project. The previous session is preserved.</value>
+  </data>
+  <data name="ProjectSaveFailed" xml:space="preserve">
+    <value>The project could not be saved. The previous file version is preserved.</value>
+  </data>
+  <data name="HttpsRequired" xml:space="preserve">
+    <value>Confluence requires a valid HTTPS URL without embedded credentials.</value>
+  </data>
+  <data name="CloseStepTitle" xml:space="preserve">
+    <value>Remove this step from the project?</value>
+  </data>
+  <data name="CloseStepBody" xml:space="preserve">
+    <value>Save the editable project before removing this step. A PNG export does not save the project.</value>
+  </data>
+  <data name="ExportSuccess" xml:space="preserve">
+    <value>PNG exported: {0}. Save the editable project separately.</value>
+  </data>
+  <data name="MaskHelp" xml:space="preserve">
+    <value>Opaque mask — editable projects retain the original image.</value>
+  </data>
+</root>

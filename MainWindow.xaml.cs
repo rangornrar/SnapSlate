@@ -146,6 +146,8 @@ public sealed partial class MainWindow : Window
         BuildShadeStrip();
         SelectTool(EditorTool.Select);
         AddDocument(CreateDemoDocument(isInitial: true), select: true);
+        MarkProjectClean();
+        AppWindow.Closing += MainWindow_Closing;
 
         _clipboardPollTimer = DispatcherQueue.CreateTimer();
         _clipboardPollTimer.Interval = TimeSpan.FromMilliseconds(850);
@@ -262,6 +264,10 @@ public sealed partial class MainWindow : Window
 
     private async Task<ScreenshotDocument?> CreateDocumentFromFileAsync(StorageFile file)
     {
+        if ((await file.GetBasicPropertiesAsync()).Size > ImageSafety.MaxImageBytes)
+        {
+            throw new InvalidDataException("Image file exceeds the supported limit.");
+        }
         var buffer = await FileIO.ReadBufferAsync(file);
         var bytes = buffer.ToArray();
         if (bytes.Length == 0)
@@ -269,6 +275,7 @@ public sealed partial class MainWindow : Window
             return null;
         }
 
+        ImageSafety.Validate(bytes);
         var (sourceWidth, sourceHeight) = await GetImageSizeAsync(bytes);
         var thumbnail = await CreateBitmapImageAsync(bytes, 160);
         return CreateDocumentCore(
@@ -286,6 +293,7 @@ public sealed partial class MainWindow : Window
 
     private async Task<ScreenshotDocument> CreateDocumentFromClipboardAsync(byte[] bytes)
     {
+        ImageSafety.Validate(bytes);
         var (sourceWidth, sourceHeight) = await GetImageSizeAsync(bytes);
         var captureIndex = _nextCaptureIndex++;
         var thumbnail = await CreateBitmapImageAsync(bytes, 160);
@@ -350,7 +358,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private async Task LoadDocumentAsync(ScreenshotDocument document)
+    private async Task LoadDocumentAsync(ScreenshotDocument document, BitmapImage? preparedImage = null)
     {
         if (_currentDocument == document && !_isApplyingDocumentState)
         {
@@ -385,7 +393,7 @@ public sealed partial class MainWindow : Window
 
             if (document.ImageBytes is { Length: > 0 })
             {
-                ImportedImage.Source = await CreateBitmapImageAsync(document.ImageBytes);
+                ImportedImage.Source = preparedImage ?? await CreateBitmapImageAsync(document.ImageBytes);
                 ImportedImage.Visibility = Visibility.Visible;
                 PlaceholderPanel.Visibility = Visibility.Collapsed;
             }
@@ -711,32 +719,47 @@ public sealed partial class MainWindow : Window
 
     private async void ImportScreenshotButton_Click(object sender, RoutedEventArgs e)
     {
-        var picker = new FileOpenPicker();
-        picker.FileTypeFilter.Add(".png");
-        picker.FileTypeFilter.Add(".jpg");
-        picker.FileTypeFilter.Add(".jpeg");
-        picker.FileTypeFilter.Add(".bmp");
-        picker.FileTypeFilter.Add(".webp");
-        InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-
-        var file = await picker.PickSingleFileAsync();
-        if (file is null)
+        if (_isImportingImage || _isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen) return;
+        _isImportingImage = true;
+        try
         {
-            StatusText.Text = "Import annule.";
-            return;
-        }
+            var picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".bmp");
+            picker.FileTypeFilter.Add(".webp");
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
 
-        var document = await CreateDocumentFromFileAsync(file);
-        if (document is null)
+            var file = await picker.PickSingleFileAsync();
+            if (file is null)
+            {
+                StatusText.Text = "Import annule.";
+                return;
+            }
+
+            var document = await CreateDocumentFromFileAsync(file);
+            if (document is null)
+            {
+                StatusText.Text = "Impossible de lire le fichier selectionne.";
+                return;
+            }
+
+            PushUndoState(CaptureProjectState());
+            AddDocument(document, select: true);
+            document.IsDirty = true;
+            StatusText.Text = $"Nouveau tab cree pour {file.Name}.";
+
+        }
+        catch (Exception error)
         {
-            StatusText.Text = "Impossible de lire le fichier selectionne.";
-            return;
+            AppDiagnostics.Record(error);
+            StatusText.Text = SafetyText("ImportFailed");
         }
-
-        PushUndoState(CaptureProjectState());
-        AddDocument(document, select: true);
-        document.IsDirty = true;
-        StatusText.Text = $"Nouveau tab cree pour {file.Name}.";
+        finally
+        {
+            _isImportingImage = false;
+        }
     }
 
     private void NewDemoTabButton_Click(object sender, RoutedEventArgs e)
@@ -758,16 +781,17 @@ public sealed partial class MainWindow : Window
 
     private async Task TryCloseDocumentAsync(ScreenshotDocument document)
     {
+        if (_isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return;
         if (document.IsDirty)
         {
             var dialog = new ContentDialog
             {
                 XamlRoot = RootGrid.XamlRoot,
-                Title = $"Fermer {document.BaseTitle} ?",
-                Content = "Cet onglet contient du contenu non sauvegarde. Voulez-vous enregistrer avant de fermer ?",
-                PrimaryButtonText = "Enregistrer",
-                SecondaryButtonText = "Fermer sans sauvegarder",
-                CloseButtonText = "Annuler",
+                Title = SafetyText("CloseStepTitle"),
+                Content = SafetyText("CloseStepBody"),
+                PrimaryButtonText = SafetyText("Save"),
+                SecondaryButtonText = SafetyText("Discard"),
+                CloseButtonText = SafetyText("Cancel"),
                 DefaultButton = ContentDialogButton.Primary
             };
 
@@ -779,7 +803,8 @@ public sealed partial class MainWindow : Window
 
             if (result == ContentDialogResult.Primary)
             {
-                var saved = await SaveDocumentAsync(document);
+                var saved = await SaveProjectAsync();
+                if (HasUnsavedProjectChanges()) return;
                 if (!saved)
                 {
                     return;
@@ -852,42 +877,52 @@ public sealed partial class MainWindow : Window
 
     private async Task<bool> SaveDocumentAsync(ScreenshotDocument document)
     {
-        StorageFile? file = null;
-        if (!string.IsNullOrWhiteSpace(document.SavedPath))
+        try
         {
-            try
+            StorageFile? file = null;
+            if (!string.IsNullOrWhiteSpace(document.SavedPath))
             {
-                file = await StorageFile.GetFileFromPathAsync(document.SavedPath);
+                try
+                {
+                    file = await StorageFile.GetFileFromPathAsync(document.SavedPath);
+                }
+                catch
+                {
+                    file = null;
+                }
             }
-            catch
-            {
-                file = null;
-            }
-        }
 
-        if (file is null)
-        {
-            var picker = new FileSavePicker();
-            picker.FileTypeChoices.Add("PNG image", [".png"]);
-            picker.SuggestedFileName = document.Origin == DocumentOrigin.FileImport
-                ? $"{System.IO.Path.GetFileNameWithoutExtension(document.FileNameLabel)}-annotated"
-                : document.BaseTitle.Replace(' ', '-').ToLowerInvariant();
-
-            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-            file = await picker.PickSaveFileAsync();
             if (file is null)
             {
-                StatusText.Text = "Sauvegarde annulee.";
-                return false;
+                var picker = new FileSavePicker();
+                picker.FileTypeChoices.Add("PNG image", [".png"]);
+                picker.SuggestedFileName = document.Origin == DocumentOrigin.FileImport
+                    ? $"{System.IO.Path.GetFileNameWithoutExtension(document.FileNameLabel)}-annotated"
+                    : document.BaseTitle.Replace(' ', '-').ToLowerInvariant();
+
+                InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+                file = await picker.PickSaveFileAsync();
+                if (file is null)
+                {
+                    StatusText.Text = "Sauvegarde annulee.";
+                    return false;
+                }
             }
+
+            var snapshot = document.CloneForHistory();
+            await Task.Run(() => GuideImageRenderer.SaveDocumentImage(snapshot, _palettes, file.Path));
+
+            document.SavedPath = file.Path;
+            StatusText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("ExportSuccess"), file.Path);
+            return true;
+
         }
-
-        GuideImageRenderer.SaveDocumentImage(document, _palettes, file.Path);
-
-        document.SavedPath = file.Path;
-        document.IsDirty = false;
-        StatusText.Text = $"Sauvegarde terminee : {file.Path}";
-        return true;
+        catch (Exception error)
+        {
+            AppDiagnostics.Record(error);
+            StatusText.Text = SafetyText("ExportFailed");
+            return false;
+        }
     }
 
     private void ClearAnnotationsButton_Click(object sender, RoutedEventArgs e)
@@ -1554,7 +1589,8 @@ public sealed partial class MainWindow : Window
     private void RenderAnnotations(ScreenshotDocument document)
     {
         AnnotationCanvas.Children.Clear();
-        foreach (var annotation in document.Annotations)
+        foreach (var annotation in document.Annotations.Where(item => item.Kind != AnnotationKind.Mask)
+            .Concat(document.Annotations.Where(item => item.Kind == AnnotationKind.Mask)))
         {
             switch (annotation.Kind)
             {
@@ -1704,12 +1740,12 @@ public sealed partial class MainWindow : Window
                     {
                         Width = annotation.Bounds.Width,
                         Height = annotation.Bounds.Height,
-                        RadiusX = 20,
-                        RadiusY = 20,
+                        RadiusX = 0,
+                        RadiusY = 0,
                         Stroke = new SolidColorBrush(ColorHelper.FromArgb(255, 18, 18, 18)),
-                        Fill = new SolidColorBrush(ColorHelper.FromArgb(215, 18, 18, 18)),
+                        Fill = new SolidColorBrush(ColorHelper.FromArgb(255, 18, 18, 18)),
                         StrokeThickness = 2,
-                        Opacity = annotation.Opacity
+                        Opacity = 1
                     };
 
                     AttachAnnotationInteraction(rectangle, annotation);
@@ -2007,7 +2043,7 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            if (!App.Preferences.AutoImportClipboard || !_clipboardWatcherPrimed)
+            if (!App.Preferences.AutoImportClipboard || !_clipboardWatcherPrimed || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen || _isSavingProject || _isOpeningProject)
             {
                 return;
             }
@@ -2031,9 +2067,10 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
+            var imported = await CreateDocumentFromClipboardAsync(bytes);
+            PushUndoState(CaptureProjectState());
             _lastClipboardFingerprint = fingerprint;
-
-            AddDocument(await CreateDocumentFromClipboardAsync(bytes), select: true);
+            AddDocument(imported, select: true);
             StatusText.Text = "Nouvelle capture importee.";
         }
         catch

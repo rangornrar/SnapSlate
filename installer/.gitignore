@@ -2,3 +2,5 @@ dist/
 private/
 release/
 SnapSlate-Installer-x64.zip
+
+/publish/

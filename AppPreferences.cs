@@ -101,7 +101,7 @@ public sealed class AppPreferences
         var path = GetPreferencesPath();
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         var json = JsonSerializer.Serialize(this, SerializerOptions);
-        File.WriteAllText(path, json);
+        AtomicFile.Write(path, temporary => File.WriteAllText(temporary, json));
     }
 
     public string? GetLanguageOverride()

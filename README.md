@@ -41,7 +41,7 @@ dotnet test .\tests\SnapSlate.Tests.csproj -c Release
 Pour préparer les fichiers exécutables sans packaging MSIX :
 
 ```powershell
-.\installer\Build-Installer.ps1 -Configuration Debug
+.\installer\Build-Installer.ps1 -Configuration Release
 ```
 
 Les fichiers sont placés dans `installer/dist/app/`. Lancer `SnapSlate.exe` depuis ce dossier sous Windows. Les scripts historiques `Install-SnapSlate.ps1` concernent un autre parcours MSIX ; ils ne sont pas le point d’entrée de ce staging exécutable.
@@ -62,3 +62,7 @@ Résultat : `installer/release/SnapSlate-Setup.exe`. La compilation CI ne produi
 - [Contribuer](CONTRIBUTING.md) · [Sécurité](SECURITY.md)
 
 Le code source et les binaires ne disposent pas actuellement d’un fichier de licence général dans ce dépôt. Les dépendances ont leurs propres conditions d’utilisation.
+
+## Sauvegarde et masquage
+
+Le projet éditable `.snapslate` conserve les sources originales. Les masques sont appliqués de manière opaque aux images exportées ; ils ne suppriment pas les pixels du projet. Les fichiers `.bak` contiennent la version précédente du projet. Exporter un PNG ne remplace pas la sauvegarde du projet.

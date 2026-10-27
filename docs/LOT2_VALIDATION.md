@@ -18,7 +18,8 @@ Version : `2026.10.27.002` ; application et installateur : `2026.10.27.2`.
 - 61 tests MSTest exécutés sur les sources de production, sans remplacement de leur logique.
 - Génération réelle de Markdown, HTML, PDF, DOCX et PNG dans le test de package complet.
 - Validation du DOCX par OpenXmlValidator, cible Office 2019 : zéro erreur. Image incorporée identique au PNG du package.
-- Lancement de l’application Debug x64 et export complet dans l’interface : fichiers générés, message de réussite.
+- Lancement de l’application Debug x64 et export complet dans l’interface : fichiers générés, message de réussite. Distribution autonome Release lancée ; sélection du rectangle de démonstration vérifiée.
+- La CI a détecté un verrou natif sur une image au nettoyage après PDF/DOCX. Les images sont désormais décodées en mémoire pour libérer immédiatement les fichiers.
 - Builds Debug et Release x64 exigés avant publication ; compilation et suite de tests répétées par GitHub Actions sur le commit de la PR.
 
 Les projets v1 sont lus et migrés en mémoire. Le prochain enregistrement écrit la version 2. Les champs historiques des étapes sont conservés pour ne pas perdre leur contenu, mais les exports utilisent les métadonnées du guide. Les versions anciennes de SnapSlate refusent le format v2 ; conserver le `.bak` avant une rétrogradation.

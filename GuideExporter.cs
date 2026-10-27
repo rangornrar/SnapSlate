@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Pictures;
@@ -13,7 +12,6 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using Windows.Graphics.Imaging;
 
 using A = DocumentFormat.OpenXml.Drawing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
@@ -81,7 +79,7 @@ public static class GuideExporter
                                 column.Item().PaddingBottom(2).Text(step.Note).FontSize(11);
                             }
 
-                            column.Item().PaddingTop(4).Border(1).BorderColor(Colors.Grey.Lighten2).Padding(8).Image(step.ImagePath).FitArea();
+                            column.Item().PaddingTop(4).Border(1).BorderColor(Colors.Grey.Lighten2).Padding(8).Image(File.ReadAllBytes(step.ImagePath)).FitArea();
 
                             if (step.LegendItems.Count > 0)
                             {
@@ -286,9 +284,10 @@ public static class GuideExporter
 
     private static async Task<(uint Width, uint Height)> GetImageSizeAsync(string path)
     {
-        using var stream = File.OpenRead(path);
-        using var randomAccess = stream.AsRandomAccessStream();
-        var decoder = await BitmapDecoder.CreateAsync(randomAccess);
-        return (decoder.PixelWidth, decoder.PixelHeight);
+        // Decode from memory so the native decoder cannot retain a file handle after return.
+        var bytes = await File.ReadAllBytesAsync(path);
+        using var stream = new MemoryStream(bytes, writable: false);
+        using var image = System.Drawing.Image.FromStream(stream);
+        return ((uint)image.Width, (uint)image.Height);
     }
 }

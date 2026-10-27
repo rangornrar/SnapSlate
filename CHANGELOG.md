@@ -14,6 +14,7 @@ Le format est volontairement simple et oriente publication GitHub.
 - Format de projet v2 ; migration v1 à partir de la première étape, indépendamment de la sélection.
 - Onze outils accessibles sur les petites images grâce à une barre indépendante de la capture et défilante.
 - Chargements obsolètes ignorés ; exports sur instantané, progression et annulation entre étapes/formats, nettoyage des packages partiels.
+- Images PDF/DOCX décodées en mémoire pour éviter les verrous natifs empêchant le nettoyage.
 - Réglages conservés dans un brouillon ; Annuler, Échap et fermeture du panneau abandonnent les modifications. Enregistrer persiste les préférences en arrière-plan.
 
 ### Vérification

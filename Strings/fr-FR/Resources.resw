@@ -60,4 +60,9 @@
   <data name="MaskHelp" xml:space="preserve">
     <value>Masquage opaque — les projets éditables conservent l’image originale.</value>
   </data>
+  <data name="ExportCancel.Content" xml:space="preserve"><value>Annuler l’export</value></data>
+  <data name="ExportCancel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Annuler l’export</value></data>
+  <data name="ExportProgress" xml:space="preserve"><value>Export de l’étape {0} sur {1}…</value></data>
+  <data name="ExportAlreadyRunning" xml:space="preserve"><value>Un export est déjà en cours. Attendez sa fin ou annulez-le.</value></data>
+  <data name="ExportCancelled" xml:space="preserve"><value>Export annulé. Aucun package partiel conservé.</value></data>
 </root>

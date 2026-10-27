@@ -15,6 +15,11 @@
     <PackageReference Include="MSTest" Version="4.1.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.7" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
+    <PackageReference Include="QuestPDF" Version="2026.2.4" />
+    <Compile Include="..\GuidePackageBuilder.cs" Link="Production\GuidePackageBuilder.cs" />
+    <Compile Include="..\GuideExporter.cs" Link="Production\GuideExporter.cs" />
+    <Compile Include="..\ExportFormatChoice.cs" Link="Production\ExportFormatChoice.cs" />
     <!-- Link the exact production services, without starting WinUI or MSIX. -->
     <Compile Include="..\ProjectJson.cs" Link="Production\ProjectJson.cs" />
     <Compile Include="..\GuideTextExporter.cs" Link="Production\GuideTextExporter.cs" />
@@ -31,6 +36,8 @@
     <Compile Include="..\GuideTemplateType.cs" Link="Production\GuideTemplateType.cs" />
     <Compile Include="..\GradientPaletteDefinition.cs" Link="Production\GradientPaletteDefinition.cs" />
     <Compile Include="..\GuideImageRenderer.cs" Link="Production\GuideImageRenderer.cs" />
+    <Compile Include="..\GuideMetadata.cs" Link="Production\GuideMetadata.cs" />
+    <Compile Include="..\CropGeometry.cs" Link="Production\CropGeometry.cs" />
     <Compile Include="..\ProjectState.cs" Link="Production\ProjectState.cs" />
   </ItemGroup>
 </Project>

@@ -55,8 +55,8 @@ public sealed partial class MainWindow
     }
 
     private bool UseEnglish =>
-        App.Preferences.Language == LanguageChoice.English ||
-        (App.Preferences.Language == LanguageChoice.System &&
+        EditingPreferences.Language == LanguageChoice.English ||
+        (EditingPreferences.Language == LanguageChoice.System &&
          CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.Equals("en", StringComparison.OrdinalIgnoreCase));
 
     private string T(string french, string english) => UseEnglish ? english : french;
@@ -368,7 +368,7 @@ public sealed partial class MainWindow
             return;
         }
 
-        var templateType = _currentDocument?.TemplateType ?? GuideTemplateType.UserManual;
+        var templateType = EditingMetadata.TemplateType;
         ExportTemplateValueText.Text = string.Format(
             CultureInfo.CurrentCulture,
             T("Type actuel : {0}", "Current type: {0}"),
@@ -425,26 +425,26 @@ public sealed partial class MainWindow
 
     private void ApplyPreferencesToUi()
     {
-        RootGrid.RequestedTheme = App.Preferences.GetRequestedTheme();
-        ThemeComboBox.SelectedIndex = (int)App.Preferences.Theme;
-        LanguageComboBox.SelectedIndex = (int)App.Preferences.Language;
-        ExportFormatComboBox.SelectedIndex = (int)App.Preferences.DefaultExportFormat;
-        AutoImportClipboardToggleSwitch.IsOn = App.Preferences.AutoImportClipboard;
-        ExportFolderTextBox.Text = App.Preferences.ExportFolder;
-        NotionParentPageIdTextBox.Text = App.Preferences.NotionParentPageId;
-        ConfluenceBaseUrlTextBox.Text = App.Preferences.ConfluenceBaseUrl;
-        ConfluenceSpaceKeyTextBox.Text = App.Preferences.ConfluenceSpaceKey;
-        ConfluenceParentPageIdTextBox.Text = App.Preferences.ConfluenceParentPageId;
-        ConfluenceEmailTextBox.Text = App.Preferences.ConfluenceEmail;
-        SharePointSyncFolderTextBox.Text = App.Preferences.SharePointSyncFolder;
+        RootGrid.RequestedTheme = EditingPreferences.GetRequestedTheme();
+        ThemeComboBox.SelectedIndex = (int)EditingPreferences.Theme;
+        LanguageComboBox.SelectedIndex = (int)EditingPreferences.Language;
+        ExportFormatComboBox.SelectedIndex = (int)EditingPreferences.DefaultExportFormat;
+        AutoImportClipboardToggleSwitch.IsOn = EditingPreferences.AutoImportClipboard;
+        ExportFolderTextBox.Text = EditingPreferences.ExportFolder;
+        NotionParentPageIdTextBox.Text = EditingPreferences.NotionParentPageId;
+        ConfluenceBaseUrlTextBox.Text = EditingPreferences.ConfluenceBaseUrl;
+        ConfluenceSpaceKeyTextBox.Text = EditingPreferences.ConfluenceSpaceKey;
+        ConfluenceParentPageIdTextBox.Text = EditingPreferences.ConfluenceParentPageId;
+        ConfluenceEmailTextBox.Text = EditingPreferences.ConfluenceEmail;
+        SharePointSyncFolderTextBox.Text = EditingPreferences.SharePointSyncFolder;
         ApplyProcedurePaneLayout();
-        ApplyFloatingToolRailPosition(App.Preferences.FloatingToolRailLeft, App.Preferences.FloatingToolRailTop);
+        ApplyFloatingToolRailPosition(EditingPreferences.FloatingToolRailLeft, EditingPreferences.FloatingToolRailTop);
         UpdateSettingsSummary();
     }
 
     private void ApplyProcedurePaneLayout()
     {
-        var stepsCollapsed = App.Preferences.CollapseStepsPane;
+        var stepsCollapsed = EditingPreferences.CollapseStepsPane;
         StepsPaneColumn.Width = new GridLength(stepsCollapsed ? 48 : 256);
         InspectorPaneColumn.Width = new GridLength(_isInspectorPaneCollapsed ? 0 : 312);
         StepsHeaderPanel.Visibility = stepsCollapsed ? Visibility.Collapsed : Visibility.Visible;
@@ -462,8 +462,8 @@ public sealed partial class MainWindow
     {
         var railWidth = FloatingToolRail.ActualWidth > 0 ? FloatingToolRail.ActualWidth : 72;
         var railHeight = FloatingToolRail.ActualHeight > 0 ? FloatingToolRail.ActualHeight : 420;
-        var viewportWidth = PreviewViewport.ActualWidth > 0 ? PreviewViewport.ActualWidth : PreviewViewport.Width;
-        var viewportHeight = PreviewViewport.ActualHeight > 0 ? PreviewViewport.ActualHeight : PreviewViewport.Height;
+        var viewportWidth = CanvasWorkspace.ActualWidth;
+        var viewportHeight = CanvasWorkspace.ActualHeight;
         var maxLeft = Math.Max(8, viewportWidth - railWidth - 8);
         var maxTop = Math.Max(8, viewportHeight - railHeight - 8);
 
@@ -471,8 +471,8 @@ public sealed partial class MainWindow
         var clampedTop = Math.Clamp(top, 8, maxTop);
 
         FloatingToolRail.Margin = new Thickness(clampedLeft, clampedTop, 0, 0);
-        App.Preferences.FloatingToolRailLeft = clampedLeft;
-        App.Preferences.FloatingToolRailTop = clampedTop;
+        EditingPreferences.FloatingToolRailLeft = clampedLeft;
+        EditingPreferences.FloatingToolRailTop = clampedTop;
     }
 
     private void BuildPaletteStrip()
@@ -1096,6 +1096,7 @@ public sealed partial class MainWindow
 
     private void SetSection(ShellSection section)
     {
+        if (_isSavingSettings && section != ShellSection.Settings) return;
         _currentSection = section;
         CaptureSection.Visibility = section == ShellSection.Capture ? Visibility.Visible : Visibility.Collapsed;
         ProcedureSection.Visibility = section == ShellSection.Procedure ? Visibility.Visible : Visibility.Collapsed;
@@ -1106,7 +1107,7 @@ public sealed partial class MainWindow
     {
         if (_currentSection == ShellSection.Settings)
         {
-            ReturnToProcedureSection(false);
+            ReturnToProcedureSection();
             return;
         }
 
@@ -1117,21 +1118,20 @@ public sealed partial class MainWindow
 
     private void CaptureSettingsSnapshot()
     {
-        _settingsSnapshot = App.Preferences.Clone();
+        _settingsDraft = App.Preferences.Clone();
+        _settingsMetadata = _projectMetadata.Clone();
     }
 
-    private void ReturnToProcedureSection(bool restoreSnapshot)
+    private void ReturnToProcedureSection()
     {
-        if (restoreSnapshot && _settingsSnapshot is not null)
-        {
-            App.Preferences.CopyFrom(_settingsSnapshot);
-            App.Preferences.Save();
-            ApplyPreferencesToUi();
-            UpdateSettingsSummary();
-        }
-
+        if (_isSavingSettings) return;
+        _settingsDraft = null;
+        _settingsMetadata = null;
+        var wasInitializing = _isInitializingUi;
+        _isInitializingUi = true;
+        try { ApplyPreferencesToUi(); ApplyChromeLabels(); SyncGuideMetadataEditors(); UpdateSettingsSummary(); }
+        finally { _isInitializingUi = wasInitializing; }
         SetSection(ShellSection.Procedure);
-        _settingsSnapshot = null;
     }
 
     private void SelectSettingsNavSection(string sectionKey)
@@ -1191,31 +1191,47 @@ public sealed partial class MainWindow
         SelectSettingsNavSection(sectionKey);
     }
 
-    private void SettingsSaveButton_Click(object sender, RoutedEventArgs e)
+    private async void SettingsSaveButton_Click(object sender, RoutedEventArgs e)
     {
-        App.Preferences.Save();
-        CaptureSettingsSnapshot();
-        StatusText.Text = T("Réglages enregistrés.", "Settings saved.");
-        SetSection(ShellSection.Procedure);
+        if (_settingsDraft is null || _settingsMetadata is null) return;
+        _isSavingSettings = true;
+        SettingsScrollViewer.IsEnabled = false;
+        try
+        {
+            var preferences = _settingsDraft.Clone();
+            await Task.Run(preferences.Save);
+            App.Preferences.CopyFrom(preferences);
+            if (ProjectJson.Serialize(_projectMetadata) != ProjectJson.Serialize(_settingsMetadata))
+            {
+                PushUndoState(CaptureProjectState());
+                _projectMetadata = _settingsMetadata.Clone();
+                RefreshProjectDirtyIndicators();
+            }
+            _isSavingSettings = false;
+            ReturnToProcedureSection();
+            StatusText.Text = T("Réglages enregistrés.", "Settings saved.");
+        }
+        catch (Exception error) { AppDiagnostics.Record(error); StatusText.Text = SafetyText("OperationFailed"); }
+        finally { _isSavingSettings = false; SettingsScrollViewer.IsEnabled = true; }
     }
 
     private void SettingsCancelButton_Click(object sender, RoutedEventArgs e)
     {
-        ReturnToProcedureSection(restoreSnapshot: true);
+        ReturnToProcedureSection();
         StatusText.Text = T("Réglages annulés.", "Settings cancelled.");
     }
 
     private void FloatingToolRailDragThumb_DragDelta(object sender, DragDeltaEventArgs e)
     {
-        var currentLeft = App.Preferences.FloatingToolRailLeft;
-        var currentTop = App.Preferences.FloatingToolRailTop;
+        var currentLeft = EditingPreferences.FloatingToolRailLeft;
+        var currentTop = EditingPreferences.FloatingToolRailTop;
         ApplyFloatingToolRailPosition(currentLeft + e.HorizontalChange, currentTop + e.VerticalChange);
     }
 
     private void FloatingToolRailDragThumb_DragCompleted(object sender, DragCompletedEventArgs e)
     {
-        ApplyFloatingToolRailPosition(App.Preferences.FloatingToolRailLeft, App.Preferences.FloatingToolRailTop);
-        App.Preferences.Save();
+        ApplyFloatingToolRailPosition(EditingPreferences.FloatingToolRailLeft, EditingPreferences.FloatingToolRailTop);
+        SavePreferencesIfNeeded();
     }
 
     private void ShowHelpSectionMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1229,7 +1245,7 @@ public sealed partial class MainWindow
     {
         if (_currentSection == ShellSection.Settings)
         {
-            ReturnToProcedureSection(restoreSnapshot: false);
+            ReturnToProcedureSection();
         }
         else
         {
@@ -1261,8 +1277,8 @@ public sealed partial class MainWindow
 
     private void CollapseStepsButton_Click(object sender, RoutedEventArgs e)
     {
-        App.Preferences.CollapseStepsPane = !App.Preferences.CollapseStepsPane;
-        App.Preferences.Save();
+        EditingPreferences.CollapseStepsPane = !EditingPreferences.CollapseStepsPane;
+        SavePreferencesIfNeeded();
         ApplyPreferencesToUi();
     }
 
@@ -1385,8 +1401,8 @@ public sealed partial class MainWindow
 
     private void FitToViewportButton_Click(object sender, RoutedEventArgs e)
     {
-        var contentWidth = PreviewViewport.Width;
-        var contentHeight = PreviewViewport.Height;
+        var contentWidth = _currentDocument is null ? PreviewViewport.Width : GetSceneWidth(_currentDocument) + FloatingToolRailGutterWidth;
+        var contentHeight = _currentDocument is null ? PreviewViewport.Height : GetSceneHeight(_currentDocument);
         var availableWidth = CanvasScrollViewer.ActualWidth;
         var availableHeight = CanvasScrollViewer.ActualHeight;
 
@@ -1405,6 +1421,7 @@ public sealed partial class MainWindow
         _currentZoom = Math.Clamp(zoom, 0.5, 2.0);
         SceneScaleTransform.ScaleX = _currentZoom;
         SceneScaleTransform.ScaleY = _currentZoom;
+        if (_currentDocument is not null) ApplyCropState(_currentDocument);
         ZoomLevelText.Text = string.Format(CultureInfo.CurrentCulture, "{0:0} %", _currentZoom * 100);
         UpdateStatus();
     }
@@ -1416,8 +1433,9 @@ public sealed partial class MainWindow
             return;
         }
 
-        _currentDocument.BaseTitle = textBox.Text.Trim();
-        MarkDocumentDirty(_currentDocument);
+        if (EditingMetadata.Title == textBox.Text) return;
+        EditingMetadata.Title = textBox.Text;
+        GuideMetadataChanged();
     }
 
     private void StepNoteTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1427,7 +1445,9 @@ public sealed partial class MainWindow
             return;
         }
 
+        if (_currentDocument.StepNote == textBox.Text) return;
         _currentDocument.StepNote = textBox.Text;
+        if (_currentDocument.ImageBytes is null) RequestScenePreview();
         MarkDocumentDirty(_currentDocument);
         UpdateLegendList();
     }
@@ -1441,9 +1461,10 @@ public sealed partial class MainWindow
 
         if (TemplateTypeComboBox.SelectedItem is ComboBoxItem { Tag: GuideTemplateType type })
         {
-            PushUndoState(CaptureProjectState());
-            _currentDocument.TemplateType = type;
-            MarkDocumentDirty(_currentDocument);
+            if (EditingMetadata.TemplateType == type) return;
+            if (_settingsDraft is null) PushUndoState(CaptureProjectState());
+            EditingMetadata.TemplateType = type;
+            GuideMetadataChanged();
             if (ExportTemplateComboBox.SelectedIndex != TemplateTypeComboBox.SelectedIndex)
             {
                 ExportTemplateComboBox.SelectedIndex = TemplateTypeComboBox.SelectedIndex;
@@ -1461,9 +1482,10 @@ public sealed partial class MainWindow
 
         if (ExportTemplateComboBox.SelectedItem is ComboBoxItem { Tag: GuideTemplateType type })
         {
-            PushUndoState(CaptureProjectState());
-            _currentDocument.TemplateType = type;
-            MarkDocumentDirty(_currentDocument);
+            if (EditingMetadata.TemplateType == type) return;
+            if (_settingsDraft is null) PushUndoState(CaptureProjectState());
+            EditingMetadata.TemplateType = type;
+            GuideMetadataChanged();
             if (TemplateTypeComboBox.SelectedIndex != ExportTemplateComboBox.SelectedIndex)
             {
                 TemplateTypeComboBox.SelectedIndex = ExportTemplateComboBox.SelectedIndex;
@@ -1479,8 +1501,9 @@ public sealed partial class MainWindow
             return;
         }
 
-        _currentDocument.Audience = textBox.Text;
-        MarkDocumentDirty(_currentDocument);
+        if (EditingMetadata.Audience == textBox.Text) return;
+        EditingMetadata.Audience = textBox.Text;
+        GuideMetadataChanged();
     }
 
     private void AuthorTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1490,8 +1513,9 @@ public sealed partial class MainWindow
             return;
         }
 
-        _currentDocument.Author = textBox.Text;
-        MarkDocumentDirty(_currentDocument);
+        if (EditingMetadata.Author == textBox.Text) return;
+        EditingMetadata.Author = textBox.Text;
+        GuideMetadataChanged();
     }
 
     private void DocumentVersionTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1501,8 +1525,9 @@ public sealed partial class MainWindow
             return;
         }
 
-        _currentDocument.DocumentVersion = textBox.Text;
-        MarkDocumentDirty(_currentDocument);
+        if (EditingMetadata.DocumentVersion == textBox.Text) return;
+        EditingMetadata.DocumentVersion = textBox.Text;
+        GuideMetadataChanged();
     }
 
     private void ExportAudienceTextBox_TextChanged(object sender, TextChangedEventArgs e) => AudienceTextBox_TextChanged(sender, e);
@@ -1518,8 +1543,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.ExportFolder = textBox.Text;
-        App.Preferences.Save();
+        EditingPreferences.ExportFolder = textBox.Text;
+        SavePreferencesIfNeeded();
 
         UpdateSettingsSummary();
     }
@@ -1543,8 +1568,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.ExportFolder = folder.Path;
-        App.Preferences.Save();
+        EditingPreferences.ExportFolder = folder.Path;
+        SavePreferencesIfNeeded();
         if (ExportFolderTextBox is not null)
         {
             ExportFolderTextBox.Text = folder.Path;
@@ -1561,8 +1586,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.DefaultExportFormat = format;
-        App.Preferences.Save();
+        EditingPreferences.DefaultExportFormat = format;
+        SavePreferencesIfNeeded();
         UpdateSettingsSummary();
     }
 
@@ -1573,9 +1598,9 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.Theme = theme;
-        App.Preferences.Save();
-        RootGrid.RequestedTheme = App.Preferences.GetRequestedTheme();
+        EditingPreferences.Theme = theme;
+        SavePreferencesIfNeeded();
+        RootGrid.RequestedTheme = EditingPreferences.GetRequestedTheme();
         UpdateSettingsSummary();
     }
 
@@ -1586,8 +1611,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.Language = language;
-        App.Preferences.Save();
+        EditingPreferences.Language = language;
+        SavePreferencesIfNeeded();
         ApplyChromeLabels();
         UpdateSettingsSummary();
     }
@@ -1599,8 +1624,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.AutoImportClipboard = AutoImportClipboardToggleSwitch.IsOn;
-        App.Preferences.Save();
+        EditingPreferences.AutoImportClipboard = AutoImportClipboardToggleSwitch.IsOn;
+        SavePreferencesIfNeeded();
         UpdateSettingsSummary();
     }
 
@@ -1822,9 +1847,9 @@ public sealed partial class MainWindow
     {
         if (e.Key == Windows.System.VirtualKey.Escape && _currentSection != ShellSection.Procedure)
         {
-            if (e.OriginalSource is not TextBox)
+            if (_settingsDraft is not null || e.OriginalSource is not TextBox)
             {
-                SetSection(ShellSection.Procedure);
+                ReturnToProcedureSection();
                 StatusText.Text = T("Retour à la procédure.", "Back to the procedure.");
                 e.Handled = true;
             }
@@ -2003,7 +2028,7 @@ public sealed partial class MainWindow
 
     private void SyncDocumentEditors(ScreenshotDocument document)
     {
-        DocumentTitleTextBox.Text = document.BaseTitle;
+        SyncGuideMetadataEditors();
         ToolbarDocumentComboBox.SelectedItem = document;
         _isSyncingPaletteUi = true;
         try
@@ -2016,13 +2041,6 @@ public sealed partial class MainWindow
         }
         StepTitleTextBox.Text = document.StepTitle;
         StepNoteTextBox.Text = document.StepNote;
-        TemplateTypeComboBox.SelectedIndex = (int)document.TemplateType;
-        AudienceTextBox.Text = document.Audience;
-        AuthorTextBox.Text = document.Author;
-        DocumentVersionTextBox.Text = document.DocumentVersion;
-        ExportAudienceTextBox.Text = document.Audience;
-        ExportAuthorTextBox.Text = document.Author;
-        ExportVersionTextBox.Text = document.DocumentVersion;
         AnnotationTextBox.Text = document.AnnotationText;
         StickerModeComboBox.SelectedIndex = document.StickerModeIndex == 1 ? 1 : 0;
         OpacitySlider.Value = document.DefaultOpacity;
@@ -2030,9 +2048,9 @@ public sealed partial class MainWindow
         ToolbarOpacityValueText.Text = string.Format(CultureInfo.CurrentCulture, "{0:0} %", document.DefaultOpacity * 100);
         SelectedOpacitySlider.Value = _selectedAnnotation?.Opacity ?? document.DefaultOpacity;
         ResetStickerNumberOnColorChangeCheckBox.IsChecked = document.ResetStickerNumberOnColorChange;
-        ExportTemplateComboBox.SelectedIndex = (int)document.TemplateType;
-        ExportFolderTextBox.Text = App.Preferences.ExportFolder;
-        ExportFormatComboBox.SelectedIndex = (int)App.Preferences.DefaultExportFormat;
+
+        ExportFolderTextBox.Text = EditingPreferences.ExportFolder;
+        ExportFormatComboBox.SelectedIndex = (int)EditingPreferences.DefaultExportFormat;
         UpdateLegendList();
         RefreshShadeStrip();
         UpdateExportTemplateSummary();
@@ -2273,6 +2291,7 @@ public sealed partial class MainWindow
                 break;
         }
 
+        RequestScenePreview();
         UpdateSelectionOutline(_draggingAnnotation);
     }
 
@@ -2399,7 +2418,7 @@ public sealed partial class MainWindow
         CommitPendingTextEdits();
         try
         {
-            var rootFolder = App.Preferences.ExportFolder;
+            var rootFolder = EditingPreferences.ExportFolder;
             if (string.IsNullOrWhiteSpace(rootFolder))
                 rootFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SnapSlate-Exports");
             var package = await BuildGuidePackageAsync(rootFolder, formats);

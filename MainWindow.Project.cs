@@ -214,6 +214,8 @@ public sealed partial class MainWindow
     {
         return new SnapSlateProjectState
         {
+            Version = 2,
+            Metadata = _projectMetadata.Clone(),
             SelectedDocumentId = _currentDocument?.Id,
             SelectedAnnotationId = _selectedAnnotation?.Id,
             Documents = _documents.Select(document => document.CloneForHistory()).ToList()
@@ -242,7 +244,7 @@ public sealed partial class MainWindow
 
     private async Task<bool> CreateNewProjectAsync()
     {
-        if (_isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
+        if (_isSavingSettings || _isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
         if (!await EnsureProjectCanBeReplacedAsync(T("créer un nouveau projet", "create a new project")))
         {
             return false;
@@ -255,7 +257,7 @@ public sealed partial class MainWindow
 
     private async Task<bool> LoadDemoProjectAsync()
     {
-        if (_isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
+        if (_isSavingSettings || _isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
         if (!await EnsureProjectCanBeReplacedAsync(T("charger le modèle de démonstration", "load the demo template")))
         {
             return false;
@@ -268,7 +270,7 @@ public sealed partial class MainWindow
 
     private async Task<bool> OpenProjectAsync()
     {
-        if (_isOpeningProject || _isSavingProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
+        if (_isSavingSettings || _isOpeningProject || _isSavingProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
         _isOpeningProject = true;
         try
         {
@@ -416,7 +418,7 @@ public sealed partial class MainWindow
 
     private async Task<bool> UndoProjectAsync()
     {
-        if (_isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
+        if (_isSavingSettings || _isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
         CommitPendingTextEdits();
 
         if (_undoHistory.Count == 0)
@@ -438,7 +440,7 @@ public sealed partial class MainWindow
 
     private async Task<bool> RedoProjectAsync()
     {
-        if (_isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
+        if (_isSavingSettings || _isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
         CommitPendingTextEdits();
 
         if (_redoHistory.Count == 0)
@@ -525,6 +527,8 @@ public sealed partial class MainWindow
                 _pendingTextEditSnapshots.Clear();
                 _pendingDragSnapshot = null;
             }
+            if (_settingsDraft is not null) ReturnToProcedureSection();
+            _projectMetadata = (state.Metadata ?? GuideMetadata.FromLegacyDocument(state.Documents.FirstOrDefault())).Clone();
             _currentProjectPath = projectPath;
             _documents.Clear();
             foreach (var document in prepared) _documents.Add(document);
@@ -564,7 +568,7 @@ public sealed partial class MainWindow
 
     private void RefreshProjectDirtyIndicators()
     {
-        _projectSaveTracker.RefreshIndicators(new SnapSlateProjectState { Documents = _documents.ToList() });
+        _projectSaveTracker.RefreshIndicators(new SnapSlateProjectState { Metadata = _projectMetadata, Documents = _documents.ToList() });
     }
 
     private void RefreshDocumentCounters()
@@ -658,7 +662,7 @@ public sealed partial class MainWindow
 
     private string GetSuggestedProjectFileName()
     {
-        var title = _currentDocument?.BaseTitle ?? "snapslate-project";
+        var title = string.IsNullOrWhiteSpace(_projectMetadata.Title) ? "snapslate-project" : _projectMetadata.Title;
         var invalidCharacters = Path.GetInvalidFileNameChars();
         var sanitized = new string(title.Where(character => !invalidCharacters.Contains(character)).ToArray());
         sanitized = sanitized.Replace(' ', '-').Trim('-').ToLowerInvariant();

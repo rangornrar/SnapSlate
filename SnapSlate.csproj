@@ -12,7 +12,7 @@
     <WinUISDKReferences>false</WinUISDKReferences>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
-    <Version>2026.10.27.1</Version>
+    <Version>2026.10.27.2</Version>
     <DefaultLanguage>fr-FR</DefaultLanguage>
   </PropertyGroup>
 

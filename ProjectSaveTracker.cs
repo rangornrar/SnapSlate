@@ -28,7 +28,8 @@ internal sealed class ProjectSaveTracker
         }
     }
 
-    private static string Fingerprint(SnapSlateProjectState state) => Hash(string.Join("|", state.Documents.Select(DocumentFingerprint)));
+    private static string Fingerprint(SnapSlateProjectState state) => Hash(ProjectJson.Serialize(state.Metadata)
+        + "|" + string.Join("|", state.Documents.Select(DocumentFingerprint)));
 
     private static string DocumentFingerprint(ScreenshotDocument document)
     {

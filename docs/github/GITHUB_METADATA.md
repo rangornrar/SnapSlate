@@ -49,7 +49,7 @@ La procedure de branchement, merge et publication est ici:
 
 ### Titre conseille
 
-`SnapSlate v2026.10.27.001`
+`SnapSlate v2026.10.27.002`
 
 ### Fichier a attacher a la release
 

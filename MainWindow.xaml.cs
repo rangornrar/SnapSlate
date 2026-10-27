@@ -103,7 +103,6 @@ public sealed partial class MainWindow : Window
     private int _nextDemoIndex = 1;
     private double _currentZoom = 1.0;
     private ShellSection _currentSection = ShellSection.Procedure;
-    private AppPreferences? _settingsSnapshot;
 
     public MainWindow()
     {
@@ -365,6 +364,9 @@ public sealed partial class MainWindow : Window
             return;
         }
 
+        var loadVersion = ++_documentLoadVersion;
+        ++_previewVersion;
+        RenderedSceneImage.Source = null;
         _currentDocument = document;
         _selectedAnnotation = null;
         _isApplyingDocumentState = true;
@@ -393,7 +395,9 @@ public sealed partial class MainWindow : Window
 
             if (document.ImageBytes is { Length: > 0 })
             {
-                ImportedImage.Source = preparedImage ?? await CreateBitmapImageAsync(document.ImageBytes);
+                var image = preparedImage ?? await CreateBitmapImageAsync(document.ImageBytes);
+                if (loadVersion != _documentLoadVersion) return;
+                ImportedImage.Source = image;
                 ImportedImage.Visibility = Visibility.Visible;
                 PlaceholderPanel.Visibility = Visibility.Collapsed;
             }
@@ -414,7 +418,7 @@ public sealed partial class MainWindow : Window
         }
         finally
         {
-            _isApplyingDocumentState = false;
+            if (loadVersion == _documentLoadVersion) _isApplyingDocumentState = false;
         }
     }
 
@@ -978,7 +982,7 @@ public sealed partial class MainWindow : Window
 
     private void ApplyCropState(ScreenshotDocument document)
     {
-        if (document.AppliedCropRect is Rect appliedCrop)
+        if (document.PendingCropRect is null && document.AppliedCropRect is Rect appliedCrop)
         {
             ApplySceneViewportLayout(appliedCrop.Width, appliedCrop.Height);
             SceneTransform.X = -appliedCrop.X;
@@ -1020,17 +1024,17 @@ public sealed partial class MainWindow : Window
         var width = Math.Max(1, sceneWidth);
         var height = Math.Max(1, sceneHeight);
 
-        SceneHost.Width = width;
-        SceneHost.Height = height;
+        SceneHost.Width = Math.Max(1, _currentDocument?.SourcePixelWidth ?? width);
+        SceneHost.Height = Math.Max(1, _currentDocument?.SourcePixelHeight ?? height);
         SceneHost.Margin = new Thickness(FloatingToolRailGutterWidth, 0, 0, 0);
-        PreviewViewport.Width = width + FloatingToolRailGutterWidth;
-        PreviewViewport.Height = height;
+        PreviewViewport.Width = width * _currentZoom + FloatingToolRailGutterWidth;
+        PreviewViewport.Height = height * _currentZoom;
         UpdateViewportClip(PreviewViewport.Width, PreviewViewport.Height);
     }
 
     private static double GetSceneWidth(ScreenshotDocument document)
     {
-        if (document.AppliedCropRect is Rect appliedCrop)
+        if (document.PendingCropRect is null && document.AppliedCropRect is Rect appliedCrop)
         {
             return Math.Max(1, appliedCrop.Width);
         }
@@ -1040,7 +1044,7 @@ public sealed partial class MainWindow : Window
 
     private static double GetSceneHeight(ScreenshotDocument document)
     {
-        if (document.AppliedCropRect is Rect appliedCrop)
+        if (document.PendingCropRect is null && document.AppliedCropRect is Rect appliedCrop)
         {
             return Math.Max(1, appliedCrop.Height);
         }
@@ -1065,8 +1069,8 @@ public sealed partial class MainWindow : Window
         }
 
         var point = e.GetCurrentPoint(SceneHost).Position;
-        var sceneWidth = GetSceneWidth(document);
-        var sceneHeight = GetSceneHeight(document);
+        var sceneWidth = document.SourcePixelWidth;
+        var sceneHeight = document.SourcePixelHeight;
         if (e.GetCurrentPoint(SceneHost).Properties.IsRightButtonPressed)
         {
             ClearSelection();
@@ -1136,17 +1140,17 @@ public sealed partial class MainWindow : Window
 
         if (_currentTool == EditorTool.Crop)
         {
-            var crop = NormalizeRect(_dragStart, point);
+            var crop = CropGeometry.Clamp(NormalizeRect(_dragStart, point), _currentDocument.SourcePixelWidth, _currentDocument.SourcePixelHeight);
             if (crop.Width >= 8 && crop.Height >= 8)
             {
+                PushUndoState(CaptureProjectState());
                 _currentDocument.PendingCropRect = crop;
-                _currentDocument.AppliedCropRect = null;
+                MarkDocumentDirty(_currentDocument);
                 ApplyCropState(_currentDocument);
                 StatusText.Text = "Crop capture. Utilisez 'Appliquer crop'.";
             }
             else
             {
-                _currentDocument.PendingCropRect = null;
                 ApplyCropState(_currentDocument);
                 StatusText.Text = "Le crop est trop petit.";
             }
@@ -1518,7 +1522,7 @@ public sealed partial class MainWindow : Window
         var probe = new TextBlock
         {
             Text = string.IsNullOrWhiteSpace(text) ? " " : text,
-            FontFamily = new FontFamily("Bahnschrift SemiBold SemiConden"),
+            FontFamily = new FontFamily("Segoe UI"),
             FontSize = fontSize,
             TextWrapping = TextWrapping.Wrap,
             TextTrimming = TextTrimming.None
@@ -1603,9 +1607,9 @@ public sealed partial class MainWindow : Window
                         BorderBrush = CreateGradientBrush(annotation.PaletteKey, annotation.PaletteShadeIndex),
                         BorderThickness = new Thickness(2),
                         CornerRadius = new CornerRadius(14),
-                        Padding = new Thickness(14, 10, 14, 10),
+                        Padding = new Thickness(12, 8, 12, 8),
                         Width = Math.Max(220, annotation.Bounds.Width),
-                        Height = Math.Max(96, annotation.Bounds.Height),
+                        Height = Math.Max(60, annotation.Bounds.Height),
                         Opacity = annotation.Opacity
                     };
 
@@ -1615,7 +1619,7 @@ public sealed partial class MainWindow : Window
                         {
                             Tag = annotation,
                             Text = annotation.Text,
-                            FontFamily = new FontFamily("Bahnschrift SemiBold SemiConden"),
+                            FontFamily = new FontFamily("Segoe UI"),
                             FontSize = annotation.FontSize,
                             TextWrapping = TextWrapping.Wrap,
                             AcceptsReturn = true,
@@ -1640,7 +1644,7 @@ public sealed partial class MainWindow : Window
                         border.Child = new TextBlock
                         {
                             Text = annotation.Text,
-                            FontFamily = new FontFamily("Bahnschrift SemiBold SemiConden"),
+                            FontFamily = new FontFamily("Segoe UI"),
                             FontSize = annotation.FontSize,
                             TextWrapping = TextWrapping.Wrap,
                             Foreground = CreateGradientBrush(annotation.PaletteKey, annotation.PaletteShadeIndex)
@@ -1668,7 +1672,7 @@ public sealed partial class MainWindow : Window
                             Text = annotation.Text,
                             HorizontalAlignment = HorizontalAlignment.Center,
                             VerticalAlignment = VerticalAlignment.Center,
-                            FontFamily = new FontFamily("Bahnschrift SemiBold SemiConden"),
+                            FontFamily = new FontFamily("Segoe UI"),
                             FontSize = 28,
                             Foreground = new SolidColorBrush(Colors.White)
                         }
@@ -1790,6 +1794,14 @@ public sealed partial class MainWindow : Window
             }
         }
 
+        foreach (var visual in AnnotationCanvas.Children.OfType<FrameworkElement>())
+        {
+            if (visual.Tag is AnnotationModel model && !ReferenceEquals(model, _editingTextAnnotation))
+                visual.Opacity = 0;
+        }
+        ImportedImage.Visibility = Visibility.Collapsed;
+        PlaceholderPanel.Visibility = Visibility.Collapsed;
+        RequestScenePreview();
         AnnotationCanvas.Children.Add(SelectionOutline);
         AnnotationCanvas.Children.Add(CropPreview);
         AnnotationCanvas.Children.Add(CropBadge);
@@ -1956,6 +1968,8 @@ public sealed partial class MainWindow : Window
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
+        _editorClosed = true;
+        ++_previewVersion;
         _clipboardPollTimer.Stop();
         Clipboard.ContentChanged -= Clipboard_ContentChanged;
     }

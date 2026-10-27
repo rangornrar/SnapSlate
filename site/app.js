@@ -1,4 +1,4 @@
-﻿const SUPPORTED_LANGUAGES = new Set(["en", "fr"]);
+const SUPPORTED_LANGUAGES = new Set(["en", "fr"]);
 
 const translations = {
   en: {
@@ -38,7 +38,7 @@ const translations = {
       repo: "GitHub",
     },
     hero: {
-      badge: "Archi-IT Labs · V2026.10.27.001",
+      badge: "Archi-IT Labs · V2026.10.27.002",
       title: "Turn Windows captures into polished procedures.",
       lead:
         "SnapSlate keeps the canvas central, the tools compact and the document ready to export.",
@@ -200,7 +200,7 @@ const translations = {
       repo: "GitHub",
     },
     hero: {
-      badge: "Archi-IT Labs · V2026.10.27.001",
+      badge: "Archi-IT Labs · V2026.10.27.002",
       title: "Transformez des captures Windows en procédures soignées.",
       lead:
         "SnapSlate garde le canvas au centre, les outils compacts et le document prêt à exporter.",

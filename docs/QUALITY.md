@@ -12,6 +12,8 @@ Le lot 1 porte la suite à 42 tests : sauvegarde atomique (y compris panne et ve
 
 Le projet de tests utilise les fichiers de production `ProjectJson`, `GuideTextExporter` et `GuideExportModels`, sans mocks de leur logique. Il n’exige ni capture d’écran ni démarrage de WinUI. La CI Windows compile séparément l’application entière puis lance les tests.
 
+Le lot 2 porte la suite à 61 tests : métadonnées globales et migration v1/v2, indépendance des brouillons, recadrage provisoire ignoré à l’export, conservation du recadrage appliqué, bornage des coordonnées, transparence et identité des PNG produits pour l’aperçu et le disque. Voir [validation du lot 2](LOT2_VALIDATION.md).
+
 ## Vérification manuelle avant une version distribuée
 
 - Installer et lancer sous les versions Windows ciblées, puis désinstaller.

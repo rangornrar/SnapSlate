@@ -12,9 +12,17 @@ internal static class ProjectValidator
 
     public static void Validate(SnapSlateProjectState state)
     {
-        if (state.Version != 1 || state.Documents is null || state.Documents.Count > 200)
+        if (state.Version is < 1 or > 2 || state.Documents is null || state.Documents.Count > 200)
         {
             throw new InvalidDataException("Unsupported or invalid project.");
+        }
+
+        if (state.Version == 2 && state.Metadata is null)
+            throw new InvalidDataException("Missing guide metadata.");
+        if (state.Metadata is { } metadata)
+        {
+            if (!Enum.IsDefined(metadata.TemplateType)) throw new InvalidDataException("Invalid guide template.");
+            ValidateStrings(metadata.Title, metadata.Audience, metadata.Author, metadata.DocumentVersion);
         }
 
         var ids = new HashSet<Guid>();

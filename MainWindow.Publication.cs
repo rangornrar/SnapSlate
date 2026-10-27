@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Foundation;
@@ -66,8 +67,8 @@ public sealed partial class MainWindow
         }
 
         SharePointSyncFolderTextBox.Text = folder.Path;
-        App.Preferences.SharePointSyncFolder = folder.Path;
-        App.Preferences.Save();
+        EditingPreferences.SharePointSyncFolder = folder.Path;
+        SavePreferencesIfNeeded();
         StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Dossier SharePoint : {0}", "SharePoint folder: {0}"), folder.Path);
     }
 
@@ -78,8 +79,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.NotionParentPageId = textBox.Text.Trim();
-        App.Preferences.Save();
+        EditingPreferences.NotionParentPageId = textBox.Text.Trim();
+        SavePreferencesIfNeeded();
     }
 
     private void ConfluenceBaseUrlTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -89,8 +90,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.ConfluenceBaseUrl = textBox.Text.Trim().TrimEnd('/');
-        App.Preferences.Save();
+        EditingPreferences.ConfluenceBaseUrl = textBox.Text.Trim().TrimEnd('/');
+        SavePreferencesIfNeeded();
     }
 
     private void ConfluenceSpaceKeyTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -100,8 +101,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.ConfluenceSpaceKey = textBox.Text.Trim();
-        App.Preferences.Save();
+        EditingPreferences.ConfluenceSpaceKey = textBox.Text.Trim();
+        SavePreferencesIfNeeded();
     }
 
     private void ConfluenceParentPageIdTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -111,8 +112,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.ConfluenceParentPageId = textBox.Text.Trim();
-        App.Preferences.Save();
+        EditingPreferences.ConfluenceParentPageId = textBox.Text.Trim();
+        SavePreferencesIfNeeded();
     }
 
     private void ConfluenceEmailTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -122,8 +123,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.ConfluenceEmail = textBox.Text.Trim();
-        App.Preferences.Save();
+        EditingPreferences.ConfluenceEmail = textBox.Text.Trim();
+        SavePreferencesIfNeeded();
     }
 
     private void SharePointSyncFolderTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -133,8 +134,8 @@ public sealed partial class MainWindow
             return;
         }
 
-        App.Preferences.SharePointSyncFolder = textBox.Text.Trim();
-        App.Preferences.Save();
+        EditingPreferences.SharePointSyncFolder = textBox.Text.Trim();
+        SavePreferencesIfNeeded();
     }
 
     private async Task RunOcrAsync()
@@ -316,88 +317,33 @@ public sealed partial class MainWindow
             return null;
         }
 
-        var formats = requestedFormats is { Length: > 0 }
-            ? requestedFormats.Distinct().ToArray()
-            : new[] { ExportFormatChoice.Markdown, ExportFormatChoice.Html, ExportFormatChoice.Pdf, ExportFormatChoice.Docx };
+        if (_exportCancellation is not null)
+        {
+            StatusText.Text = SafetyText("ExportAlreadyRunning");
+            return null;
+        }
+        using var cancellation = new CancellationTokenSource();
+        _exportCancellation = cancellation;
+        ExportCancelButton.Visibility = ExportProgressRing.Visibility = Visibility.Visible;
+        ExportProgressRing.IsActive = true;
 
-        var documents = _documents.Select(document => document.CloneForHistory()).ToArray();
-        var sourceDocument = documents.FirstOrDefault(document => document.Id == _currentDocument?.Id) ?? documents[0];
-        Directory.CreateDirectory(rootFolder);
-        var packageFolder = Path.Combine(rootFolder, $"SnapSlate-{DateTime.Now:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}");
         try
         {
-            var imagesFolder = Path.Combine(packageFolder, "images");
-            Directory.CreateDirectory(imagesFolder);
-
-            var exportSteps = new List<GuideExportStep>(documents.Length);
-            var generatedFormats = new List<string>();
-
-            if (formats.Contains(ExportFormatChoice.Png))
-            {
-                generatedFormats.Add("PNG");
-            }
-
-            for (var i = 0; i < documents.Length; i++)
-            {
-                var document = documents[i];
-                var imagePath = Path.Combine(imagesFolder, $"step-{i + 1:00}.png");
-                await Task.Run(() => GuideImageRenderer.SaveDocumentImage(document, _palettes, imagePath));
-
-                exportSteps.Add(new GuideExportStep(
-                    i + 1,
-                    document.BaseTitle,
-                    document.StepNote,
-                    document.OriginLabel,
-                    document.SourceLabel,
-                    imagePath,
-                    document.Annotations
-                        .Where(annotation => annotation.Kind == AnnotationKind.Sticker)
-                        .Select(annotation => new GuideExportLegendItem(
-                            annotation.Text,
-                            string.IsNullOrWhiteSpace(annotation.LegendText) ? T("À compléter", "To fill in") : annotation.LegendText))
-                        .ToArray()));
-            }
-
-            var manifest = new GuideExportManifest(
-                sourceDocument.BaseTitle,
-                GetTemplateLabel(sourceDocument.TemplateType),
-                sourceDocument.Audience,
-                sourceDocument.Author,
-                sourceDocument.DocumentVersion,
-                DateTimeOffset.Now,
-                packageFolder,
-                exportSteps);
-
-            if (formats.Contains(ExportFormatChoice.Markdown))
-            {
-                await File.WriteAllTextAsync(Path.Combine(packageFolder, "guide.md"), BuildMarkdown(manifest), Encoding.UTF8);
-                generatedFormats.Add("Markdown");
-            }
-
-            if (formats.Contains(ExportFormatChoice.Html))
-            {
-                await File.WriteAllTextAsync(Path.Combine(packageFolder, "guide.html"), BuildHtml(manifest), Encoding.UTF8);
-                generatedFormats.Add("HTML");
-            }
-
-            if (formats.Contains(ExportFormatChoice.Pdf))
-            {
-                await GuideExporter.ExportPdfAsync(manifest, Path.Combine(packageFolder, "guide.pdf"));
-                generatedFormats.Add("PDF");
-            }
-
-            if (formats.Contains(ExportFormatChoice.Docx))
-            {
-                await GuideExporter.ExportDocxAsync(manifest, Path.Combine(packageFolder, "guide.docx"));
-                generatedFormats.Add("DOCX");
-            }
-
-            return new GuidePackageResult(packageFolder, manifest, generatedFormats);
+            return await GuidePackageBuilder.BuildAsync(rootFolder, _documents, _projectMetadata,
+                _palettes, requestedFormats, GetTemplateLabel(_projectMetadata.TemplateType), UseEnglish,
+                (step, count) => StatusText.Text = string.Format(CultureInfo.CurrentCulture,
+                    SafetyText("ExportProgress"), step, count), cancellation.Token);
         }
-        catch
+        catch (OperationCanceledException)
         {
-            TryDeleteDirectory(packageFolder);
-            throw;
+            StatusText.Text = SafetyText("ExportCancelled");
+            return null;
+        }
+        finally
+        {
+            _exportCancellation = null;
+            ExportProgressRing.IsActive = false;
+            ExportCancelButton.Visibility = ExportProgressRing.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -468,11 +414,6 @@ public sealed partial class MainWindow
         return string.IsNullOrWhiteSpace(sanitized) ? "SnapSlate" : sanitized;
     }
 }
-
-internal sealed record GuidePackageResult(
-    string PackageFolder,
-    GuideExportManifest Manifest,
-    IReadOnlyList<string> GeneratedFormats);
 
 internal static class OcrService
 {

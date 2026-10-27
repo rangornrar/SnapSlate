@@ -60,4 +60,9 @@
   <data name="MaskHelp" xml:space="preserve">
     <value>Opaque mask — editable projects retain the original image.</value>
   </data>
+  <data name="ExportCancel.Content" xml:space="preserve"><value>Cancel export</value></data>
+  <data name="ExportCancel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Cancel export</value></data>
+  <data name="ExportProgress" xml:space="preserve"><value>Exporting step {0} of {1}…</value></data>
+  <data name="ExportAlreadyRunning" xml:space="preserve"><value>An export is already running. Wait for completion or cancel it.</value></data>
+  <data name="ExportCancelled" xml:space="preserve"><value>Export cancelled. No partial package retained.</value></data>
 </root>

@@ -8,4 +8,3 @@ public enum ExportFormatChoice
     Pdf,
     Docx
 }
-

@@ -40,8 +40,14 @@ public sealed partial class MainWindow
         AutomationProperties.SetName(ToolbarDocumentComboBox, SafetyText("WorkspaceCapture"));
         AutomationProperties.SetName(ToolbarPaletteComboBox, SafetyText("UiColor"));
         AutomationProperties.SetName(ToolbarOpacitySlider, SafetyText("UiOpacity"));
-        ToolbarZoomResetButton.Content = ZoomLevelText.Text;
+        UpdateWorkspaceZoomLabel();
         UpdateWorkspaceContext();
+    }
+
+    private void UpdateWorkspaceZoomLabel()
+    {
+        ToolbarZoomResetButton.Content = ZoomLevelText.Text;
+        SetButtonTooltip(ToolbarZoomResetButton, ZoomLevelText.Text + " — " + SafetyText("UiResetTo100"));
     }
 
     private void UpdateWorkspaceContext()
@@ -58,8 +64,8 @@ public sealed partial class MainWindow
             || (_selectedAnnotation is null && _currentTool is EditorTool.Rectangle or EditorTool.Ellipse or EditorTool.ArrowStraight or EditorTool.ArrowCurved or EditorTool.Focus) ? Visibility.Visible : Visibility.Collapsed;
         StrokeThicknessSlider.Visibility = WorkspaceStrokeControls.Visibility;
         ToolbarCurrentToolText.Text = mask ? SafetyText("WorkspaceOpaqueMask")
-            : _selectedAnnotation is not null ? AnnotationPanelTitleText.Text : SafetyText(_toolLabels[_currentTool]);
-        StepDetailsTitleText.Text = _selectedAnnotation is null ? SafetyText("WorkspaceProperties") : AnnotationPanelTitleText.Text;
+            : _selectedAnnotation is not null ? SafetyText("Annotation" + _selectedAnnotation.Kind) : SafetyText(_toolLabels[_currentTool]);
+        StepDetailsTitleText.Text = _selectedAnnotation is null ? SafetyText("WorkspaceProperties") : ToolbarCurrentToolText.Text;
     }
 
     private void QueueWorkspaceFit()

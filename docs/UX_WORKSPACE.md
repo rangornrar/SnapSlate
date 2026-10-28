@@ -19,15 +19,17 @@ Captures PNG du même écran Windows, sans recomposition :
 - [Avant, fenêtre maximisée](ux-2026-10-28/before.png)
 - [Après, fenêtre initiale 1440 × 900](ux-2026-10-28/after-default.png)
 - [Après, fenêtre maximisée](ux-2026-10-28/after-maximized.png)
+- [Capture 4K complète, avec rectangle sélectionné](ux-2026-10-28/after-4k.png)
 
 ## Validation
 
 - Build Debug x64 : aucune erreur ni avertissement.
 - 83 tests automatisés réussis ; le profil de performance optionnel reste ignoré.
+- Le pourcentage courant est présent dans le nom accessible du bouton de zoom. Aperçu anglais des réglages, abandon par Échap et retour au français avec le zoom conservé.
 - Création d’un texte puis saisie directe, sans recliquer le champ ; texte et sélection visibles sur le canevas.
 - Ouverture/fermeture indépendante des étapes et propriétés, image entière visible aux deux tailles ci-dessus.
 - Import d’une image synthétique 3840 × 2160 ; création d’un rectangle, annulation (1 → 0) et rétablissement (0 → 1).
 - Enregistrement du projet, réouverture avec les deux captures et le rectangle conservés.
 - Export PNG 3840 × 2160 ; la différence de pixels avec la source reste limitée au rectangle. Le contour de sélection de l’éditeur n’est pas exporté.
 
-Les essais natifs portent sur ce poste Windows et ces tailles de fenêtre. Les écrans tactiles et les autres échelles DPI ne sont pas validés ici. Cette refonte est indépendante de la release du lot 3, `2026.10.28.001`.
+Les essais natifs portent sur ce poste Windows et ces tailles de fenêtre. Les écrans tactiles, les autres échelles DPI, Narrator et le mode de contraste élevé de Windows ne sont pas validés ici. Cette refonte est indépendante de la release du lot 3, `2026.10.28.001`.

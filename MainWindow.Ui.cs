@@ -1427,7 +1427,7 @@ public sealed partial class MainWindow
         SceneScaleTransform.ScaleY = _currentZoom;
         if (_currentDocument is not null) ApplyCropState(_currentDocument);
         ZoomLevelText.Text = string.Format(CultureInfo.CurrentCulture, "{0:0} %", _currentZoom * 100);
-        ToolbarZoomResetButton.Content = ZoomLevelText.Text;
+        UpdateWorkspaceZoomLabel();
         UpdateStatus();
     }
 

@@ -4,6 +4,21 @@ Tous les changements notables de ce projet seront documentes ici.
 
 Le format est volontairement simple et oriente publication GitHub.
 
+## [2026.10.28.002] - 2026-10-28
+
+### Interface d’annotation
+
+- Canevas dégagé au démarrage, étapes et propriétés masquées par défaut ; outils fixes à gauche, hors de la capture.
+- Commandes principales regroupées, réglages contextuels et ouverture des propriétés du texte et des gommettes à la demande.
+- Ajustement automatique de l’image, pourcentage de zoom exact et exposé aux outils d’assistance.
+- Nouvelle annotation sélectionnée, saisie directe des textes et contour de sélection visible sur les fonds clairs et sombres.
+- Annulation des formes dessinées corrigée pour restaurer l’état précédant leur création.
+
+### Vérification
+
+- 83 tests automatisés ; parcours natifs d’annotation, sauvegarde/réouverture et export 4K. Captures avant/après et limites : `docs/UX_WORKSPACE.md`.
+- Distribution Windows x64 autonome ; signature Authenticode toujours indisponible faute de certificat de production.
+
 ## [2026.10.28.001] - 2026-10-28
 
 ### Corrigé

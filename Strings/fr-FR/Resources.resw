@@ -415,4 +415,13 @@
   <data name="CaptureShortcutHelp" xml:space="preserve"><value>Ouvrir la capture Windows (import automatique si activé)</value></data>
   <data name="SourceUnknown" xml:space="preserve"><value>Source inconnue</value></data>
   <data name="DefaultAudience" xml:space="preserve"><value>Utilisateurs finaux</value></data>
+
+  <data name="WorkspaceImport" xml:space="preserve"><value>Importer</value></data>
+  <data name="WorkspaceExportPng" xml:space="preserve"><value>Exporter PNG</value></data>
+  <data name="WorkspaceProperties" xml:space="preserve"><value>Propriétés</value></data>
+  <data name="WorkspaceGuideTitle" xml:space="preserve"><value>Titre du guide</value></data>
+  <data name="WorkspaceCapture" xml:space="preserve"><value>Capture active</value></data>
+  <data name="WorkspaceOpaqueMask" xml:space="preserve"><value>Masquage opaque</value></data>
+  <data name="WorkspaceAnnotationCount" xml:space="preserve"><value>{0} annotations</value></data>
+  <data name="WorkspaceAnnotationCountSingle" xml:space="preserve"><value>1 annotation</value></data>
 </root>

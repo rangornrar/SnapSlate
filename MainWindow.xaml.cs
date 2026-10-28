@@ -33,7 +33,7 @@ public sealed partial class MainWindow : Window
 {
     private const double SceneWidth = 1360;
     private const double SceneHeight = 820;
-    private const double FloatingToolRailGutterWidth = 96;
+    private const double FloatingToolRailGutterWidth = 0;
     private const double StickerSize = 60;
     private const double TextAnnotationMinWidth = 220;
     private const double TextAnnotationMaxWidth = 760;
@@ -93,7 +93,7 @@ public sealed partial class MainWindow : Window
     private bool _isSyncingPaletteUi;
     private bool _isSyncingOpacityUi;
     private bool _isInitializingUi;
-    private bool _isInspectorPaneCollapsed;
+    private bool _isInspectorPaneCollapsed = true;
     private bool _isProcessingClipboard;
     private bool _clipboardWatcherPrimed;
     private int _nextCaptureIndex = 1;
@@ -109,8 +109,11 @@ public sealed partial class MainWindow : Window
         SetTitleBar(AppTitleBar);
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
-        AppWindow.Resize(new SizeInt32(1760, 1080));
-        AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+        var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
+        var width = Math.Min(1440, workArea.Width);
+        var height = Math.Min(900, workArea.Height);
+        AppWindow.MoveAndResize(new RectInt32(workArea.X + (workArea.Width - width) / 2, workArea.Y + (workArea.Height - height) / 2, width, height));
+        AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Standard;
 
         _palettes = CreatePalettes();
         _toolButtons =
@@ -360,6 +363,9 @@ public sealed partial class MainWindow : Window
         ++_previewVersion;
         RenderedSceneImage.Source = null;
         _currentDocument = document;
+        _autoFitPreview = true;
+        _isInspectorPaneCollapsed = true;
+        _inspectorOpenedManually = false;
         _selectedAnnotation = null;
         _isApplyingDocumentState = true;
 
@@ -441,6 +447,7 @@ public sealed partial class MainWindow : Window
 
     private void SelectTool(EditorTool tool)
     {
+        if (tool != EditorTool.Select && tool != _currentTool && _selectedAnnotation is not null) SelectAnnotation(null);
         _currentTool = tool;
         foreach (var button in _toolButtons)
         {
@@ -458,6 +465,7 @@ public sealed partial class MainWindow : Window
         ToolbarToolPickerButton.BorderThickness = new Thickness(1);
         CurrentToolText.Text = SafetyText(_toolLabels[tool]);
         ToolbarCurrentToolText.Text = SafetyText(_toolLabels[tool]);
+        UpdateWorkspaceContext();
         UpdateStatus();
     }
 
@@ -1071,12 +1079,14 @@ public sealed partial class MainWindow : Window
         if (_currentTool == EditorTool.Text)
         {
             AddTextAnnotation(document, point);
+            e.Handled = true;
             return;
         }
 
         if (_currentTool == EditorTool.Sticker)
         {
             AddStickerAnnotation(document, point);
+            e.Handled = true;
             return;
         }
 
@@ -1239,6 +1249,7 @@ public sealed partial class MainWindow : Window
         document.Annotations.Add(annotation);
         MarkDocumentDirty(document);
         RenderAnnotations(document);
+        SelectAnnotation(annotation);
         UpdateAnnotationCount(document);
         UpdateStatus();
     }
@@ -1340,6 +1351,7 @@ public sealed partial class MainWindow : Window
             _activeElement = null;
         }
 
+        var before = CaptureProjectState();
         var annotationAdded = false;
         switch (_currentTool)
         {
@@ -1470,9 +1482,10 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        PushUndoState(CaptureProjectState());
+        PushUndoState(before);
         MarkDocumentDirty(document);
         RenderAnnotations(document);
+        SelectAnnotation(document.Annotations[^1]);
         UpdateAnnotationCount(document);
         UpdateStatus();
     }
@@ -1481,7 +1494,7 @@ public sealed partial class MainWindow : Window
     {
         PushUndoState(CaptureProjectState());
         var text = string.IsNullOrWhiteSpace(textOverride)
-            ? (string.IsNullOrWhiteSpace(document.AnnotationText) ? "Note rapide" : document.AnnotationText.Trim())
+            ? (string.IsNullOrWhiteSpace(document.AnnotationText) ? SafetyText("QuickNote") : document.AnnotationText.Trim())
             : textOverride.Trim();
         var size = MeasureTextAnnotationSize(text, textOverride is null ? 28 : 24);
         document.Annotations.Add(new AnnotationModel
@@ -1498,6 +1511,18 @@ public sealed partial class MainWindow : Window
 
         MarkDocumentDirty(document);
         RenderAnnotations(document);
+        var annotation = document.Annotations[^1];
+        SelectAnnotation(annotation);
+        if (textOverride is null)
+        {
+            // Focus after layout and pointer handling have opened the inspector.
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            {
+                if (_editorClosed || !ReferenceEquals(_selectedAnnotation, annotation)) return;
+                AnnotationTextBox.Focus(FocusState.Programmatic);
+                AnnotationTextBox.SelectAll();
+            });
+        }
         UpdateAnnotationCount(document);
         UpdateStatus();
     }
@@ -1537,6 +1562,7 @@ public sealed partial class MainWindow : Window
 
         MarkDocumentDirty(document);
         RenderAnnotations(document);
+        SelectAnnotation(document.Annotations[^1]);
         UpdateAnnotationCount(document);
         UpdateStickerSequenceText(document);
         UpdateStatus();
@@ -1788,6 +1814,7 @@ public sealed partial class MainWindow : Window
         ImportedImage.Visibility = Visibility.Collapsed;
         PlaceholderPanel.Visibility = Visibility.Collapsed;
         RequestScenePreview();
+        AnnotationCanvas.Children.Add(SelectionOutlineHalo);
         AnnotationCanvas.Children.Add(SelectionOutline);
         AnnotationCanvas.Children.Add(CropPreview);
         AnnotationCanvas.Children.Add(CropBadge);
@@ -1929,9 +1956,8 @@ public sealed partial class MainWindow : Window
         var annotationCount = _currentDocument?.Annotations.Count ?? 0;
         AnnotationCountText.Text = string.Format(
             CultureInfo.CurrentCulture,
-            SafetyText("Ui0AnnotationsZoom10"),
-            annotationCount,
-            _currentZoom * 100);
+            SafetyText(annotationCount == 1 ? "WorkspaceAnnotationCountSingle" : "WorkspaceAnnotationCount"),
+            annotationCount);
     }
 
     private SolidColorBrush GetBrush(string key)

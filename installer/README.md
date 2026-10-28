@@ -22,7 +22,7 @@ Les anciens scripts d’installation MSIX ont été retirés. Aucun certificat n
 
 ## Signature Authenticode
 
-**La release 2026.10.28.001 n’est pas signée : aucun certificat de production n’est disponible.**
+**La release 2026.10.28.002 n’est pas signée : aucun certificat de production n’est disponible.**
 
 Avec un certificat de signature de code valide et sa clé privée déjà disponible dans `CurrentUser/My`, utiliser :
 

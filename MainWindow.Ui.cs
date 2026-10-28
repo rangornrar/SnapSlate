@@ -149,7 +149,7 @@ public sealed partial class MainWindow
         SetButtonContent(ZoomOutButton, SafetyText("UiText_ffb392d1"));
         SetButtonContent(ZoomResetButton, SafetyText("Ui100"));
         SetButtonContent(ZoomInButton, SafetyText("UiText_e63541c0"));
-        ZoomLevelText.Text = "100 %";
+        ZoomLevelText.Text = string.Format(CultureInfo.CurrentCulture, "{0:0} %", _currentZoom * 100);
         SetButtonContent(ExportPngButton, "PNG");
         SetButtonContent(ExportAllFormatsButton, SafetyText("UiAll"));
         SetButtonContent(ExportMarkdownButton, "Markdown");
@@ -291,6 +291,7 @@ public sealed partial class MainWindow
         SetText(SettingsTipBodyText, SafetyText("UiUsefulShortcutsAreGroupedInHelpSo"));
         AutoImportClipboardToggleSwitch.OnContent = string.Empty;
         AutoImportClipboardToggleSwitch.OffContent = string.Empty;
+        ApplyWorkspaceChrome();
     }
 
     private void UpdateExportSummaryList()
@@ -449,35 +450,24 @@ public sealed partial class MainWindow
 
     private void ApplyProcedurePaneLayout()
     {
-        var stepsCollapsed = EditingPreferences.CollapseStepsPane;
-        StepsPaneColumn.Width = new GridLength(stepsCollapsed ? 48 : 256);
-        InspectorPaneColumn.Width = new GridLength(_isInspectorPaneCollapsed ? 0 : 312);
-        StepsHeaderPanel.Visibility = stepsCollapsed ? Visibility.Collapsed : Visibility.Visible;
-        DocumentTabsListView.Visibility = stepsCollapsed ? Visibility.Collapsed : Visibility.Visible;
-        DocumentTabsCompactListView.Visibility = stepsCollapsed ? Visibility.Visible : Visibility.Collapsed;
-        CollapseStepsButton.Visibility = stepsCollapsed ? Visibility.Collapsed : Visibility.Visible;
-        AddStepButton.Visibility = stepsCollapsed ? Visibility.Collapsed : Visibility.Visible;
-        StepsPaneHintText.Visibility = stepsCollapsed ? Visibility.Collapsed : Visibility.Visible;
-        InspectorToggleButton.Content = _isInspectorPaneCollapsed ? SafetyText("UiText") : SafetyText("UiText");
-        ToolbarStepsButton.Content = stepsCollapsed ? SafetyText("UiSteps") : SafetyText("UiSteps");
+        if (_isDraggingAnnotation) return;
+        StepsPaneColumn.Width = new GridLength(_showStepsPane ? 240 : 0);
+        StepsPaneHost.Visibility = _showStepsPane ? Visibility.Visible : Visibility.Collapsed;
+        InspectorPaneColumn.Width = new GridLength(_isInspectorPaneCollapsed ? 0 : 284);
+        InspectorPaneHost.Visibility = _isInspectorPaneCollapsed ? Visibility.Collapsed : Visibility.Visible;
+        StepsHeaderPanel.Visibility = DocumentTabsListView.Visibility = Visibility.Visible;
+        DocumentTabsCompactListView.Visibility = Visibility.Collapsed;
+        CollapseStepsButton.Visibility = AddStepButton.Visibility = Visibility.Visible;
+        StepsPaneHintText.Visibility = Visibility.Collapsed;
+        ToolbarStepsButton.Content = SafetyText("UiSteps");
         ToolbarOpacityValueText.Text = string.Format(CultureInfo.CurrentCulture, "{0:0} %", ToolbarOpacitySlider.Value * 100);
+        QueueWorkspaceFit();
     }
 
     private void ApplyFloatingToolRailPosition(double left, double top)
     {
-        var railWidth = FloatingToolRail.ActualWidth > 0 ? FloatingToolRail.ActualWidth : 72;
-        var railHeight = FloatingToolRail.ActualHeight > 0 ? FloatingToolRail.ActualHeight : 420;
-        var viewportWidth = CanvasWorkspace.ActualWidth;
-        var viewportHeight = CanvasWorkspace.ActualHeight;
-        var maxLeft = Math.Max(8, viewportWidth - railWidth - 8);
-        var maxTop = Math.Max(8, viewportHeight - railHeight - 8);
-
-        var clampedLeft = Math.Clamp(left, 8, maxLeft);
-        var clampedTop = Math.Clamp(top, 8, maxTop);
-
-        FloatingToolRail.Margin = new Thickness(clampedLeft, clampedTop, 0, 0);
-        EditingPreferences.FloatingToolRailLeft = clampedLeft;
-        EditingPreferences.FloatingToolRailTop = clampedTop;
+        // The rail is docked outside the image viewport; old floating positions remain compatible.
+        FloatingToolRail.Margin = new Thickness(4);
     }
 
     private void BuildPaletteStrip()
@@ -1106,6 +1096,9 @@ public sealed partial class MainWindow
         CaptureSection.Visibility = section == ShellSection.Capture ? Visibility.Visible : Visibility.Collapsed;
         ProcedureSection.Visibility = section == ShellSection.Procedure ? Visibility.Visible : Visibility.Collapsed;
         SettingsSection.Visibility = section == ShellSection.Settings ? Visibility.Visible : Visibility.Collapsed;
+        WorkspaceFooterLeft.Visibility = section == ShellSection.Procedure ? Visibility.Visible : Visibility.Collapsed;
+        foreach (var control in new UIElement[] { ToolbarZoomOutButton, ToolbarZoomResetButton, ToolbarZoomInButton, ToolbarFitButton, AnnotationCountText })
+            control.Visibility = section == ShellSection.Procedure ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -1282,14 +1275,14 @@ public sealed partial class MainWindow
 
     private void CollapseStepsButton_Click(object sender, RoutedEventArgs e)
     {
-        EditingPreferences.CollapseStepsPane = !EditingPreferences.CollapseStepsPane;
-        SavePreferencesIfNeeded();
-        ApplyPreferencesToUi();
+        _showStepsPane = !_showStepsPane;
+        ApplyProcedurePaneLayout();
     }
 
     private void InspectorToggleButton_Click(object sender, RoutedEventArgs e)
     {
         _isInspectorPaneCollapsed = !_isInspectorPaneCollapsed;
+        _inspectorOpenedManually = !_isInspectorPaneCollapsed;
         ApplyProcedurePaneLayout();
     }
 
@@ -1398,18 +1391,24 @@ public sealed partial class MainWindow
         await ApplyPaletteSelectionAsync(palette.Key, _currentDocument.SelectedPaletteShadeIndex);
     }
 
-    private void ZoomInButton_Click(object sender, RoutedEventArgs e) => SetZoom(_currentZoom + 0.1);
+    private void ZoomInButton_Click(object sender, RoutedEventArgs e) => SetManualZoom(_currentZoom + 0.1);
 
-    private void ZoomOutButton_Click(object sender, RoutedEventArgs e) => SetZoom(_currentZoom - 0.1);
+    private void ZoomOutButton_Click(object sender, RoutedEventArgs e) => SetManualZoom(_currentZoom - 0.1);
 
-    private void ZoomResetButton_Click(object sender, RoutedEventArgs e) => SetZoom(1.0);
+    private void ZoomResetButton_Click(object sender, RoutedEventArgs e) => SetManualZoom(1.0);
 
     private void FitToViewportButton_Click(object sender, RoutedEventArgs e)
     {
+        _autoFitPreview = true;
+        FitPreviewToViewport();
+    }
+
+    private void FitPreviewToViewport()
+    {
         var contentWidth = _currentDocument is null ? PreviewViewport.Width : GetSceneWidth(_currentDocument) + FloatingToolRailGutterWidth;
         var contentHeight = _currentDocument is null ? PreviewViewport.Height : GetSceneHeight(_currentDocument);
-        var availableWidth = CanvasScrollViewer.ActualWidth;
-        var availableHeight = CanvasScrollViewer.ActualHeight;
+        var availableWidth = Math.Max(1, CanvasScrollViewer.ActualWidth - 24);
+        var availableHeight = Math.Max(1, CanvasScrollViewer.ActualHeight - 24);
 
         if (contentWidth <= 0 || contentHeight <= 0 || availableWidth <= 0 || availableHeight <= 0)
         {
@@ -1418,16 +1417,17 @@ public sealed partial class MainWindow
         }
 
         var fitZoom = Math.Min(availableWidth / contentWidth, availableHeight / contentHeight);
-        SetZoom(fitZoom);
+        SetZoom(Math.Min(1, fitZoom));
     }
 
     private void SetZoom(double zoom)
     {
-        _currentZoom = Math.Clamp(zoom, 0.5, 2.0);
+        _currentZoom = Math.Clamp(zoom, 0.05, 2.0);
         SceneScaleTransform.ScaleX = _currentZoom;
         SceneScaleTransform.ScaleY = _currentZoom;
         if (_currentDocument is not null) ApplyCropState(_currentDocument);
         ZoomLevelText.Text = string.Format(CultureInfo.CurrentCulture, "{0:0} %", _currentZoom * 100);
+        UpdateWorkspaceZoomLabel();
         UpdateStatus();
     }
 
@@ -2094,7 +2094,10 @@ public sealed partial class MainWindow
             StopInlineTextEdit(refreshSelection: false);
         }
 
+        var selectionChanged = !ReferenceEquals(_selectedAnnotation, annotation);
         _selectedAnnotation = annotation;
+        if (selectionChanged && !_inspectorOpenedManually) _isInspectorPaneCollapsed = annotation?.Kind is not (AnnotationKind.Text or AnnotationKind.Sticker);
+        ApplyProcedurePaneLayout();
         _isSyncingObjectList = true;
         AnnotationObjectsList.SelectedItem = annotation;
         _isSyncingObjectList = false;
@@ -2108,9 +2111,10 @@ public sealed partial class MainWindow
         {
             if (annotation is null)
             {
+                LegendPanel.Visibility = Visibility.Visible;
                 StepDetailsPanel.Visibility = Visibility.Visible;
                 AnnotationContextPanel.Visibility = Visibility.Collapsed;
-                SelectionOutline.Visibility = Visibility.Collapsed;
+                SelectionOutlineHalo.Visibility = SelectionOutline.Visibility = Visibility.Collapsed;
                 StepDetailsSubtitleText.Text = SafetyText("UiStepTitleAndNote");
                 SelectedAnnotationSummaryText.Text = SafetyText("UiNoObjectSelected");
                 SelectedColorLabelText.Visibility = Visibility.Collapsed;
@@ -2136,14 +2140,16 @@ public sealed partial class MainWindow
             };
 
             var isSticker = annotation.Kind == AnnotationKind.Sticker;
+            SelectedStickerValueHost.Visibility = isSticker ? Visibility.Visible : Visibility.Collapsed;
+            LegendPanel.Visibility = isSticker ? Visibility.Visible : Visibility.Collapsed;
             var isText = annotation.Kind == AnnotationKind.Text;
             var isStrokeBased = annotation.Kind is AnnotationKind.Rectangle or AnnotationKind.Ellipse or AnnotationKind.ArrowStraight or AnnotationKind.ArrowCurved or AnnotationKind.Focus or AnnotationKind.Mask;
             var paletteName = _palettes.TryGetValue(annotation.PaletteKey, out var selectedPalette)
                 ? selectedPalette.DisplayName
                 : annotation.PaletteKey;
 
-            SelectedColorLabelText.Visibility = Visibility.Visible;
-            SelectedColorText.Visibility = Visibility.Visible;
+            SelectedColorLabelText.Visibility = Visibility.Collapsed;
+            SelectedColorText.Visibility = Visibility.Collapsed;
             StickerValueLabelText.Visibility = isSticker ? Visibility.Visible : Visibility.Collapsed;
             StickerValueText.Visibility = isSticker ? Visibility.Visible : Visibility.Collapsed;
             StickerLegendLabelText.Visibility = isSticker ? Visibility.Visible : Visibility.Collapsed;
@@ -2154,7 +2160,7 @@ public sealed partial class MainWindow
             StickerModeComboBox.Visibility = isSticker ? Visibility.Visible : Visibility.Collapsed;
             ResetStickerNumberOnColorChangeCheckBox.Visibility = isSticker ? Visibility.Visible : Visibility.Collapsed;
             StrokeThicknessSlider.Visibility = isStrokeBased ? Visibility.Visible : Visibility.Collapsed;
-            StrokeSummaryText.Visibility = isStrokeBased ? Visibility.Visible : Visibility.Collapsed;
+            StrokeSummaryText.Visibility = Visibility.Collapsed;
             CropStateText.Visibility = (_currentDocument.PendingCropRect is not null || _currentDocument.AppliedCropRect is not null) ? Visibility.Visible : Visibility.Collapsed;
             ApplyCropButton.Visibility = _currentDocument.PendingCropRect is not null ? Visibility.Visible : Visibility.Collapsed;
             ResetCropButton.Visibility = (_currentDocument.PendingCropRect is not null || _currentDocument.AppliedCropRect is not null) ? Visibility.Visible : Visibility.Collapsed;
@@ -2176,6 +2182,7 @@ public sealed partial class MainWindow
                 _ => annotation.Opacity.ToString("P0", CultureInfo.CurrentCulture)
             };
 
+            SelectedOpacityLabelText.Visibility = SelectedOpacitySlider.Visibility = annotation.Kind == AnnotationKind.Mask ? Visibility.Collapsed : Visibility.Visible;
             SelectedOpacitySlider.Value = annotation.Opacity;
             StrokeThicknessSlider.Value = annotation.StrokeThickness;
             AnnotationTextBox.Text = isText ? annotation.Text : string.Empty;
@@ -2184,6 +2191,7 @@ public sealed partial class MainWindow
         finally
         {
             _isSyncingAnnotationSelectionUi = false;
+            UpdateWorkspaceContext();
         }
     }
 
@@ -2193,15 +2201,18 @@ public sealed partial class MainWindow
 
         if (bounds.Width <= 0 || bounds.Height <= 0)
         {
-            SelectionOutline.Visibility = Visibility.Collapsed;
+            SelectionOutlineHalo.Visibility = SelectionOutline.Visibility = Visibility.Collapsed;
             return;
         }
 
-        SelectionOutline.Visibility = Visibility.Visible;
-        SelectionOutline.Width = bounds.Width + 12;
-        SelectionOutline.Height = bounds.Height + 12;
-        Canvas.SetLeft(SelectionOutline, Math.Max(0, bounds.X - 6));
-        Canvas.SetTop(SelectionOutline, Math.Max(0, bounds.Y - 6));
+        foreach (var outline in new[] { SelectionOutlineHalo, SelectionOutline })
+        {
+            outline.Visibility = Visibility.Visible;
+            outline.Width = bounds.Width + 12;
+            outline.Height = bounds.Height + 12;
+            Canvas.SetLeft(outline, Math.Max(0, bounds.X - 6));
+            Canvas.SetTop(outline, Math.Max(0, bounds.Y - 6));
+        }
     }
 
     private void AnnotationElement_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -2215,8 +2226,8 @@ public sealed partial class MainWindow
                 return;
             }
 
-            SelectAnnotation(annotation);
             BeginAnnotationDrag(element, annotation, e);
+            SelectAnnotation(annotation);
             e.Handled = true;
         }
     }

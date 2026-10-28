@@ -8,6 +8,8 @@ Depuis la racine du dépôt, avec le SDK de `global.json` et Inno Setup de `eng/
 
 Le script publie dans une sortie propre, autonome (.NET et Windows App SDK inclus), restaure les dépendances verrouillées, prépare `dist/app`, l’archive portable `SnapSlate-Installer-x64.zip`, puis `release/SnapSlate-Setup.exe`. Il échoue si une commande échoue. La version du setup vient du projet, sans numéro indépendant dans le script Inno.
 
+Un `dotnet clean` avec les propriétés de déploiement autonome précède le publish : un build MSIX antérieur peut sinon laisser un PRI incomplet dans les fichiers intermédiaires et empêcher le chargement des thèmes WinUI au lancement.
+
 `Test-Distribution.ps1` vérifie versions, composants et égalité des binaires ZIP/staging ; il produit `release/SHA256SUMS.txt` et `release/build-provenance.json`. La provenance contient la révision Git de construction, le SDK, les empreintes et l’état de signature. Il s’agit d’un relevé de build, pas d’une attestation cryptographique.
 
 En CI seulement, `eng/Install-CiBuildTools.ps1` télécharge le compilateur épinglé et vérifie son SHA-256. `Test-Distribution.ps1 -InstallSmoke` installe dans un répertoire temporaire neuf du runner, vérifie le binaire installé, lance l’application et attend sa fenêtre, puis arrête cette instance et désinstalle. Cette option est refusée hors GitHub Actions ; elle ne doit pas servir sur un poste utilisateur.

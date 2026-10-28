@@ -27,6 +27,8 @@ dotnet test .\tests\SnapSlate.Tests.csproj -c Release -p:Platform=x64 --filter "
 
 Build Debug x64 sans avertissement ni erreur. Le workflow Release exécute les tests puis construit et vérifie la distribution. Le script d’installation de test est limité aux runners jetables GitHub Actions ; il n’installe rien sur le poste utilisateur.
 
+Le contrôle de lancement a détecté un PRI WinUI réutilisé après le build MSIX, dépourvu des ressources de thème nécessaires à la distribution autonome. Le packaging effectue maintenant un nettoyage avec les mêmes propriétés que le publish. Une publication Release propre démarre localement ; la CI exerce volontairement build MSIX → packaging autonome → lancement installé pour prévenir ce défaut.
+
 ## Mesure ciblée du contrôle d’état modifié
 
 Même machine, même PNG de 1920 × 1032 (103 748 octets), tableaux distincts pour chaque étape ; cinq boucles `HasChanges` + `RefreshIndicators`, après mise en cache initiale. Mesures uniques indicatives, pas un benchmark statistique ni une mesure de la mémoire totale de WinUI.

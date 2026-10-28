@@ -36,6 +36,17 @@ function Remove-DirectorySafely {
 }
 
 Remove-DirectorySafely -Path $buildOutputDir
+# MSIX and unpackaged builds share intermediate PRI files. Clean with the same
+# deployment properties before publishing so WinUI framework resources are merged.
+dotnet clean $projectPath `
+    -c $Configuration `
+    -p:Platform=$Platform `
+    -p:WindowsPackageType=None `
+    -p:WindowsAppSDKSelfContained=true `
+    -p:PublishReadyToRun=false `
+    -r "win-$Platform"
+if ($LASTEXITCODE -ne 0) { throw "Clean failed with exit code $LASTEXITCODE." }
+
 Write-Host "Publishing SnapSlate ($Configuration, $Platform)..."
 dotnet publish $projectPath `
     -c $Configuration `

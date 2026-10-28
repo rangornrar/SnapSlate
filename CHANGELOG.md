@@ -15,6 +15,7 @@ Le format est volontairement simple et oriente publication GitHub.
 - Ressources FR/EN centralisées, langue explicite des guides et dates, titres DOCX sémantiques et descriptions d’images.
 - Sources exportées limitées au nom de fichier ; retrait des scripts MSIX qui ajoutaient un certificat à la confiance système.
 - SDK et dépendances verrouillés, version du setup issue du projet, Inno épinglé par SHA-256 en CI, contrôles installation/lancement/désinstallation et provenance des distributions.
+- Nettoyage avant publication autonome pour régénérer le PRI WinUI après un build MSIX et éviter un échec de lancement sur les ressources de thème.
 - Signature Authenticode optionnelle préparée ; cette release reste non signée, aucun certificat de production n’étant disponible.
 
 ### Vérification

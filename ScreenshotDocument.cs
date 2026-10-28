@@ -13,7 +13,7 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
     private string _baseTitle = "Capture";
     private string _stepNote = string.Empty;
     private string _originLabel = "Demo";
-    private string _sourceLabel = "Source inconnue";
+    private string _sourceLabel = LocalizedText.Get("SourceUnknown");
     private string _fileNameLabel = "capture.png";
     private int _sourcePixelWidth = 1360;
     private int _sourcePixelHeight = 820;
@@ -22,10 +22,10 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
     private string _selectedPaletteKey = "Sunset";
     private int _selectedPaletteShadeIndex = 3;
     private string _paletteDisplayName = "sunset note";
-    private string _annotationText = "Note rapide";
+    private string _annotationText = LocalizedText.Get("QuickNote");
     private int _stepNumber = 1;
     private GuideTemplateType _templateType = GuideTemplateType.UserManual;
-    private string _audience = "Utilisateurs finaux";
+    private string _audience = LocalizedText.Get("DefaultAudience");
     private string _author = "SnapSlate";
     private string _documentVersion = "1.0";
     private double _defaultOpacity = 1;
@@ -238,7 +238,21 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
 
     public string TabTitle => IsDirty ? $"{BaseTitle} *" : BaseTitle;
 
-    public string TabSubtitle => IsDirty ? "A sauvegarder" : OriginLabel;
+    public string TabSubtitle => IsDirty ? LocalizedText.Get("ProjectUnsaved") : LocalizedText.Get("Origin" + Origin);
+
+    [JsonIgnore]
+    public string AccessibleStepName => $"{StepNumber}. {BaseTitle}";
+    [JsonIgnore]
+    public string StepActionsName => LocalizedText.Get("StepActions") + ": " + BaseTitle;
+    [JsonIgnore]
+    public string StepActionsId => "StepActions-" + Id;
+    public override string ToString() => AccessibleStepName;
+    internal void NotifyLanguageChanged()
+    {
+        OnPropertyChanged(nameof(TabSubtitle));
+        OnPropertyChanged(nameof(StepActionsName));
+        OnPropertyChanged(nameof(AccessibleStepName));
+    }
 
     public ScreenshotDocument CloneForHistory()
     {
@@ -292,6 +306,7 @@ public sealed class ScreenshotDocument : INotifyPropertyChanged
 
         field = value;
         OnPropertyChanged(propertyName);
+        if (propertyName is nameof(BaseTitle) or nameof(StepNumber)) NotifyLanguageChanged();
         return true;
     }
 

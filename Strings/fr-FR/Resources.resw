@@ -65,4 +65,354 @@
   <data name="ExportProgress" xml:space="preserve"><value>Export de l’étape {0} sur {1}…</value></data>
   <data name="ExportAlreadyRunning" xml:space="preserve"><value>Un export est déjà en cours. Attendez sa fin ou annulez-le.</value></data>
   <data name="ExportCancelled" xml:space="preserve"><value>Export annulé. Aucun package partiel conservé.</value></data>
+  <data name="ClipboardImported" xml:space="preserve"><value>Image du presse-papiers importée.</value></data>
+  <data name="ClipboardNoImage" xml:space="preserve"><value>Aucune image disponible dans le presse-papiers.</value></data>
+  <data name="ClipboardFailed" xml:space="preserve"><value>Impossible de lire l’image du presse-papiers. Réessayez avec l’import manuel.</value></data>
+  <data name="SourceClipboard" xml:space="preserve"><value>Image du presse-papiers</value></data>
+  <data name="LegendPlaceholder" xml:space="preserve"><value>À compléter</value></data>
+  <data name="PublicationTextOnlyNotice" xml:space="preserve"><value>Publication de texte seul : les captures ne sont pas envoyées. Utilisez l’export du guide pour partager les images.</value></data>
+  <data name="PublicationModes" xml:space="preserve"><value>Notion et Confluence Cloud publient uniquement le texte et les légendes, sans captures. Le dossier SharePoint conserve le guide complet avec les images.</value></data>
+  <data name="PublicationUnauthorized" xml:space="preserve"><value>Authentification refusée (401). Vérifiez le jeton et le compte.</value></data>
+  <data name="PublicationForbidden" xml:space="preserve"><value>Accès refusé (403). Vérifiez les droits sur la page et l’espace.</value></data>
+  <data name="PublicationRateLimited" xml:space="preserve"><value>Limite de publication atteinte (429). Attendez avant de réessayer.</value></data>
+  <data name="PublicationNotFound" xml:space="preserve"><value>Page ou espace introuvable (404). Vérifiez les identifiants et les droits.</value></data>
+  <data name="PublicationHttpFailed" xml:space="preserve"><value>Publication refusée par le serveur (HTTP {0}).</value></data>
+  <data name="PublicationFailed" xml:space="preserve"><value>Publication impossible. Vérifiez la connexion et les paramètres.</value></data>
+  <data name="ExportAuthor" xml:space="preserve"><value>Auteur</value></data>
+  <data name="ExportGenerated" xml:space="preserve"><value>Généré le</value></data>
+  <data name="ExportSteps" xml:space="preserve"><value>Étapes</value></data>
+  <data name="ExportLegend" xml:space="preserve"><value>Légende</value></data>
+  <data name="AnnotationObjects" xml:space="preserve"><value>Objets de l’étape</value></data>
+  <data name="ObjectMoveHelp" xml:space="preserve"><value>Sélectionnez un objet puis utilisez Tab et les boutons de déplacement (1 px). Suppr efface l’objet, Ctrl+Z annule.</value></data>
+  <data name="ProjectUnsaved" xml:space="preserve"><value>À sauvegarder</value></data>
+  <data name="StepActions" xml:space="preserve"><value>Actions de l’étape</value></data>
+  <data name="ImportClipboard.Text" xml:space="preserve"><value>Importer l’image du presse-papiers (Ctrl+Maj+V)</value></data>
+  <data name="ImportClipboard.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Importer l’image du presse-papiers, même identique</value></data>
+  <data name="OriginDemo" xml:space="preserve"><value>Démonstration</value></data>
+  <data name="OriginBlankProject" xml:space="preserve"><value>Projet vide</value></data>
+  <data name="OriginClipboardCapture" xml:space="preserve"><value>Presse-papiers</value></data>
+  <data name="OriginFileImport" xml:space="preserve"><value>Fichier importé</value></data>
+  <data name="ImportCancelled" xml:space="preserve"><value>Import annulé.</value></data>
+  <data name="ImportUnreadable" xml:space="preserve"><value>Impossible de lire le fichier sélectionné.</value></data>
+  <data name="ImportFileSuccess" xml:space="preserve"><value>Étape créée pour {0}.</value></data>
+  <data name="DemoCreated" xml:space="preserve"><value>Nouvelle page de démonstration créée.</value></data>
+  <data name="PngCancelled" xml:space="preserve"><value>Export PNG annulé.</value></data>
+  <data name="AnnotationsCleared" xml:space="preserve"><value>Les annotations ont été effacées.</value></data>
+  <data name="CropDrawFirst" xml:space="preserve"><value>Tracez d’abord une zone de recadrage.</value></data>
+  <data name="CropApplied" xml:space="preserve"><value>Recadrage appliqué à cette étape.</value></data>
+  <data name="CropReset" xml:space="preserve"><value>Recadrage réinitialisé.</value></data>
+  <data name="CropPendingHint" xml:space="preserve"><value>Recadrage en attente. Utilisez Appliquer.</value></data>
+  <data name="CropTooSmall" xml:space="preserve"><value>La zone de recadrage est trop petite.</value></data>
+  <data name="CropAppliedSize" xml:space="preserve"><value>Recadrage appliqué : {0:0} × {1:0} px.</value></data>
+  <data name="CropPendingSize" xml:space="preserve"><value>Recadrage en attente : {0:0} × {1:0} px.</value></data>
+  <data name="CropNone" xml:space="preserve"><value>Aucun recadrage appliqué.</value></data>
+  <data name="CropBadge" xml:space="preserve"><value>Recadrage {0:0} × {1:0}</value></data>
+  <data name="StrokeCurrent" xml:space="preserve"><value>Trait actuel : {0:0} px</value></data>
+  <data name="SourceLabel" xml:space="preserve"><value>Source : {0}</value></data>
+  <data name="QuickNote" xml:space="preserve"><value>Note rapide</value></data>
+  <data name="DemoSource" xml:space="preserve"><value>Maquette éditoriale Lorem Ipsum</value></data>
+  <data name="NewProjectTitle" xml:space="preserve"><value>Nouveau projet</value></data>
+  <data name="BlankSource" xml:space="preserve"><value>Démarrer à zéro</value></data>
+  <data name="CopyTitle" xml:space="preserve"><value>{0} — copie</value></data>
+  <data name="MoveObjectLeft.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Déplacer l’objet vers gauche de 1 pixel</value></data>
+  <data name="MoveLeft" xml:space="preserve"><value>Déplacer vers gauche</value></data>
+  <data name="MoveObjectRight.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Déplacer l’objet vers droite de 1 pixel</value></data>
+  <data name="MoveRight" xml:space="preserve"><value>Déplacer vers droite</value></data>
+  <data name="MoveObjectUp.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Déplacer l’objet vers haut de 1 pixel</value></data>
+  <data name="MoveUp" xml:space="preserve"><value>Déplacer vers haut</value></data>
+  <data name="MoveObjectDown.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Déplacer l’objet vers bas de 1 pixel</value></data>
+  <data name="MoveDown" xml:space="preserve"><value>Déplacer vers bas</value></data>
+  <data name="ToolSelect" xml:space="preserve"><value>Sélection</value></data>
+  <data name="HintSelect" xml:space="preserve"><value>Cliquez un objet pour le sélectionner et le déplacer.</value></data>
+  <data name="ToolCrop" xml:space="preserve"><value>Recadrer</value></data>
+  <data name="HintCrop" xml:space="preserve"><value>Glissez une zone puis appliquez le recadrage.</value></data>
+  <data name="ToolText" xml:space="preserve"><value>Texte</value></data>
+  <data name="HintText" xml:space="preserve"><value>Cliquez dans la scène pour poser un texte.</value></data>
+  <data name="AnnotationText" xml:space="preserve"><value>Texte</value></data>
+  <data name="ToolSticker" xml:space="preserve"><value>Gommette</value></data>
+  <data name="HintSticker" xml:space="preserve"><value>Cliquez pour poser une gommette.</value></data>
+  <data name="AnnotationSticker" xml:space="preserve"><value>Gommette</value></data>
+  <data name="ToolArrowStraight" xml:space="preserve"><value>Flèche droite</value></data>
+  <data name="HintArrowStraight" xml:space="preserve"><value>Glissez pour tracer une flèche droite.</value></data>
+  <data name="AnnotationArrowStraight" xml:space="preserve"><value>Flèche droite</value></data>
+  <data name="ToolArrowCurved" xml:space="preserve"><value>Flèche courbe</value></data>
+  <data name="HintArrowCurved" xml:space="preserve"><value>Glissez pour tracer une flèche courbe.</value></data>
+  <data name="AnnotationArrowCurved" xml:space="preserve"><value>Flèche courbe</value></data>
+  <data name="ToolRectangle" xml:space="preserve"><value>Rectangle</value></data>
+  <data name="HintRectangle" xml:space="preserve"><value>Glissez pour entourer une zone rectangulaire.</value></data>
+  <data name="AnnotationRectangle" xml:space="preserve"><value>Rectangle</value></data>
+  <data name="ToolEllipse" xml:space="preserve"><value>Ovale</value></data>
+  <data name="HintEllipse" xml:space="preserve"><value>Glissez pour entourer une zone ovale.</value></data>
+  <data name="AnnotationEllipse" xml:space="preserve"><value>Ovale</value></data>
+  <data name="ToolFocus" xml:space="preserve"><value>Focus</value></data>
+  <data name="HintFocus" xml:space="preserve"><value>Glissez pour mettre une zone en avant.</value></data>
+  <data name="AnnotationFocus" xml:space="preserve"><value>Focus</value></data>
+  <data name="ToolMask" xml:space="preserve"><value>Masquage</value></data>
+  <data name="HintMask" xml:space="preserve"><value>Glissez pour masquer une zone.</value></data>
+  <data name="AnnotationMask" xml:space="preserve"><value>Masquage</value></data>
+  <data name="UiCreateANewProject" xml:space="preserve"><value>créer un nouveau projet</value></data>
+  <data name="UiNewProjectCreated" xml:space="preserve"><value>Nouveau projet créé.</value></data>
+  <data name="UiLoadTheDemoTemplate" xml:space="preserve"><value>charger le modèle de démonstration</value></data>
+  <data name="UiDemoTemplateLoaded" xml:space="preserve"><value>Modèle de démonstration chargé.</value></data>
+  <data name="UiOpenAProject" xml:space="preserve"><value>ouvrir un projet</value></data>
+  <data name="UiProjectOpenCancelled" xml:space="preserve"><value>Ouverture de projet annulée.</value></data>
+  <data name="UiTheProjectFileIsEmptyOrInvalid" xml:space="preserve"><value>Le fichier de projet est vide ou invalide.</value></data>
+  <data name="UiProjectLoaded0" xml:space="preserve"><value>Projet chargé : {0}</value></data>
+  <data name="UiSnapSlateProject" xml:space="preserve"><value>Projet SnapSlate</value></data>
+  <data name="UiProjectSaveCancelled" xml:space="preserve"><value>Sauvegarde de projet annulée.</value></data>
+  <data name="UiNoSaveLocationIsAvailable" xml:space="preserve"><value>Aucun emplacement de sauvegarde n'est disponible.</value></data>
+  <data name="UiProjectSaved0" xml:space="preserve"><value>Projet sauvegardé : {0}</value></data>
+  <data name="UiNothingToUndo" xml:space="preserve"><value>Rien à annuler.</value></data>
+  <data name="UiLastActionUndone" xml:space="preserve"><value>Dernière action annulée.</value></data>
+  <data name="UiNothingToRedo" xml:space="preserve"><value>Rien à rétablir.</value></data>
+  <data name="UiLastActionRedone" xml:space="preserve"><value>Dernière action rétablie.</value></data>
+  <data name="UiSharePointFolderSelectionCancelled" xml:space="preserve"><value>Choix du dossier SharePoint annulé.</value></data>
+  <data name="UiSharePointFolder0" xml:space="preserve"><value>Dossier SharePoint : {0}</value></data>
+  <data name="UiNoDocumentIsSelected" xml:space="preserve"><value>Aucun document n’est sélectionné.</value></data>
+  <data name="UiOCRRequiresAnImportedCapture" xml:space="preserve"><value>L’OCR nécessite une capture importée.</value></data>
+  <data name="UiNoTextWasDetected" xml:space="preserve"><value>Aucun texte n’a été détecté.</value></data>
+  <data name="UiOCRAdded0" xml:space="preserve"><value>OCR ajouté : {0}</value></data>
+  <data name="UiUnableToRunOCROnThisImage" xml:space="preserve"><value>Impossible d’exécuter l’OCR sur cette image.</value></data>
+  <data name="UiEnterTheNotionTokenAndTheParent" xml:space="preserve"><value>Renseignez le jeton Notion et l’ID de la page parente.</value></data>
+  <data name="UiNotionPublicationCompleted" xml:space="preserve"><value>Publication Notion terminée.</value></data>
+  <data name="UiNotionPublicationCompleted0" xml:space="preserve"><value>Publication Notion terminée : {0}</value></data>
+  <data name="UiEnterTheSiteURLSpaceKeyEmail" xml:space="preserve"><value>Renseignez l’URL du site, la clé d’espace, l’e-mail et le jeton Confluence.</value></data>
+  <data name="UiTheConfluenceParentPageIDMustBe" xml:space="preserve"><value>L’ID de page parente Confluence doit être numérique.</value></data>
+  <data name="UiConfluencePublicationCompleted" xml:space="preserve"><value>Publication Confluence terminée.</value></data>
+  <data name="UiConfluencePublicationCompleted0" xml:space="preserve"><value>Publication Confluence terminée : {0}</value></data>
+  <data name="UiChooseASynchronizedSharePointFolder" xml:space="preserve"><value>Choisissez un dossier SharePoint synchronisé.</value></data>
+  <data name="UiPackageCopiedTo0" xml:space="preserve"><value>Package copié vers {0}</value></data>
+  <data name="UiUnableToCopyThePackageToSharePoint" xml:space="preserve"><value>Impossible de copier le package vers SharePoint.</value></data>
+  <data name="UiNoStepsToExport" xml:space="preserve"><value>Aucune étape à exporter.</value></data>
+  <data name="UiFile" xml:space="preserve"><value>Fichier</value></data>
+  <data name="UiEdit" xml:space="preserve"><value>Édition</value></data>
+  <data name="UiImage" xml:space="preserve"><value>Image</value></data>
+  <data name="UiExport" xml:space="preserve"><value>Export</value></data>
+  <data name="UiHelp" xml:space="preserve"><value>Aide</value></data>
+  <data name="UiOpenFileActions" xml:space="preserve"><value>Ouvrir les actions de fichier</value></data>
+  <data name="UiOpenEditActions" xml:space="preserve"><value>Ouvrir les actions d’édition</value></data>
+  <data name="UiOpenImageActions" xml:space="preserve"><value>Ouvrir les actions image</value></data>
+  <data name="UiOpenExportOptions" xml:space="preserve"><value>Ouvrir les options d’export</value></data>
+  <data name="UiOpenHelpAndShortcuts" xml:space="preserve"><value>Ouvrir l’aide et les raccourcis</value></data>
+  <data name="UiNew" xml:space="preserve"><value>Nouveau</value></data>
+  <data name="UiOpen" xml:space="preserve"><value>Ouvrir</value></data>
+  <data name="UiSave" xml:space="preserve"><value>Sauver</value></data>
+  <data name="UiUndo" xml:space="preserve"><value>Annuler</value></data>
+  <data name="UiRedo" xml:space="preserve"><value>Refaire</value></data>
+  <data name="UiImport" xml:space="preserve"><value>Importer</value></data>
+  <data name="UiCurrentStepPNG" xml:space="preserve"><value>PNG de l’étape courante</value></data>
+  <data name="UiExportAll" xml:space="preserve"><value>Tout exporter</value></data>
+  <data name="UiWord" xml:space="preserve"><value>Word</value></data>
+  <data name="UiToNotionTextOnly" xml:space="preserve"><value>Vers Notion — texte seul</value></data>
+  <data name="UiToConfluenceTextOnly" xml:space="preserve"><value>Vers Confluence — texte seul</value></data>
+  <data name="UiToSharePoint" xml:space="preserve"><value>Vers SharePoint</value></data>
+  <data name="UiQuickHelp" xml:space="preserve"><value>Aide rapide</value></data>
+  <data name="UiPrintScreen" xml:space="preserve"><value>Impr écran</value></data>
+  <data name="UiAltPrintScreen" xml:space="preserve"><value>Alt + Impr écran</value></data>
+  <data name="UiWinPrintScreen" xml:space="preserve"><value>Win + Impr écran</value></data>
+  <data name="UiWinShiftS" xml:space="preserve"><value>Win + Shift + S</value></data>
+  <data name="UiFnWinSpace" xml:space="preserve"><value>Fn + Win + Espace</value></data>
+  <data name="UiSettings" xml:space="preserve"><value>⚙ Réglages</value></data>
+  <data name="UiOpenSettings" xml:space="preserve"><value>Ouvrir les réglages</value></data>
+  <data name="UiApplicationMenu" xml:space="preserve"><value>Menu de l’application</value></data>
+  <data name="UiEditTheDocumentTitle" xml:space="preserve"><value>Modifier le titre du document</value></data>
+  <data name="UiText" xml:space="preserve"><value>◫</value></data>
+  <data name="UiShowOrHideTheInspector" xml:space="preserve"><value>Afficher ou masquer l’inspecteur</value></data>
+  <data name="UiGeneral" xml:space="preserve"><value>Général</value></data>
+  <data name="UiCapture" xml:space="preserve"><value>Capture</value></data>
+  <data name="UiPublication" xml:space="preserve"><value>Publication</value></data>
+  <data name="UiShortcuts" xml:space="preserve"><value>Raccourcis</value></data>
+  <data name="UiAbout" xml:space="preserve"><value>À propos</value></data>
+  <data name="UiNewProject" xml:space="preserve"><value>Nouveau projet</value></data>
+  <data name="UiOpenAProject_207d0454" xml:space="preserve"><value>Ouvrir un projet</value></data>
+  <data name="UiSaveProject" xml:space="preserve"><value>Sauvegarder le projet</value></data>
+  <data name="UiDemo" xml:space="preserve"><value>Demo</value></data>
+  <data name="UiLoadTheDemoTemplate_d853f526" xml:space="preserve"><value>Charger le modèle de démonstration</value></data>
+  <data name="UiOCR" xml:space="preserve"><value>OCR</value></data>
+  <data name="UiRecognizeTextFromTheCurrentImage" xml:space="preserve"><value>Reconnaître le texte de la capture courante</value></data>
+  <data name="UiExport_014c6f83" xml:space="preserve"><value>Exporter</value></data>
+  <data name="UiUndoTheLastAction" xml:space="preserve"><value>Annuler la dernière action</value></data>
+  <data name="UiRedo_2758230a" xml:space="preserve"><value>Rétablir</value></data>
+  <data name="UiRedoTheLastAction" xml:space="preserve"><value>Rétablir la dernière action</value></data>
+  <data name="UiHideSteps" xml:space="preserve"><value>Cacher étapes</value></data>
+  <data name="UiBrowse" xml:space="preserve"><value>Parcourir</value></data>
+  <data name="UiText_ffb392d1" xml:space="preserve"><value>−</value></data>
+  <data name="Ui100" xml:space="preserve"><value>100 %</value></data>
+  <data name="UiText_e63541c0" xml:space="preserve"><value>+</value></data>
+  <data name="UiAll" xml:space="preserve"><value>Tout</value></data>
+  <data name="UiApply" xml:space="preserve"><value>Appliquer</value></data>
+  <data name="UiApplyCrop" xml:space="preserve"><value>Appliquer le crop</value></data>
+  <data name="UiReset" xml:space="preserve"><value>Réinitialiser</value></data>
+  <data name="UiResetCrop" xml:space="preserve"><value>Réinitialiser le crop</value></data>
+  <data name="UiClearAll" xml:space="preserve"><value>Effacer tout</value></data>
+  <data name="UiClearAllAnnotations" xml:space="preserve"><value>Effacer toutes les annotations</value></data>
+  <data name="UiDuplicate" xml:space="preserve"><value>Dupliquer</value></data>
+  <data name="UiDuplicateSelectedObject" xml:space="preserve"><value>Dupliquer l’objet sélectionné</value></data>
+  <data name="UiDelete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="UiDeleteSelectedObject" xml:space="preserve"><value>Supprimer l’objet sélectionné</value></data>
+  <data name="UiFront" xml:space="preserve"><value>Devant</value></data>
+  <data name="UiBringTheObjectToFront" xml:space="preserve"><value>Envoyer l’objet devant</value></data>
+  <data name="UiBack" xml:space="preserve"><value>Derrière</value></data>
+  <data name="UiSendTheObjectToBack" xml:space="preserve"><value>Envoyer l’objet derrière</value></data>
+  <data name="UiLegend" xml:space="preserve"><value>+ Légende</value></data>
+  <data name="UiAddALegend" xml:space="preserve"><value>Ajouter une légende</value></data>
+  <data name="UiPublishTextToNotion" xml:space="preserve"><value>Publier le texte vers Notion</value></data>
+  <data name="UiPublishTextToConfluenceCloud" xml:space="preserve"><value>Publier le texte vers Confluence Cloud</value></data>
+  <data name="UiPublishToSharePoint" xml:space="preserve"><value>Publier vers SharePoint</value></data>
+  <data name="UiCopyThePackageToTheSynchronizedFolder" xml:space="preserve"><value>Copier le package vers le dossier synchronisé</value></data>
+  <data name="UiAdd" xml:space="preserve"><value>Ajouter</value></data>
+  <data name="UiText_7c12212b" xml:space="preserve"><value>‹</value></data>
+  <data name="UiHideTheSteps" xml:space="preserve"><value>Masquer les étapes</value></data>
+  <data name="UiZoomOut" xml:space="preserve"><value>Rétrécir la vue</value></data>
+  <data name="UiResetTo100" xml:space="preserve"><value>Remettre à 100 %</value></data>
+  <data name="UiZoomIn" xml:space="preserve"><value>Agrandir la vue</value></data>
+  <data name="UiFit" xml:space="preserve"><value>Ajuster</value></data>
+  <data name="UiFitToView" xml:space="preserve"><value>Ajuster la vue</value></data>
+  <data name="UiSteps" xml:space="preserve"><value>Étapes</value></data>
+  <data name="UiShowOrHideTheStepsPane" xml:space="preserve"><value>Afficher ou masquer les étapes</value></data>
+  <data name="UiSelect" xml:space="preserve"><value>Sélection</value></data>
+  <data name="UiCropTheCapture" xml:space="preserve"><value>Recadrer la capture</value></data>
+  <data name="UiText_0420e350" xml:space="preserve"><value>Texte</value></data>
+  <data name="UiSticker" xml:space="preserve"><value>Gommette</value></data>
+  <data name="UiStraightArrow" xml:space="preserve"><value>Flèche droite</value></data>
+  <data name="UiCurvedArrow" xml:space="preserve"><value>Flèche courbe</value></data>
+  <data name="UiRectangle" xml:space="preserve"><value>Rectangle</value></data>
+  <data name="UiEllipse" xml:space="preserve"><value>Ovale</value></data>
+  <data name="UiFocus" xml:space="preserve"><value>Focus</value></data>
+  <data name="UiMask" xml:space="preserve"><value>Masquage</value></data>
+  <data name="UiChooseATool" xml:space="preserve"><value>Choisir un outil</value></data>
+  <data name="UiWindowsCaptureShortcutsAndUsefulSnapSlateShortcuts" xml:space="preserve"><value>Raccourcis de capture Windows et raccourcis SnapSlate utiles.</value></data>
+  <data name="UiHowItWorks" xml:space="preserve"><value>Comment ça marche</value></data>
+  <data name="UiPrintScreenAltPrintScreenWinPrint" xml:space="preserve"><value>Impr écran, Alt + Impr écran, Win + Impr écran, Win + Shift + S ou Fn + Win + Espace : toutes les façons courantes de capturer avant import.</value></data>
+  <data name="UiCopiesTheWholeScreenToTheClipboard" xml:space="preserve"><value>Copie l’écran entier dans le presse-papiers.</value></data>
+  <data name="UiCopiesOnlyTheActiveWindow" xml:space="preserve"><value>Copie uniquement la fenêtre active.</value></data>
+  <data name="UiSavesTheCaptureToPicturesScreenshots" xml:space="preserve"><value>Sauvegarde la capture dans Images &gt; Captures d’écran.</value></data>
+  <data name="UiCaptureShortcuts" xml:space="preserve"><value>Raccourcis de capture</value></data>
+  <data name="UiWinShiftSSnippingToolWithFreeform" xml:space="preserve"><value>Win + Shift + S : outil Capture d’écran avec modes forme libre, rectangle, fenêtre et plein écran.</value></data>
+  <data name="UiFnWinSpaceUsefulOnKeyboardsWithout" xml:space="preserve"><value>Fn + Win + Espace : utile sur les claviers sans touche Impr écran.</value></data>
+  <data name="UiPrtScnAltPrtScnAndWinPrtScnWork" xml:space="preserve"><value>PrtScn, Alt + PrtScn et Win + PrtScn fonctionnent selon le matériel.</value></data>
+  <data name="UiImportedScreenshotsCanAlsoArriveAutomaticallyFrom" xml:space="preserve"><value>Les captures importées peuvent aussi arriver automatiquement depuis le presse-papiers.</value></data>
+  <data name="UiCtrlOImportAnImageFile" xml:space="preserve"><value>Ctrl + O : importer un fichier image.</value></data>
+  <data name="UiUsefulShortcuts" xml:space="preserve"><value>Raccourcis utiles</value></data>
+  <data name="UiStatus" xml:space="preserve"><value>État</value></data>
+  <data name="UiAutomaticImportWorksWhileSnapSlateIsOpen" xml:space="preserve"><value>L’import automatique fonctionne tant que SnapSlate est ouvert.</value></data>
+  <data name="UiDocument" xml:space="preserve"><value>Document</value></data>
+  <data name="UiTool" xml:space="preserve"><value>Outil</value></data>
+  <data name="UiTool_9ad395ff" xml:space="preserve"><value>Outil :</value></data>
+  <data name="UiDragToReorderTheSteps" xml:space="preserve"><value>Glissez pour réordonner les étapes.</value></data>
+  <data name="UiPalette" xml:space="preserve"><value>Palette</value></data>
+  <data name="UiShades" xml:space="preserve"><value>Nuances</value></data>
+  <data name="UiOpacity" xml:space="preserve"><value>Opacité</value></data>
+  <data name="UiStepTitleAndNote" xml:space="preserve"><value>Titre et note de l’étape</value></data>
+  <data name="UiColor" xml:space="preserve"><value>Couleur</value></data>
+  <data name="UiPreview" xml:space="preserve"><value>Aperçu</value></data>
+  <data name="UiStepDetails" xml:space="preserve"><value>Détails de l’étape</value></data>
+  <data name="UiStepTitle" xml:space="preserve"><value>Titre de l’étape</value></data>
+  <data name="UiStepNote" xml:space="preserve"><value>Note de l’étape</value></data>
+  <data name="UiDocumentType" xml:space="preserve"><value>Type de document</value></data>
+  <data name="UiAudience" xml:space="preserve"><value>Public visé</value></data>
+  <data name="UiAuthor" xml:space="preserve"><value>Auteur</value></data>
+  <data name="UiVersion" xml:space="preserve"><value>Version</value></data>
+  <data name="UiSelectedObject" xml:space="preserve"><value>Objet sélectionné</value></data>
+  <data name="UiStickerValue" xml:space="preserve"><value>Valeur de la gommette</value></data>
+  <data name="UiStickerLegend" xml:space="preserve"><value>Légende de la gommette</value></data>
+  <data name="UiStickerFormat" xml:space="preserve"><value>Format de la gommette</value></data>
+  <data name="UiThickness" xml:space="preserve"><value>Épaisseur</value></data>
+  <data name="UiStickerLegends" xml:space="preserve"><value>Légendes des gommettes</value></data>
+  <data name="UiPNGForTheCurrentStepTheOther" xml:space="preserve"><value>PNG pour l’étape courante. Les autres boutons exportent le document au format choisi, ou en lot avec Tout.</value></data>
+  <data name="UiMainFormat" xml:space="preserve"><value>Format principal</value></data>
+  <data name="UiAudience_4bfa6ed2" xml:space="preserve"><value>Public</value></data>
+  <data name="UiExportFolder" xml:space="preserve"><value>Dossier d’export</value></data>
+  <data name="UiCurrentTypeUserManual" xml:space="preserve"><value>Type actuel : Manuel utilisateur</value></data>
+  <data name="UiSummary" xml:space="preserve"><value>Résumé</value></data>
+  <data name="UiAllGeneratesMarkdownHTMLPDFAndDOCX" xml:space="preserve"><value>Tout génère Markdown, HTML, PDF et DOCX dans le même dossier que les images.</value></data>
+  <data name="UiPublish" xml:space="preserve"><value>Publication</value></data>
+  <data name="UiRecognizedTextIsInsertedAsAText" xml:space="preserve"><value>Le texte reconnu est ajouté comme annotation texte sur la capture courante.</value></data>
+  <data name="UiNotion" xml:space="preserve"><value>Notion</value></data>
+  <data name="UiShareTheParentPageWithYourNotion" xml:space="preserve"><value>Partagez la page parente avec votre intégration Notion, puis saisissez l’ID de la page parente et le jeton API.</value></data>
+  <data name="UiParentPageID" xml:space="preserve"><value>ID de page parente</value></data>
+  <data name="UiNotionAPIToken" xml:space="preserve"><value>Jeton API Notion</value></data>
+  <data name="UiConfluence" xml:space="preserve"><value>Confluence</value></data>
+  <data name="UiCreateAPageInAConfluenceCloud" xml:space="preserve"><value>Créez une page dans un espace Confluence Cloud avec l’URL du site, la clé d’espace, l’e-mail et le jeton API.</value></data>
+  <data name="UiSiteURL" xml:space="preserve"><value>URL du site</value></data>
+  <data name="UiSpaceKey" xml:space="preserve"><value>Clé d’espace</value></data>
+  <data name="UiParentPageIDOptional" xml:space="preserve"><value>ID de page parente (optionnel)</value></data>
+  <data name="UiAccountEmail" xml:space="preserve"><value>E-mail du compte</value></data>
+  <data name="UiConfluenceAPIToken" xml:space="preserve"><value>Jeton API Confluence</value></data>
+  <data name="UiSharePoint" xml:space="preserve"><value>SharePoint</value></data>
+  <data name="UiCopyTheExportPackageIntoAFolder" xml:space="preserve"><value>Copiez le package d’export dans un dossier synchronisé avec SharePoint ou OneDrive.</value></data>
+  <data name="UiSynchronizedSharePointFolder" xml:space="preserve"><value>Dossier SharePoint synchronisé</value></data>
+  <data name="UiAppearance" xml:space="preserve"><value>Apparence</value></data>
+  <data name="UiLanguage" xml:space="preserve"><value>Langue</value></data>
+  <data name="UiTheme" xml:space="preserve"><value>Thème</value></data>
+  <data name="UiAppLanguage" xml:space="preserve"><value>Langue de l’application</value></data>
+  <data name="UiAutomaticImport" xml:space="preserve"><value>Import automatique</value></data>
+  <data name="UiSystemFollowsWindowsAutomatically" xml:space="preserve"><value>Le mode Système suit le thème Windows automatiquement.</value></data>
+  <data name="UiByDefaultSnapSlateFollowsTheWindowsLanguage" xml:space="preserve"><value>Par défaut, SnapSlate suit la langue de Windows.</value></data>
+  <data name="UiEnablesAutomaticImportOfCapturesCopiedTo" xml:space="preserve"><value>Active l’import automatique des captures copiées dans le presse-papiers.</value></data>
+  <data name="UiThemeAndLanguageApplyImmediatelyWithoutRestarting" xml:space="preserve"><value>Le thème et la langue s’appliquent immédiatement, sans redémarrage.</value></data>
+  <data name="UiSnapSlateAcceleratesVisualProcedureCreationWithCaptures" xml:space="preserve"><value>SnapSlate accélère la création de procédures visuelles avec captures, annotations, export et publication.</value></data>
+  <data name="UiCancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="UiSave_63e08f48" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="UiSnapSlateTip" xml:space="preserve"><value>Conseil SnapSlate</value></data>
+  <data name="UiUsefulShortcutsAreGroupedInHelpSo" xml:space="preserve"><value>Les raccourcis utiles sont regroupés dans Aide pour rester visibles sans encombrer les réglages.</value></data>
+  <data name="UiMarkdownImages" xml:space="preserve"><value>Markdown + images</value></data>
+  <data name="UiHTMLImages" xml:space="preserve"><value>HTML + images</value></data>
+  <data name="UiDocumentPDF" xml:space="preserve"><value>PDF du document</value></data>
+  <data name="UiWordDOCX" xml:space="preserve"><value>Word / DOCX</value></data>
+  <data name="UiSaveTheProject" xml:space="preserve"><value>Sauvegarder le projet</value></data>
+  <data name="UiDemoTemplate" xml:space="preserve"><value>Modèle de démonstration</value></data>
+  <data name="UiImportTheCurrentCapture" xml:space="preserve"><value>Importer la capture active</value></data>
+  <data name="UiDeleteTheSelectedObject" xml:space="preserve"><value>Supprimer l’objet sélectionné</value></data>
+  <data name="UiLight" xml:space="preserve"><value>Clair</value></data>
+  <data name="UiDark" xml:space="preserve"><value>Sombre</value></data>
+  <data name="UiSystem" xml:space="preserve"><value>Système</value></data>
+  <data name="UiFrench" xml:space="preserve"><value>Français</value></data>
+  <data name="UiEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="UiFollowWindows" xml:space="preserve"><value>Suivre Windows</value></data>
+  <data name="UiUserManual" xml:space="preserve"><value>Manuel utilisateur</value></data>
+  <data name="UiInternalProcedure" xml:space="preserve"><value>Procédure interne</value></data>
+  <data name="UiSupportPlaybook" xml:space="preserve"><value>Support client</value></data>
+  <data name="UiReleaseNotes" xml:space="preserve"><value>Notes de version</value></data>
+  <data name="UiCurrentType0" xml:space="preserve"><value>Type actuel : {0}</value></data>
+  <data name="UiNumeric" xml:space="preserve"><value>Numérique</value></data>
+  <data name="UiAlphabetic" xml:space="preserve"><value>Alphabétique</value></data>
+  <data name="UiShade0" xml:space="preserve"><value>Nuance {0}</value></data>
+  <data name="UiHelpOpened" xml:space="preserve"><value>Aide ouverte.</value></data>
+  <data name="UiSettingsSaved" xml:space="preserve"><value>Réglages enregistrés.</value></data>
+  <data name="UiSettingsCancelled" xml:space="preserve"><value>Réglages annulés.</value></data>
+  <data name="UiBackToTheProcedure" xml:space="preserve"><value>Retour à la procédure.</value></data>
+  <data name="UiPrintScreenCopiesTheWholeScreenTo" xml:space="preserve"><value>Impr écran : copie tout l’écran dans le presse-papiers.</value></data>
+  <data name="UiAltPrintScreenCopiesTheActiveWindow" xml:space="preserve"><value>Alt + Impr écran : copie la fenêtre active dans le presse-papiers.</value></data>
+  <data name="UiWinPrintScreenSavesTheCaptureTo" xml:space="preserve"><value>Win + Impr écran : enregistre la capture dans Images &gt; Captures d’écran.</value></data>
+  <data name="UiWinShiftSOpensSnippingTool" xml:space="preserve"><value>Win + Shift + S : ouvre l’outil Capture d’écran.</value></data>
+  <data name="UiFnWinSpaceAlternateOnSomeKeyboards" xml:space="preserve"><value>Fn + Win + Espace : alternative sur certains claviers sans touche Impr écran.</value></data>
+  <data name="UiScreenshotHelpOpened" xml:space="preserve"><value>Aide capture ouverte.</value></data>
+  <data name="UiFolderSelectionCancelled" xml:space="preserve"><value>Choix de dossier annulé.</value></data>
+  <data name="UiExportFolder0" xml:space="preserve"><value>Dossier d’export : {0}</value></data>
+  <data name="UiMoveUp" xml:space="preserve"><value>Monter</value></data>
+  <data name="UiMoveDown" xml:space="preserve"><value>Descendre</value></data>
+  <data name="UiClickTheCanvasToAddASticker" xml:space="preserve"><value>Cliquez dans le canvas pour ajouter une gommette.</value></data>
+  <data name="UiDeleteTheSticker" xml:space="preserve"><value>Supprimer la gommette ?</value></data>
+  <data name="UiDoYouWantToRenumberTheRemaining" xml:space="preserve"><value>Voulez-vous renuméroter les gommettes restantes ?</value></data>
+  <data name="UiRenumber" xml:space="preserve"><value>Renuméroter</value></data>
+  <data name="UiDeleteWithoutRenumbering" xml:space="preserve"><value>Supprimer sans renuméroter</value></data>
+  <data name="UiTextEditableInThePreview" xml:space="preserve"><value>Texte modifiable dans l’aperçu.</value></data>
+  <data name="UiToFillIn" xml:space="preserve"><value>À compléter</value></data>
+  <data name="UiNoObjectSelected" xml:space="preserve"><value>Aucun objet sélectionné.</value></data>
+  <data name="UiObject" xml:space="preserve"><value>Objet</value></data>
+  <data name="UiDescribeWhatThisStickerPointsTo" xml:space="preserve"><value>Décrivez ce que pointe cette gommette</value></data>
+  <data name="UiEnterText" xml:space="preserve"><value>Saisissez le texte</value></data>
+  <data name="UiExportComplete0In1" xml:space="preserve"><value>Export terminé : {0} dans {1}</value></data>
+  <data name="UiActivePalette0" xml:space="preserve"><value>Palette active : {0}</value></data>
+  <data name="UiChangeStickerColor" xml:space="preserve"><value>Changer la couleur de la gommette ?</value></data>
+  <data name="UiDoYouWantToRenumberTheStickers" xml:space="preserve"><value>Voulez-vous renuméroter les gommettes après ce changement de couleur ?</value></data>
+  <data name="UiKeepNumbering" xml:space="preserve"><value>Continuer</value></data>
+  <data name="UiDoubleClickToFinishEditingTheText" xml:space="preserve"><value>Double-cliquez pour terminer la modification du texte.</value></data>
+  <data name="Ui0AnnotationsZoom10" xml:space="preserve"><value>{0} annotations · Zoom {1:0} %</value></data>
+  <data name="UiLegend_c4bc5851" xml:space="preserve"><value>Légende</value></data>
+
+  <data name="CaptureShortcutHelp" xml:space="preserve"><value>Ouvrir la capture Windows (import automatique si activé)</value></data>
+  <data name="SourceUnknown" xml:space="preserve"><value>Source inconnue</value></data>
+  <data name="DefaultAudience" xml:space="preserve"><value>Utilisateurs finaux</value></data>
 </root>

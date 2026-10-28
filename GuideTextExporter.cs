@@ -27,16 +27,17 @@ internal static class GuideTextExporter
         return EscapeHtml(NormalizeLineBreaks(value)).Replace("\n", "<br />");
     }
 
-    internal static string BuildMarkdown(GuideExportManifest manifest, bool includeImageReferences = true, bool useEnglish = false)
+    internal static string BuildMarkdown(GuideExportManifest manifest, bool includeImageReferences = true, bool? useEnglish = null)
     {
-        string T(string french, string english) => useEnglish ? english : french;
+        var english = useEnglish ?? manifest.Language == "en-US";
+        string L(string key) => LocalizedText.Get(key, english ? "en-US" : "fr-FR");
         var markdown = new StringBuilder();
         markdown.AppendLine($"# {manifest.Title}");
         markdown.AppendLine();
-        markdown.AppendLine($"- {T("Type de document", "Document type")} : {manifest.TemplateName}");
-        markdown.AppendLine($"- {T("Public", "Audience")} : {manifest.Audience}");
-        markdown.AppendLine($"- {T("Auteur", "Author")} : {manifest.Author}");
-        markdown.AppendLine($"- {T("Version", "Version")} : {manifest.Version}");
+        markdown.AppendLine($"- {L("UiDocumentType")} : {manifest.TemplateName}");
+        markdown.AppendLine($"- {L("UiAudience_4bfa6ed2")} : {manifest.Audience}");
+        markdown.AppendLine($"- {L("UiAuthor")} : {manifest.Author}");
+        markdown.AppendLine($"- {L("UiVersion")} : {manifest.Version}");
         markdown.AppendLine();
 
         foreach (var step in manifest.Steps)
@@ -58,7 +59,7 @@ internal static class GuideTextExporter
 
             if (step.LegendItems.Count > 0)
             {
-                markdown.AppendLine(T("Légende", "Legend"));
+                markdown.AppendLine(L("UiLegend_c4bc5851"));
                 foreach (var legend in step.LegendItems)
                 {
                     markdown.AppendLine($"- {legend.StickerLabel} : {legend.Description}");
@@ -74,12 +75,13 @@ internal static class GuideTextExporter
         return markdown.ToString();
     }
 
-    internal static string BuildHtml(GuideExportManifest manifest, bool useEnglish = false)
+    internal static string BuildHtml(GuideExportManifest manifest, bool? useEnglish = null)
     {
-        string T(string french, string english) => useEnglish ? english : french;
+        var english = useEnglish ?? manifest.Language == "en-US";
+        string L(string key) => LocalizedText.Get(key, english ? "en-US" : "fr-FR");
         var html = new StringBuilder();
         html.AppendLine("<!doctype html>");
-        html.AppendLine($"<html lang=\"{(useEnglish ? "en" : "fr")}\">");
+        html.AppendLine($"<html lang=\"{(english ? "en" : "fr")}\">");
         html.AppendLine("<head>");
         html.AppendLine("<meta charset=\"utf-8\">");
         html.AppendLine($"<title>{EscapeHtml(manifest.Title)}</title>");
@@ -89,7 +91,7 @@ internal static class GuideTextExporter
         html.AppendLine("<body>");
         html.AppendLine($"<h1>{EscapeHtml(manifest.Title)}</h1>");
         html.AppendLine($"<p class=\"meta\">{EscapeHtml(manifest.TemplateName)} · {EscapeHtml(manifest.Audience)} · {EscapeHtml(manifest.Version)}</p>");
-        html.AppendLine($"<p class=\"meta\">{EscapeHtml(T("Auteur", "Author"))} : {EscapeHtml(manifest.Author)} · {EscapeHtml(manifest.GeneratedAt.ToString("g", CultureInfo.CurrentCulture))}</p>");
+        html.AppendLine($"<p class=\"meta\">{EscapeHtml(L("UiAuthor"))} : {EscapeHtml(manifest.Author)} · {EscapeHtml(manifest.GeneratedAt.ToString("g", LocalizedText.Culture(english ? "en-US" : "fr-FR")))}</p>");
 
         foreach (var step in manifest.Steps)
         {
@@ -105,7 +107,7 @@ internal static class GuideTextExporter
             if (step.LegendItems.Count > 0)
             {
                 html.AppendLine("<div class=\"legend\">");
-                html.AppendLine($"<strong>{EscapeHtml(T("Légende", "Legend"))}</strong>");
+                html.AppendLine($"<strong>{EscapeHtml(L("UiLegend_c4bc5851"))}</strong>");
                 html.AppendLine("<ul>");
                 foreach (var legend in step.LegendItems)
                 {

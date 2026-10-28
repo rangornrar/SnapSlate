@@ -15,6 +15,11 @@ Transformer des captures Windows en une suite d’étapes annotées, sauvegardab
 | `GuideImageRenderer` | Rendu des images annotées |
 | `GuideTextExporter` | Construction HTML et Markdown sans dépendance à l’interface |
 | `GuideExporter` | Production PDF / DOCX avec QuestPDF et Open XML |
+| `ClipboardImportCoordinator` | Coalescence des événements, imports manuels répétés et abandon des lectures obsolètes |
+| `ProjectContentFingerprint`, `ProjectSaveTracker` | État modifié sans sérialisation Base64 ; empreintes d’images immuables mises en cache |
+| `GuidePackageBuilder`, `ExportSource` | Instantanés d’export, progression, annulation et source sans chemin privé |
+| `TextPublicationService`, `PublicationTextBuilder` | Transport HTTP testable et contenu textuel sans construire les fichiers illustrés |
+| `LocalizedText`, `Strings/*/Resources.resw` | Ressources communes à l’interface et aux exporteurs, culture explicite |
 | `installer/` | Staging exécutable et setup Inno Setup |
 
 Le flux principal est : presse-papiers ou import → document → annotations → rendu d’image → manifeste d’export → fichiers de sortie. La sauvegarde de projet suit un autre flux : état du projet → `ProjectPersistence` → `ProjectJson` → fichier `.snapslate`.
@@ -36,4 +41,6 @@ Le format JSON conserve les images et l’état en mémoire. Le coût mémoire d
 
 ## Limites de validation
 
-La CI vérifie la compilation Release x64 et les tests des services isolés. Le presse-papiers, le rendu WinUI, l’installation, les exports PDF/DOCX et la qualité visuelle nécessitent encore des essais Windows. Voir [QUALITY.md](QUALITY.md).
+La CI compile Release x64, teste les services de production (dont parcours import/annotation/sauvegarde/réouverture/export et génération PDF/DOCX), puis construit et installe la distribution sur un runner Windows jetable. Elle vérifie le lancement et la désinstallation avant de conserver les artefacts. Le raccordement complet des interactions WinUI, Narrator, les thèmes contrastés et les publications sur des comptes réels demandent encore des essais ciblés. Voir [QUALITY.md](QUALITY.md) et [LOT3_VALIDATION.md](LOT3_VALIDATION.md).
+
+Les tableaux d’images sont immuables après import : les snapshots d’historique les partagent, leur SHA-256 est calculé une fois par tableau et mis en cache faible. Toute future modification de pixels doit affecter un nouveau tableau. Le JSON complet est réservé aux sauvegardes. La séparation des services est progressive ; la classe partielle MainWindow reste le coordinateur de l’interface.

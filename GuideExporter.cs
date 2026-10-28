@@ -25,6 +25,8 @@ public static class GuideExporter
     {
         return Task.Run(() =>
         {
+            var culture = LocalizedText.Culture(manifest.Language);
+            string L(string key) => LocalizedText.Get(key, manifest.Language);
             QuestPDF.Settings.License = LicenseType.Community;
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 
@@ -47,9 +49,9 @@ public static class GuideExporter
                         column.Spacing(10);
                         column.Item().Text(manifest.Title).FontSize(24).SemiBold().FontColor(Colors.Blue.Darken3);
                         column.Item().Text($"{manifest.TemplateName} · {manifest.Audience} · {manifest.Version}").FontSize(11).FontColor(Colors.Grey.Darken1);
-                        column.Item().Text($"Auteur : {manifest.Author} · Généré le {manifest.GeneratedAt.ToString("g", CultureInfo.CurrentCulture)}").FontSize(10);
+                        column.Item().Text($"{L("ExportAuthor")} : {manifest.Author} · {L("ExportGenerated")} {manifest.GeneratedAt.ToString("g", culture)}").FontSize(10);
                         column.Item().LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
-                        column.Item().Text($"Étapes : {manifest.Steps.Count}").FontSize(11).SemiBold();
+                        column.Item().Text($"{L("ExportSteps")} : {manifest.Steps.Count}").FontSize(11).SemiBold();
                     });
 
                     page.Footer().PaddingTop(8).AlignCenter().Text($"SnapSlate · {manifest.Title}").FontSize(9).FontColor(Colors.Grey.Darken1);
@@ -83,7 +85,7 @@ public static class GuideExporter
 
                             if (step.LegendItems.Count > 0)
                             {
-                                column.Item().PaddingTop(6).Text("Légende").SemiBold().FontSize(12);
+                                column.Item().PaddingTop(6).Text(L("ExportLegend")).SemiBold().FontSize(12);
                                 foreach (var item in step.LegendItems)
                                 {
                                     column.Item().PaddingLeft(8).Text($"• {item.StickerLabel} — {item.Description}");
@@ -104,7 +106,7 @@ public static class GuideExporter
                 Subject = manifest.TemplateName,
                 Keywords = $"SnapSlate,{manifest.TemplateName},{manifest.Audience}",
                 Creator = "SnapSlate",
-                Language = "fr-FR",
+                Language = culture.Name,
                 CreationDate = manifest.GeneratedAt,
                 ModifiedDate = manifest.GeneratedAt
             })
@@ -118,8 +120,11 @@ public static class GuideExporter
         {
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 
+            var culture = LocalizedText.Culture(manifest.Language);
+            string L(string key) => LocalizedText.Get(key, manifest.Language);
             using var document = WordprocessingDocument.Create(outputPath, WordprocessingDocumentType.Document);
             document.PackageProperties.Title = manifest.Title;
+            document.PackageProperties.Language = culture.Name;
             document.PackageProperties.Creator = manifest.Author;
             document.PackageProperties.LastModifiedBy = manifest.Author;
             document.PackageProperties.Subject = manifest.TemplateName;
@@ -127,13 +132,22 @@ public static class GuideExporter
 
             var mainPart = document.AddMainDocumentPart();
             mainPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document(new Body());
+            var stylesPart = mainPart.AddNewPart<StyleDefinitionsPart>();
+            stylesPart.Styles = new Styles(new DocDefaults(new RunPropertiesDefault(new RunPropertiesBaseStyle(new Languages { Val = culture.Name }))));
+            for (var level = 1; level <= 3; level++)
+            {
+                stylesPart.Styles.Append(new Style(new StyleName { Val = "Heading " + level }, new PrimaryStyle(),
+                    new StyleParagraphProperties(new OutlineLevel { Val = level - 1 }))
+                { Type = StyleValues.Paragraph, StyleId = "Heading" + level });
+            }
+            stylesPart.Styles.Save();
             var body = mainPart.Document.Body!;
 
             body.Append(
                 CreateHeadingParagraph(manifest.Title, 1, 26),
                 CreateTextParagraph($"{manifest.TemplateName} · {manifest.Audience} · {manifest.Version}", 11, false),
-                CreateTextParagraph($"Auteur : {manifest.Author} · Généré le {manifest.GeneratedAt.ToString("g", CultureInfo.CurrentCulture)}", 10, false),
-                CreateTextParagraph($"Étapes : {manifest.Steps.Count}", 10, true));
+                CreateTextParagraph($"{L("ExportAuthor")} : {manifest.Author} · {L("ExportGenerated")} {manifest.GeneratedAt.ToString("g", culture)}", 10, false),
+                CreateTextParagraph($"{L("ExportSteps")} : {manifest.Steps.Count}", 10, true));
 
             foreach (var step in manifest.Steps)
             {
@@ -156,12 +170,12 @@ public static class GuideExporter
                     imagePart.FeedData(stream);
                 }
 
-                var drawing = CreateImageDrawing(mainPart.GetIdOfPart(imagePart), Path.GetFileName(step.ImagePath), imageWidthEmu, imageHeightEmu, (uint)(step.Index + 1));
+                var drawing = CreateImageDrawing(mainPart.GetIdOfPart(imagePart), Path.GetFileName(step.ImagePath), imageWidthEmu, imageHeightEmu, (uint)(step.Index + 1), step.Title);
                 body.Append(new Paragraph(new Run(drawing)));
 
                 if (step.LegendItems.Count > 0)
                 {
-                    body.Append(CreateHeadingParagraph("Légende", 3, 14));
+                    body.Append(CreateHeadingParagraph(L("ExportLegend"), 3, 14));
                     foreach (var item in step.LegendItems)
                     {
                         body.Append(CreateTextParagraph($"• {item.StickerLabel} — {item.Description}", 10, false));
@@ -179,7 +193,7 @@ public static class GuideExporter
     private static Paragraph CreateHeadingParagraph(string text, int headingLevel, int fontSize)
     {
         var paragraph = new Paragraph();
-        var properties = new ParagraphProperties();
+        var properties = new ParagraphProperties(new ParagraphStyleId { Val = "Heading" + headingLevel });
         if (headingLevel <= 2)
         {
             properties.SpacingBetweenLines = new SpacingBetweenLines
@@ -244,7 +258,7 @@ public static class GuideExporter
         return run;
     }
 
-    private static Drawing CreateImageDrawing(string relationshipId, string fileName, long cx, long cy, uint docPropsId)
+    private static Drawing CreateImageDrawing(string relationshipId, string fileName, long cx, long cy, uint docPropsId, string description)
     {
         return new Drawing(
             new DW.Inline(
@@ -256,13 +270,13 @@ public static class GuideExporter
                     RightEdge = 0L,
                     BottomEdge = 0L
                 },
-                new DW.DocProperties { Id = docPropsId, Name = fileName },
+                new DW.DocProperties { Id = docPropsId, Name = fileName, Title = description, Description = description },
                 new DW.NonVisualGraphicFrameDrawingProperties(new A.GraphicFrameLocks { NoChangeAspect = true }),
                 new A.Graphic(
                     new A.GraphicData(
                         new PIC.Picture(
                             new PIC.NonVisualPictureProperties(
-                                new PIC.NonVisualDrawingProperties { Id = 0U, Name = fileName },
+                                new PIC.NonVisualDrawingProperties { Id = 0U, Name = fileName, Description = description },
                                 new PIC.NonVisualPictureDrawingProperties()),
                             new PIC.BlipFill(
                                 new A.Blip { Embed = relationshipId },

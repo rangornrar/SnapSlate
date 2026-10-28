@@ -4,7 +4,9 @@ param(
     [string]$Configuration = "Release",
 
     [ValidateSet("x64")]
-    [string]$Platform = "x64"
+    [string]$Platform = "x64",
+    [string]$SigningCertificateThumbprint = $env:SNAPSLATE_SIGNING_CERT_THUMBPRINT,
+    [uri]$TimestampUrl = "https://timestamp.digicert.com"
 )
 
 $ErrorActionPreference = "Stop"
@@ -41,6 +43,7 @@ dotnet publish $projectPath `
     -p:WindowsPackageType=None `
     -p:WindowsAppSDKSelfContained=true `
     -p:PublishReadyToRun=false `
+    -p:RestoreLockedMode=true `
     -r "win-$Platform" `
     --self-contained true `
     -o $buildOutputDir
@@ -51,6 +54,11 @@ if (-not (Test-Path $buildOutputDir)) {
     throw "The build output folder was not found: $buildOutputDir"
 }
 
+if ($SigningCertificateThumbprint) {
+    foreach ($ownedFile in @('SnapSlate.exe','SnapSlate.dll')) {
+        & (Join-Path $installerDir 'Sign-Binary.ps1') -Path (Join-Path $buildOutputDir $ownedFile) -CertificateThumbprint $SigningCertificateThumbprint -TimestampUrl $TimestampUrl
+    }
+}
 Remove-DirectorySafely -Path $distDir
 New-Item -ItemType Directory -Force -Path $distAppDir | Out-Null
 

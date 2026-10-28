@@ -4,6 +4,23 @@ Tous les changements notables de ce projet seront documentes ici.
 
 Le format est volontairement simple et oriente publication GitHub.
 
+## [2026.10.28.001] - 2026-10-28
+
+### Corrigé
+
+- Presse-papiers sur événement, imports historisés et import volontaire répété (`Ctrl+Shift+V`), origine neutre.
+- Empreintes d’état sans JSON/Base64 des images, hash d’images immuables réutilisé ; export PNG en tâche de fond.
+- Publications Notion et Confluence Cloud v2 clairement textuelles, sans générer les formats illustrés ; titre Notion transmis et erreurs HTTP utiles sans réponse confidentielle.
+- Objets sélectionnables par liste, boutons de déplacement de 1 px, noms d’étapes/actions et champs associés à leurs libellés ; ressources de contraste système.
+- Ressources FR/EN centralisées, langue explicite des guides et dates, titres DOCX sémantiques et descriptions d’images.
+- Sources exportées limitées au nom de fichier ; retrait des scripts MSIX qui ajoutaient un certificat à la confiance système.
+- SDK et dépendances verrouillés, version du setup issue du projet, Inno épinglé par SHA-256 en CI, contrôles installation/lancement/désinstallation et provenance des distributions.
+- Signature Authenticode optionnelle préparée ; cette release reste non signée, aucun certificat de production n’étant disponible.
+
+### Vérification
+
+- 83 tests automatisés ; profilage explicite pour 1/10/50 étapes. Périmètre et limites : `docs/LOT3_VALIDATION.md`.
+
 ## [2026.10.27.002] - 2026-10-27
 
 ### Corrigé

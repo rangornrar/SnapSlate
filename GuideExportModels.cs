@@ -11,7 +11,8 @@ public sealed record GuideExportManifest(
     string Version,
     DateTimeOffset GeneratedAt,
     string ExportFolder,
-    IReadOnlyList<GuideExportStep> Steps);
+    IReadOnlyList<GuideExportStep> Steps,
+    string Language = "fr-FR");
 
 public sealed record GuideExportStep(
     int Index,

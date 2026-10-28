@@ -18,6 +18,7 @@ internal static class GuidePackageBuilder
         // Clone everything before the first await, including metadata and document order.
         var documents = sourceDocuments.Select(document => document.CloneForHistory()).ToArray();
         var metadata = sourceMetadata.Clone();
+        var language = useEnglish ? "en-US" : "fr-FR";
         var formats = requestedFormats.Length > 0 ? requestedFormats.Distinct().ToArray()
             : [ExportFormatChoice.Markdown, ExportFormatChoice.Html, ExportFormatChoice.Pdf, ExportFormatChoice.Docx];
         var packageFolder = Path.Combine(rootFolder, $"SnapSlate-{DateTime.Now:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}");
@@ -36,12 +37,12 @@ internal static class GuidePackageBuilder
                 await Task.Run(() => GuideImageRenderer.SaveDocumentImage(document, palettes, imagePath), cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
                 steps.Add(new(index + 1, document.StepTitle, document.StepNote, document.OriginLabel,
-                    document.SourceLabel, imagePath, document.Annotations.Where(annotation => annotation.Kind == AnnotationKind.Sticker)
+                    ExportSource.ForDocument(document, language), imagePath, document.Annotations.Where(annotation => annotation.Kind == AnnotationKind.Sticker)
                     .Select(annotation => new GuideExportLegendItem(annotation.Text,
-                        string.IsNullOrWhiteSpace(annotation.LegendText) ? (useEnglish ? "To fill in" : "À compléter") : annotation.LegendText)).ToArray()));
+                        string.IsNullOrWhiteSpace(annotation.LegendText) ? LocalizedText.Get("LegendPlaceholder", language) : annotation.LegendText)).ToArray()));
             }
             var manifest = new GuideExportManifest(metadata.Title, templateName, metadata.Audience, metadata.Author,
-                metadata.DocumentVersion, DateTimeOffset.Now, packageFolder, steps);
+                metadata.DocumentVersion, DateTimeOffset.Now, packageFolder, steps, language);
             var generatedFormats = new List<string>();
             foreach (var format in formats)
             {

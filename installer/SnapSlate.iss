@@ -1,5 +1,7 @@
 #define MyAppName "SnapSlate"
-#define MyAppVersion "2026.10.27.2"
+#ifndef MyAppVersion
+#error Build with Build-SetupExe.ps1 to supply the project version
+#endif
 #define MyAppPublisher "SnapSlate"
 #define MyAppSetupName "SnapSlate-Setup"
 
@@ -18,6 +20,10 @@ Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
 Uninstallable=yes
+#ifdef SignRelease
+SignTool=releaseSign
+SignedUninstaller=yes
+#endif
 SetupIconFile=..\Assets\AppIcon.ico
 OutputDir=release
 OutputBaseFilename={#MyAppSetupName}

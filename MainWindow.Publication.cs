@@ -62,14 +62,14 @@ public sealed partial class MainWindow
         var folder = await picker.PickSingleFolderAsync();
         if (folder is null)
         {
-            StatusText.Text = T("Choix du dossier SharePoint annulé.", "SharePoint folder selection cancelled.");
+            StatusText.Text = SafetyText("UiSharePointFolderSelectionCancelled");
             return;
         }
 
         SharePointSyncFolderTextBox.Text = folder.Path;
         EditingPreferences.SharePointSyncFolder = folder.Path;
         SavePreferencesIfNeeded();
-        StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Dossier SharePoint : {0}", "SharePoint folder: {0}"), folder.Path);
+        StatusText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("UiSharePointFolder0"), folder.Path);
     }
 
     private void NotionParentPageIdTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -145,13 +145,13 @@ public sealed partial class MainWindow
         var document = _currentDocument;
         if (document is null)
         {
-            StatusText.Text = T("Aucun document n’est sélectionné.", "No document is selected.");
+            StatusText.Text = SafetyText("UiNoDocumentIsSelected");
             return;
         }
 
         if (document.ImageBytes is not { Length: > 0 })
         {
-            StatusText.Text = T("L’OCR nécessite une capture importée.", "OCR requires an imported capture.");
+            StatusText.Text = SafetyText("UiOCRRequiresAnImportedCapture");
             return;
         }
 
@@ -160,17 +160,17 @@ public sealed partial class MainWindow
             var recognizedText = await OcrService.RecognizeTextAsync(document.ImageBytes);
             if (string.IsNullOrWhiteSpace(recognizedText))
             {
-                StatusText.Text = T("Aucun texte n’a été détecté.", "No text was detected.");
+                StatusText.Text = SafetyText("UiNoTextWasDetected");
                 return;
             }
 
             AddTextAnnotation(document, new Point(48, 48), recognizedText);
             var firstLine = recognizedText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? recognizedText;
-            StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("OCR ajouté : {0}", "OCR added: {0}"), firstLine);
+            StatusText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("UiOCRAdded0"), firstLine);
         }
         catch
         {
-            StatusText.Text = T("Impossible d’exécuter l’OCR sur cette image.", "Unable to run OCR on this image.");
+            StatusText.Text = SafetyText("UiUnableToRunOCROnThisImage");
         }
     }
 
@@ -182,33 +182,22 @@ public sealed partial class MainWindow
         var parentPageId = NotionParentPageIdTextBox.Text.Trim();
         if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(parentPageId))
         {
-            StatusText.Text = T("Renseignez le jeton Notion et l’ID de la page parente.", "Enter the Notion token and the parent page ID.");
+            StatusText.Text = SafetyText("UiEnterTheNotionTokenAndTheParent");
             return;
         }
 
-        var tempRoot = CreatePublicationRoot();
         try
         {
-            var package = await BuildGuidePackageAsync(tempRoot, []);
-            if (package is null)
-            {
-                return;
-            }
+            var manifest = PublicationTextBuilder.Capture(_documents, _projectMetadata,
+                GetTemplateLabel(_projectMetadata.TemplateType), UseEnglish ? "en-US" : "fr-FR");
 
-            var markdown = BuildPublicationMarkdown(package.Manifest);
-            var pageUrl = await NotionPublisher.PublishAsync(token, parentPageId, markdown);
+            var markdown = PublicationTextBuilder.Markdown(manifest);
+            var pageUrl = await TextPublicationService.NotionAsync(PublicationHttpClient, token, parentPageId, manifest.Title, markdown);
             StatusText.Text = pageUrl is null
-                ? T("Publication Notion terminée.", "Notion publication completed.")
-                : string.Format(CultureInfo.CurrentCulture, T("Publication Notion terminée : {0}", "Notion publication completed: {0}"), pageUrl);
+                ? SafetyText("UiNotionPublicationCompleted")
+                : string.Format(CultureInfo.CurrentCulture, SafetyText("UiNotionPublicationCompleted0"), pageUrl);
         }
-        catch
-        {
-            StatusText.Text = T("Impossible de publier vers Notion.", "Unable to publish to Notion.");
-        }
-        finally
-        {
-            TryDeleteDirectory(tempRoot);
-        }
+        catch (Exception error) { ShowPublicationFailure(error); }
     }
 
     private async Task PublishToConfluenceAsync()
@@ -229,7 +218,7 @@ public sealed partial class MainWindow
 
         if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(spaceKey) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
         {
-            StatusText.Text = T("Renseignez l’URL du site, la clé d’espace, l’e-mail et le jeton Confluence.", "Enter the site URL, space key, email, and Confluence token.");
+            StatusText.Text = SafetyText("UiEnterTheSiteURLSpaceKeyEmail");
             return;
         }
 
@@ -238,36 +227,25 @@ public sealed partial class MainWindow
         {
             if (!long.TryParse(parentPageText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedParentPageId))
             {
-                StatusText.Text = T("L’ID de page parente Confluence doit être numérique.", "The Confluence parent page ID must be numeric.");
+                StatusText.Text = SafetyText("UiTheConfluenceParentPageIDMustBe");
                 return;
             }
 
             parentPageId = parsedParentPageId;
         }
 
-        var tempRoot = CreatePublicationRoot();
         try
         {
-            var package = await BuildGuidePackageAsync(tempRoot, []);
-            if (package is null)
-            {
-                return;
-            }
+            var manifest = PublicationTextBuilder.Capture(_documents, _projectMetadata,
+                GetTemplateLabel(_projectMetadata.TemplateType), UseEnglish ? "en-US" : "fr-FR");
 
-            var storage = BuildConfluenceStorage(package.Manifest);
-            var pageUrl = await ConfluencePublisher.PublishAsync(baseUrl, spaceKey, email, token, package.Manifest.Title, storage, parentPageId);
+            var storage = PublicationTextBuilder.ConfluenceStorage(manifest);
+            var pageUrl = await TextPublicationService.ConfluenceAsync(PublicationHttpClient, baseUrl, spaceKey, email, token, manifest.Title, storage, parentPageId);
             StatusText.Text = pageUrl is null
-                ? T("Publication Confluence terminée.", "Confluence publication completed.")
-                : string.Format(CultureInfo.CurrentCulture, T("Publication Confluence terminée : {0}", "Confluence publication completed: {0}"), pageUrl);
+                ? SafetyText("UiConfluencePublicationCompleted")
+                : string.Format(CultureInfo.CurrentCulture, SafetyText("UiConfluencePublicationCompleted0"), pageUrl);
         }
-        catch
-        {
-            StatusText.Text = T("Impossible de publier vers Confluence.", "Unable to publish to Confluence.");
-        }
-        finally
-        {
-            TryDeleteDirectory(tempRoot);
-        }
+        catch (Exception error) { ShowPublicationFailure(error); }
     }
 
     private async Task PublishToSharePointAsync()
@@ -277,7 +255,7 @@ public sealed partial class MainWindow
         var targetFolder = SharePointSyncFolderTextBox.Text.Trim();
         if (string.IsNullOrWhiteSpace(targetFolder))
         {
-            StatusText.Text = T("Choisissez un dossier SharePoint synchronisé.", "Choose a synchronized SharePoint folder.");
+            StatusText.Text = SafetyText("UiChooseASynchronizedSharePointFolder");
             return;
         }
 
@@ -297,11 +275,11 @@ public sealed partial class MainWindow
             var destinationFolder = Path.Combine(destinationRoot, folderName);
             SharePointPublisher.CopyDirectory(package.PackageFolder, destinationFolder);
 
-            StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Package copié vers {0}", "Package copied to {0}"), destinationFolder);
+            StatusText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("UiPackageCopiedTo0"), destinationFolder);
         }
         catch
         {
-            StatusText.Text = T("Impossible de copier le package vers SharePoint.", "Unable to copy the package to SharePoint.");
+            StatusText.Text = SafetyText("UiUnableToCopyThePackageToSharePoint");
         }
         finally
         {
@@ -313,7 +291,7 @@ public sealed partial class MainWindow
     {
         if (_documents.Count == 0)
         {
-            StatusText.Text = T("Aucune étape à exporter.", "No steps to export.");
+            StatusText.Text = SafetyText("UiNoStepsToExport");
             return null;
         }
 
@@ -347,44 +325,17 @@ public sealed partial class MainWindow
         }
     }
 
-    private string BuildPublicationMarkdown(GuideExportManifest manifest)
+    private void ShowPublicationFailure(Exception error)
     {
-        return BuildMarkdown(manifest, includeImageReferences: false);
-    }
-
-    private string BuildConfluenceStorage(GuideExportManifest manifest)
-    {
-        var storage = new StringBuilder();
-        storage.AppendLine($"<h1>{EscapeHtml(manifest.Title)}</h1>");
-        storage.AppendLine($"<p><strong>{EscapeHtml(T("Type de document", "Document type"))}</strong> : {EscapeHtml(manifest.TemplateName)}</p>");
-        storage.AppendLine($"<p><strong>{EscapeHtml(T("Public", "Audience"))}</strong> : {EscapeHtml(manifest.Audience)}</p>");
-        storage.AppendLine($"<p><strong>{EscapeHtml(T("Auteur", "Author"))}</strong> : {EscapeHtml(manifest.Author)}</p>");
-        storage.AppendLine($"<p><strong>{EscapeHtml(T("Version", "Version"))}</strong> : {EscapeHtml(manifest.Version)}</p>");
-
-        foreach (var step in manifest.Steps)
+        AppDiagnostics.Record(error);
+        StatusText.Text = error is PublicationException failure ? failure.StatusCode switch
         {
-            storage.AppendLine($"<h2>{EscapeHtml($"{step.Index:00}. {step.Title}")}</h2>");
-
-            if (!string.IsNullOrWhiteSpace(step.Note))
-            {
-                storage.AppendLine($"<p>{EscapeHtml(step.Note).Replace("\r\n", "<br />").Replace("\n", "<br />").Replace("\r", "<br />")}</p>");
-            }
-
-            storage.AppendLine($"<p><strong>{EscapeHtml(T("Source", "Source"))}</strong> : {EscapeHtml(step.SourceLabel)}</p>");
-
-            if (step.LegendItems.Count > 0)
-            {
-                storage.AppendLine($"<p><strong>{EscapeHtml(T("Légende", "Legend"))}</strong></p>");
-                storage.AppendLine("<ul>");
-                foreach (var legend in step.LegendItems)
-                {
-                    storage.AppendLine($"<li><strong>{EscapeHtml(legend.StickerLabel)}</strong> : {EscapeHtml(legend.Description)}</li>");
-                }
-                storage.AppendLine("</ul>");
-            }
-        }
-
-        return storage.ToString();
+            System.Net.HttpStatusCode.Unauthorized => SafetyText("PublicationUnauthorized"),
+            System.Net.HttpStatusCode.Forbidden => SafetyText("PublicationForbidden"),
+            System.Net.HttpStatusCode.TooManyRequests => SafetyText("PublicationRateLimited"),
+            System.Net.HttpStatusCode.NotFound => SafetyText("PublicationNotFound"),
+            _ => string.Format(CultureInfo.CurrentCulture, SafetyText("PublicationHttpFailed"), (int)failure.StatusCode)
+        } : SafetyText("PublicationFailed");
     }
 
     private string CreatePublicationRoot()
@@ -446,88 +397,6 @@ internal static class OcrService
             .ToArray();
 
         return lines.Length == 0 ? string.Empty : string.Join(Environment.NewLine, lines);
-    }
-}
-
-internal static class NotionPublisher
-{
-    private const string NotionVersion = "2026-03-11";
-
-    public static async Task<string?> PublishAsync(string token, string parentPageId, string markdown)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.notion.com/v1/pages");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        request.Headers.TryAddWithoutValidation("Notion-Version", NotionVersion);
-        request.Content = JsonContent.Create(new
-        {
-            parent = new { page_id = parentPageId },
-            markdown
-        });
-
-        using var response = await MainWindow.PublicationHttpClient.SendAsync(request);
-        var payload = await response.Content.ReadAsStringAsync();
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new InvalidOperationException(string.IsNullOrWhiteSpace(payload) ? $"Notion returned {(int)response.StatusCode}." : payload);
-        }
-
-        using var json = JsonDocument.Parse(payload);
-        return json.RootElement.TryGetProperty("url", out var urlElement) ? urlElement.GetString() : null;
-    }
-}
-
-internal static class ConfluencePublisher
-{
-    public static async Task<string?> PublishAsync(
-        string baseUrl,
-        string spaceKey,
-        string email,
-        string token,
-        string title,
-        string storage,
-        long? parentPageId)
-    {
-        var endpoint = PublicationEndpoint.Confluence(baseUrl);
-        var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
-        var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{email}:{token}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", credentials);
-        request.Content = JsonContent.Create(new
-        {
-            type = "page",
-            title,
-            space = new { key = spaceKey },
-            ancestors = parentPageId.HasValue ? new[] { new { id = parentPageId.Value } } : null,
-            body = new
-            {
-                storage = new
-                {
-                    value = storage,
-                    representation = "storage"
-                }
-            }
-        }, options: new JsonSerializerOptions
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        });
-
-        using var response = await MainWindow.PublicationHttpClient.SendAsync(request);
-        var payload = await response.Content.ReadAsStringAsync();
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new InvalidOperationException(string.IsNullOrWhiteSpace(payload) ? $"Confluence returned {(int)response.StatusCode}." : payload);
-        }
-
-        using var json = JsonDocument.Parse(payload);
-        if (json.RootElement.TryGetProperty("_links", out var links) && links.TryGetProperty("webui", out var webUi))
-        {
-            var relativeUrl = webUi.GetString();
-            if (!string.IsNullOrWhiteSpace(relativeUrl))
-            {
-                return new Uri(new Uri($"{baseUrl.TrimEnd('/')}/"), relativeUrl).ToString();
-            }
-        }
-
-        return null;
     }
 }
 

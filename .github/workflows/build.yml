@@ -17,15 +17,36 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 10.0.x
+          global-json-file: global.json
       # Restore and build must agree on configuration, platform and ReadyToRun.
       # The installer also builds without ReadyToRun; publishing may opt in separately.
       - name: Restore
-        run: dotnet restore .\SnapSlate.csproj -p:Configuration=Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false
+        run: dotnet restore .\SnapSlate.csproj -p:Configuration=Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false --locked-mode
       - name: Build
-        run: dotnet build .\SnapSlate.csproj -c Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false --no-restore
+        run: dotnet build .\SnapSlate.csproj -c Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false -p:ContinuousIntegrationBuild=true --no-restore
+      - name: Restore locked test dependencies
+        run: dotnet restore .\tests\SnapSlate.Tests.csproj -p:Configuration=Release -p:Platform=x64 --locked-mode
       - name: Test project safety, redaction and exports
-        run: dotnet test .\tests\SnapSlate.Tests.csproj -c Release -p:Platform=x64 --logger "trx;LogFileName=tests.trx"
+        run: dotnet test .\tests\SnapSlate.Tests.csproj -c Release -p:Platform=x64 -p:ContinuousIntegrationBuild=true --no-restore --filter "TestCategory!=Performance" --logger "trx;LogFileName=tests.trx"
+      - name: Install pinned installer compiler
+        shell: pwsh
+        run: .\eng\Install-CiBuildTools.ps1 -Destination "$env:RUNNER_TEMP\SnapSlate-BuildTools"
+      - name: Build self-contained installer and portable archive
+        shell: pwsh
+        run: .\installer\Build-SetupExe.ps1 -Configuration Release -Platform x64
+      - name: Verify install, application launch and uninstall
+        shell: pwsh
+        run: .\installer\Test-Distribution.ps1 -InstallSmoke
+      - name: Upload verified distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: distribution-x64
+          compression-level: 0
+          path: |
+            installer/release/SnapSlate-Setup.exe
+            installer/SnapSlate-Installer-x64.zip
+            installer/release/SHA256SUMS.txt
+            installer/release/build-provenance.json
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4

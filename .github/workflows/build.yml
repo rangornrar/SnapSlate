@@ -38,9 +38,10 @@ jobs:
         shell: pwsh
         run: .\installer\Test-Distribution.ps1 -InstallSmoke
       - name: Upload verified distribution
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: distribution-x64
+          if-no-files-found: error
           compression-level: 0
           path: |
             installer/release/SnapSlate-Setup.exe
@@ -49,7 +50,7 @@ jobs:
             installer/release/build-provenance.json
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: test-results
           path: tests/TestResults/*.trx

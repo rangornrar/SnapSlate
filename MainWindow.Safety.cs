@@ -1,20 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.UI.Windowing;
-using Microsoft.Windows.ApplicationModel.Resources;
 
 namespace SnapSlate;
 
 public sealed partial class MainWindow
 {
-    private readonly ResourceManager _safetyResources = new();
-
-    private string SafetyText(string key)
-    {
-        var context = _safetyResources.CreateResourceContext();
-        context.QualifierValues["Language"] = UseEnglish ? "en-US" : "fr-FR";
-        return _safetyResources.MainResourceMap.GetValue("Resources/" + key, context).ValueAsString;
-    }
+    private string SafetyText(string key) => LocalizedText.Get(key, UseEnglish ? "en-US" : "fr-FR");
 
     private void MainWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
     {

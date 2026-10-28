@@ -20,6 +20,8 @@
     <Compile Include="..\GuidePackageBuilder.cs" Link="Production\GuidePackageBuilder.cs" />
     <Compile Include="..\GuideExporter.cs" Link="Production\GuideExporter.cs" />
     <Compile Include="..\ExportFormatChoice.cs" Link="Production\ExportFormatChoice.cs" />
+    <Compile Include="..\ProjectContentFingerprint.cs" Link="Production\ProjectContentFingerprint.cs" />
+    <Compile Include="..\ClipboardImportCoordinator.cs" Link="Production\ClipboardImportCoordinator.cs" />
     <!-- Link the exact production services, without starting WinUI or MSIX. -->
     <Compile Include="..\ProjectJson.cs" Link="Production\ProjectJson.cs" />
     <Compile Include="..\GuideTextExporter.cs" Link="Production\GuideTextExporter.cs" />
@@ -39,5 +41,16 @@
     <Compile Include="..\GuideMetadata.cs" Link="Production\GuideMetadata.cs" />
     <Compile Include="..\CropGeometry.cs" Link="Production\CropGeometry.cs" />
     <Compile Include="..\ProjectState.cs" Link="Production\ProjectState.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Strings\fr-FR\Resources.resw" LogicalName="SnapSlate.Strings.fr-FR.Resources.resw" />
+    <EmbeddedResource Include="..\Strings\en-US\Resources.resw" LogicalName="SnapSlate.Strings.en-US.Resources.resw" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\LocalizedText.cs" Link="Production\LocalizedText.cs" />
+    <Compile Include="..\ExportSource.cs" Link="Production\ExportSource.cs" />
+    <Compile Include="..\AnnotationMovement.cs" Link="Production\AnnotationMovement.cs" />
+    <Compile Include="..\TextPublicationService.cs" Link="Production\TextPublicationService.cs" />
+    <Compile Include="..\PublicationTextBuilder.cs" Link="Production\PublicationTextBuilder.cs" />
   </ItemGroup>
 </Project>

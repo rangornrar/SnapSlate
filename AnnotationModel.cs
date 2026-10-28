@@ -34,6 +34,9 @@ public sealed class AnnotationModel : INotifyPropertyChanged
     private double _fontSize = 28;
     private bool _isBold;
 
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string AccessibleLabel => LocalizedText.Get("Annotation" + Kind) + (string.IsNullOrWhiteSpace(Text) ? string.Empty : ": " + Text);
+    public override string ToString() => AccessibleLabel;
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -149,6 +152,7 @@ public sealed class AnnotationModel : INotifyPropertyChanged
 
         field = value;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AccessibleLabel)));
         return true;
     }
 }

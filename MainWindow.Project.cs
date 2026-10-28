@@ -40,6 +40,8 @@ public sealed partial class MainWindow
     {
         TrackProjectTextBoxes();
         ConfigureKeyboardAccelerators();
+        ApplyAccessibleFieldLabels();
+        AddKeyboardAccelerator(VirtualKey.V, VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift, ImportClipboardKeyboardAccelerator_Invoked);
         UpdateUndoRedoButtons();
     }
 
@@ -70,6 +72,12 @@ public sealed partial class MainWindow
         AddKeyboardAccelerator(VirtualKey.O, VirtualKeyModifiers.Control, OpenProjectKeyboardAccelerator_Invoked);
         AddKeyboardAccelerator(VirtualKey.Z, VirtualKeyModifiers.Control, UndoProjectKeyboardAccelerator_Invoked);
         AddKeyboardAccelerator(VirtualKey.Y, VirtualKeyModifiers.Control, RedoProjectKeyboardAccelerator_Invoked);
+    }
+
+    private async void ImportClipboardKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        await TryImportClipboardCaptureAsync(force: true);
     }
 
     private void AddKeyboardAccelerator(
@@ -187,10 +195,7 @@ public sealed partial class MainWindow
 
     private bool AreProjectStatesEquivalent(SnapSlateProjectState left, SnapSlateProjectState right)
     {
-        return string.Equals(
-            ProjectPersistence.Serialize(left),
-            ProjectPersistence.Serialize(right),
-            StringComparison.Ordinal);
+        return ProjectContentFingerprint.Project(left) == ProjectContentFingerprint.Project(right);
     }
 
     private void PushUndoState(SnapSlateProjectState state)
@@ -245,26 +250,26 @@ public sealed partial class MainWindow
     private async Task<bool> CreateNewProjectAsync()
     {
         if (_isSavingSettings || _isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
-        if (!await EnsureProjectCanBeReplacedAsync(T("créer un nouveau projet", "create a new project")))
+        if (!await EnsureProjectCanBeReplacedAsync(SafetyText("UiCreateANewProject")))
         {
             return false;
         }
 
         await ApplyProjectStateAsync(CreateBlankProjectState(), projectPath: null, markDocumentsClean: true, clearHistory: true);
-        StatusText.Text = T("Nouveau projet créé.", "New project created.");
+        StatusText.Text = SafetyText("UiNewProjectCreated");
         return true;
     }
 
     private async Task<bool> LoadDemoProjectAsync()
     {
         if (_isSavingSettings || _isSavingProject || _isOpeningProject || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen) return false;
-        if (!await EnsureProjectCanBeReplacedAsync(T("charger le modèle de démonstration", "load the demo template")))
+        if (!await EnsureProjectCanBeReplacedAsync(SafetyText("UiLoadTheDemoTemplate")))
         {
             return false;
         }
 
         await ApplyProjectStateAsync(CreateDemoProjectState(), projectPath: null, markDocumentsClean: true, clearHistory: true);
-        StatusText.Text = T("Modèle de démonstration chargé.", "Demo template loaded.");
+        StatusText.Text = SafetyText("UiDemoTemplateLoaded");
         return true;
     }
 
@@ -274,7 +279,7 @@ public sealed partial class MainWindow
         _isOpeningProject = true;
         try
         {
-            if (!await EnsureProjectCanBeReplacedAsync(T("ouvrir un projet", "open a project")))
+            if (!await EnsureProjectCanBeReplacedAsync(SafetyText("UiOpenAProject")))
             {
                 return false;
             }
@@ -287,7 +292,7 @@ public sealed partial class MainWindow
             var file = await picker.PickSingleFileAsync();
             if (file is null)
             {
-                StatusText.Text = T("Ouverture de projet annulée.", "Project open cancelled.");
+                StatusText.Text = SafetyText("UiProjectOpenCancelled");
                 return false;
             }
 
@@ -301,12 +306,12 @@ public sealed partial class MainWindow
                 var state = ProjectPersistence.Deserialize(json);
                 if (state is null)
                 {
-                    StatusText.Text = T("Le fichier de projet est vide ou invalide.", "The project file is empty or invalid.");
+                    StatusText.Text = SafetyText("UiTheProjectFileIsEmptyOrInvalid");
                     return false;
                 }
 
                 await ApplyProjectStateAsync(state, file.Path, markDocumentsClean: true, clearHistory: true);
-                StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Projet chargé : {0}", "Project loaded: {0}"), file.Path);
+                StatusText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("UiProjectLoaded0"), file.Path);
                 return true;
             }
             catch (Exception error)
@@ -341,14 +346,14 @@ public sealed partial class MainWindow
             if (saveAs || string.IsNullOrWhiteSpace(targetPath))
             {
                 var picker = new FileSavePicker();
-                picker.FileTypeChoices.Add(T("Projet SnapSlate", "SnapSlate project"), [ProjectFileExtension]);
+                picker.FileTypeChoices.Add(SafetyText("UiSnapSlateProject"), [ProjectFileExtension]);
                 picker.SuggestedFileName = GetSuggestedProjectFileName();
                 InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
 
                 var file = await picker.PickSaveFileAsync();
                 if (file is null)
                 {
-                    StatusText.Text = T("Sauvegarde de projet annulée.", "Project save cancelled.");
+                    StatusText.Text = SafetyText("UiProjectSaveCancelled");
                     return false;
                 }
 
@@ -357,7 +362,7 @@ public sealed partial class MainWindow
 
             if (string.IsNullOrWhiteSpace(targetPath))
             {
-                StatusText.Text = T("Aucun emplacement de sauvegarde n'est disponible.", "No save location is available.");
+                StatusText.Text = SafetyText("UiNoSaveLocationIsAvailable");
                 return false;
             }
 
@@ -373,7 +378,7 @@ public sealed partial class MainWindow
                 await AtomicFile.WriteTextAsync(targetPath, json);
                 _currentProjectPath = targetPath;
                 MarkProjectClean(state);
-                StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Projet sauvegardé : {0}", "Project saved: {0}"), targetPath);
+                StatusText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("UiProjectSaved0"), targetPath);
                 return true;
             }
             catch (Exception error)
@@ -423,7 +428,7 @@ public sealed partial class MainWindow
 
         if (_undoHistory.Count == 0)
         {
-            StatusText.Text = T("Rien à annuler.", "Nothing to undo.");
+            StatusText.Text = SafetyText("UiNothingToUndo");
             return false;
         }
 
@@ -433,7 +438,7 @@ public sealed partial class MainWindow
         _redoHistory.Add(currentState);
 
         await ApplyProjectStateAsync(previousState, _currentProjectPath, markDocumentsClean: false, clearHistory: false);
-        StatusText.Text = T("Dernière action annulée.", "Last action undone.");
+        StatusText.Text = SafetyText("UiLastActionUndone");
         UpdateUndoRedoButtons();
         return true;
     }
@@ -445,7 +450,7 @@ public sealed partial class MainWindow
 
         if (_redoHistory.Count == 0)
         {
-            StatusText.Text = T("Rien à rétablir.", "Nothing to redo.");
+            StatusText.Text = SafetyText("UiNothingToRedo");
             return false;
         }
 
@@ -455,7 +460,7 @@ public sealed partial class MainWindow
         _undoHistory.Add(currentState);
 
         await ApplyProjectStateAsync(nextState, _currentProjectPath, markDocumentsClean: false, clearHistory: false);
-        StatusText.Text = T("Dernière action rétablie.", "Last action redone.");
+        StatusText.Text = SafetyText("UiLastActionRedone");
         UpdateUndoRedoButtons();
         return true;
     }
@@ -528,6 +533,7 @@ public sealed partial class MainWindow
                 _pendingDragSnapshot = null;
             }
             if (_settingsDraft is not null) ReturnToProcedureSection();
+            ++_projectEpoch;
             _projectMetadata = (state.Metadata ?? GuideMetadata.FromLegacyDocument(state.Documents.FirstOrDefault())).Clone();
             _currentProjectPath = projectPath;
             _documents.Clear();
@@ -636,10 +642,10 @@ public sealed partial class MainWindow
     {
         return new ScreenshotDocument
         {
-            BaseTitle = "Nouveau projet",
+            BaseTitle = LocalizedText.Get("NewProjectTitle"),
             Origin = DocumentOrigin.BlankProject,
             OriginLabel = "Projet vide",
-            SourceLabel = "Démarrer à zéro",
+            SourceLabel = LocalizedText.Get("BlankSource"),
             FileNameLabel = "nouveau-projet.snapslate",
             SourcePixelWidth = (int)SceneWidth,
             SourcePixelHeight = (int)SceneHeight,

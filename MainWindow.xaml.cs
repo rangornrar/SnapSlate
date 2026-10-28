@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
@@ -46,30 +45,30 @@ public sealed partial class MainWindow : Window
     private readonly ObservableCollection<GradientPaletteDefinition> _paletteOrder = [];
     private readonly Dictionary<EditorTool, string> _toolLabels = new()
     {
-        [EditorTool.Select] = "Sélection",
-        [EditorTool.Crop] = "Recadrer",
-        [EditorTool.Text] = "Texte",
-        [EditorTool.Sticker] = "Gommette",
-        [EditorTool.ArrowStraight] = "Flèche droite",
-        [EditorTool.ArrowCurved] = "Flèche courbe",
-        [EditorTool.Rectangle] = "Rectangle",
-        [EditorTool.Ellipse] = "Ovale",
-        [EditorTool.Focus] = "Focus",
-        [EditorTool.Mask] = "Masquage"
+        [EditorTool.Select] = "ToolSelect",
+        [EditorTool.Crop] = "ToolCrop",
+        [EditorTool.Text] = "ToolText",
+        [EditorTool.Sticker] = "ToolSticker",
+        [EditorTool.ArrowStraight] = "ToolArrowStraight",
+        [EditorTool.ArrowCurved] = "ToolArrowCurved",
+        [EditorTool.Rectangle] = "ToolRectangle",
+        [EditorTool.Ellipse] = "ToolEllipse",
+        [EditorTool.Focus] = "ToolFocus",
+        [EditorTool.Mask] = "ToolMask"
     };
 
     private readonly Dictionary<EditorTool, string> _toolHints = new()
     {
-        [EditorTool.Select] = "Cliquez un objet pour le sélectionner et le déplacer.",
-        [EditorTool.Crop] = "Glissez une zone puis appliquez le recadrage.",
-        [EditorTool.Text] = "Cliquez dans la scène pour poser un texte.",
-        [EditorTool.Sticker] = "Cliquez pour poser une gommette.",
-        [EditorTool.ArrowStraight] = "Glissez pour tracer une flèche droite.",
-        [EditorTool.ArrowCurved] = "Glissez pour tracer une flèche courbe.",
-        [EditorTool.Rectangle] = "Glissez pour entourer une zone rectangulaire.",
-        [EditorTool.Ellipse] = "Glissez pour entourer une zone ovale.",
-        [EditorTool.Focus] = "Glissez pour mettre une zone en avant.",
-        [EditorTool.Mask] = "Glissez pour masquer une zone."
+        [EditorTool.Select] = "HintSelect",
+        [EditorTool.Crop] = "HintCrop",
+        [EditorTool.Text] = "HintText",
+        [EditorTool.Sticker] = "HintSticker",
+        [EditorTool.ArrowStraight] = "HintArrowStraight",
+        [EditorTool.ArrowCurved] = "HintArrowCurved",
+        [EditorTool.Rectangle] = "HintRectangle",
+        [EditorTool.Ellipse] = "HintEllipse",
+        [EditorTool.Focus] = "HintFocus",
+        [EditorTool.Mask] = "HintMask"
     };
 
     private readonly List<Button> _toolButtons;
@@ -97,8 +96,6 @@ public sealed partial class MainWindow : Window
     private bool _isInspectorPaneCollapsed;
     private bool _isProcessingClipboard;
     private bool _clipboardWatcherPrimed;
-    private readonly DispatcherQueueTimer _clipboardPollTimer;
-    private string? _lastClipboardFingerprint;
     private int _nextCaptureIndex = 1;
     private int _nextDemoIndex = 1;
     private double _currentZoom = 1.0;
@@ -148,11 +145,6 @@ public sealed partial class MainWindow : Window
         MarkProjectClean();
         AppWindow.Closing += MainWindow_Closing;
 
-        _clipboardPollTimer = DispatcherQueue.CreateTimer();
-        _clipboardPollTimer.Interval = TimeSpan.FromMilliseconds(850);
-        _clipboardPollTimer.IsRepeating = true;
-        _clipboardPollTimer.Tick += ClipboardPollTimer_Tick;
-        _clipboardPollTimer.Start();
         Closed += MainWindow_Closed;
 
         Clipboard.ContentChanged += Clipboard_ContentChanged;
@@ -212,8 +204,8 @@ public sealed partial class MainWindow : Window
         var document = CreateDocumentCore(
             title,
             DocumentOrigin.Demo,
-            "Démo Lorem Ipsum",
-            "Maquette éditoriale Lorem Ipsum",
+            SafetyText("OriginDemo"),
+            SafetyText("DemoSource"),
             "lorem-ipsum.png",
             null,
             (int)SceneWidth,
@@ -274,13 +266,13 @@ public sealed partial class MainWindow : Window
             return null;
         }
 
-        ImageSafety.Validate(bytes);
+        await Task.Run(() => { ImageSafety.Validate(bytes); ProjectContentFingerprint.WarmImage(bytes); });
         var (sourceWidth, sourceHeight) = await GetImageSizeAsync(bytes);
         var thumbnail = await CreateBitmapImageAsync(bytes, 160);
         return CreateDocumentCore(
             System.IO.Path.GetFileNameWithoutExtension(file.Name),
             DocumentOrigin.FileImport,
-            "Fichier importe",
+            SafetyText("OriginFileImport"),
             file.Path,
             file.Name,
             bytes,
@@ -292,15 +284,15 @@ public sealed partial class MainWindow : Window
 
     private async Task<ScreenshotDocument> CreateDocumentFromClipboardAsync(byte[] bytes)
     {
-        ImageSafety.Validate(bytes);
+        await Task.Run(() => { ImageSafety.Validate(bytes); ProjectContentFingerprint.WarmImage(bytes); });
         var (sourceWidth, sourceHeight) = await GetImageSizeAsync(bytes);
         var captureIndex = _nextCaptureIndex++;
         var thumbnail = await CreateBitmapImageAsync(bytes, 160);
         return CreateDocumentCore(
             $"Capture {captureIndex:00}",
             DocumentOrigin.ClipboardCapture,
-            "Win + Shift + S",
-            $"Capture Windows importee a {DateTime.Now:HH:mm:ss}",
+            SafetyText("OriginClipboardCapture"),
+            SafetyText("SourceClipboard"),
             $"capture-{captureIndex:00}.png",
             bytes,
             sourceWidth,
@@ -336,7 +328,7 @@ public sealed partial class MainWindow : Window
             SelectedPaletteKey = palette.Key,
             SelectedPaletteShadeIndex = 3,
             PaletteDisplayName = palette.DisplayName,
-            AnnotationText = "Note rapide",
+            AnnotationText = SafetyText("QuickNote"),
             StickerModeIndex = 0,
             StrokeThickness = 6,
             ResetStickerNumberOnColorChange = false,
@@ -373,22 +365,15 @@ public sealed partial class MainWindow : Window
 
         try
         {
-            CanvasSummaryText.Text = document.Origin switch
-            {
-                DocumentOrigin.ClipboardCapture => "Nouvelle capture importee.",
-                DocumentOrigin.FileImport => "Image importee.",
-                DocumentOrigin.BlankProject => "Projet vide.",
-                DocumentOrigin.Demo => "Page Lorem Ipsum.",
-                _ => "Planche de demonstration."
-            };
+            CanvasSummaryText.Text = SafetyText("Origin" + document.Origin);
             CanvasFileNameText.Text = document.FileNameLabel;
-            ImageSourceText.Text = $"Source : {document.SourceLabel}";
+            ImageSourceText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("SourceLabel"), document.SourceLabel);
 
             AnnotationTextBox.Text = document.AnnotationText;
             StickerModeComboBox.SelectedIndex = document.StickerModeIndex;
             StrokeThicknessSlider.Value = document.StrokeThickness;
             ResetStickerNumberOnColorChangeCheckBox.IsChecked = document.ResetStickerNumberOnColorChange;
-            StrokeSummaryText.Text = $"Trait actuel : {document.StrokeThickness:0} px";
+            StrokeSummaryText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("StrokeCurrent"), document.StrokeThickness);
 
             ApplyPaletteSelection(document.SelectedPaletteKey, document.SelectedPaletteShadeIndex, updateDocument: false, updateSelectedAnnotation: false);
             SyncDocumentEditors(document);
@@ -471,8 +456,8 @@ public sealed partial class MainWindow : Window
         ToolbarToolPickerButton.Background = GetBrush("ShellPanelBrush");
         ToolbarToolPickerButton.BorderBrush = GetBrush("ShellStrokeBrush");
         ToolbarToolPickerButton.BorderThickness = new Thickness(1);
-        CurrentToolText.Text = _toolLabels[tool];
-        ToolbarCurrentToolText.Text = _toolLabels[tool];
+        CurrentToolText.Text = SafetyText(_toolLabels[tool]);
+        ToolbarCurrentToolText.Text = SafetyText(_toolLabels[tool]);
         UpdateStatus();
     }
 
@@ -569,7 +554,7 @@ public sealed partial class MainWindow : Window
             _isSyncingPaletteUi = false;
         }
 
-        var paletteSummary = string.Format(CultureInfo.CurrentCulture, T("Palette active : {0}", "Active palette: {0}"), palette.DisplayName);
+        var paletteSummary = string.Format(CultureInfo.CurrentCulture, SafetyText("UiActivePalette0"), palette.DisplayName);
         PaletteSummaryText.Text = paletteSummary;
 
         if (_currentDocument is not null && updateDocument)
@@ -598,11 +583,11 @@ public sealed partial class MainWindow : Window
         var dialog = new ContentDialog
         {
             XamlRoot = RootGrid.XamlRoot,
-            Title = T("Changer la couleur de la gommette ?", "Change sticker color?"),
-            Content = T("Voulez-vous renuméroter les gommettes après ce changement de couleur ?", "Do you want to renumber the stickers after this color change?"),
-            PrimaryButtonText = T("Renuméroter", "Renumber"),
-            SecondaryButtonText = T("Continuer", "Keep numbering"),
-            CloseButtonText = T("Annuler", "Cancel"),
+            Title = SafetyText("UiChangeStickerColor"),
+            Content = SafetyText("UiDoYouWantToRenumberTheStickers"),
+            PrimaryButtonText = SafetyText("UiRenumber"),
+            SecondaryButtonText = SafetyText("UiKeepNumbering"),
+            CloseButtonText = SafetyText("UiCancel"),
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -689,7 +674,7 @@ public sealed partial class MainWindow : Window
         }
 
         MarkDocumentDirty(_currentDocument);
-        StrokeSummaryText.Text = $"Trait actuel : {StrokeThicknessSlider.Value:0} px";
+        StrokeSummaryText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("StrokeCurrent"), StrokeThicknessSlider.Value);
     }
 
     private void ResetStickerNumberOnColorChangeCheckBox_Changed(object sender, RoutedEventArgs e)
@@ -738,21 +723,21 @@ public sealed partial class MainWindow : Window
             var file = await picker.PickSingleFileAsync();
             if (file is null)
             {
-                StatusText.Text = "Import annule.";
+                StatusText.Text = SafetyText("ImportCancelled");
                 return;
             }
 
             var document = await CreateDocumentFromFileAsync(file);
             if (document is null)
             {
-                StatusText.Text = "Impossible de lire le fichier selectionne.";
+                StatusText.Text = SafetyText("ImportUnreadable");
                 return;
             }
 
             PushUndoState(CaptureProjectState());
             AddDocument(document, select: true);
             document.IsDirty = true;
-            StatusText.Text = $"Nouveau tab cree pour {file.Name}.";
+            StatusText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("ImportFileSuccess"), file.Name);
 
         }
         catch (Exception error)
@@ -772,7 +757,7 @@ public sealed partial class MainWindow : Window
         var document = CreateDemoDocument();
         AddDocument(document, select: true);
         document.IsDirty = true;
-        StatusText.Text = "Nouvelle page Lorem Ipsum creee.";
+        StatusText.Text = SafetyText("DemoCreated");
     }
 
     private async void CloseDocumentButton_Click(object sender, RoutedEventArgs e)
@@ -908,7 +893,7 @@ public sealed partial class MainWindow : Window
                 file = await picker.PickSaveFileAsync();
                 if (file is null)
                 {
-                    StatusText.Text = "Sauvegarde annulee.";
+                    StatusText.Text = SafetyText("PngCancelled");
                     return false;
                 }
             }
@@ -941,14 +926,14 @@ public sealed partial class MainWindow : Window
         MarkDocumentDirty(_currentDocument);
         RenderAnnotations(_currentDocument);
         UpdateAnnotationCount(_currentDocument);
-        StatusText.Text = "Les annotations ont ete effacees.";
+        StatusText.Text = SafetyText("AnnotationsCleared");
     }
 
     private void ApplyCropButton_Click(object sender, RoutedEventArgs e)
     {
         if (_currentDocument?.PendingCropRect is not Rect crop || crop.Width < 8 || crop.Height < 8)
         {
-            StatusText.Text = "Tracez d'abord une vraie zone de crop.";
+            StatusText.Text = SafetyText("CropDrawFirst");
             return;
         }
 
@@ -957,7 +942,7 @@ public sealed partial class MainWindow : Window
         _currentDocument.PendingCropRect = null;
         MarkDocumentDirty(_currentDocument);
         ApplyCropState(_currentDocument);
-        StatusText.Text = "Le crop est applique a cet onglet.";
+        StatusText.Text = SafetyText("CropApplied");
     }
 
     private void ResetCropButton_Click(object sender, RoutedEventArgs e)
@@ -977,7 +962,7 @@ public sealed partial class MainWindow : Window
         }
 
         ApplyCropState(_currentDocument);
-        StatusText.Text = "Le crop a ete reinitialise.";
+        StatusText.Text = SafetyText("CropReset");
     }
 
     private void ApplyCropState(ScreenshotDocument document)
@@ -987,7 +972,7 @@ public sealed partial class MainWindow : Window
             ApplySceneViewportLayout(appliedCrop.Width, appliedCrop.Height);
             SceneTransform.X = -appliedCrop.X;
             SceneTransform.Y = -appliedCrop.Y;
-            CropStateText.Text = $"Crop applique : {appliedCrop.Width:0} x {appliedCrop.Height:0}px.";
+            CropStateText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("CropAppliedSize"), appliedCrop.Width, appliedCrop.Height);
             HideCropOverlay();
             ResetCropButton.IsEnabled = true;
             ApplyCropButton.IsEnabled = false;
@@ -998,8 +983,8 @@ public sealed partial class MainWindow : Window
         SceneTransform.X = 0;
         SceneTransform.Y = 0;
         CropStateText.Text = document.PendingCropRect is Rect pendingCrop
-            ? $"Crop en attente : {pendingCrop.Width:0} x {pendingCrop.Height:0}px."
-            : "Aucun crop applique pour le moment.";
+            ? string.Format(CultureInfo.CurrentCulture, SafetyText("CropPendingSize"), pendingCrop.Width, pendingCrop.Height)
+            : SafetyText("CropNone");
 
         if (document.PendingCropRect is Rect overlayCrop)
         {
@@ -1147,12 +1132,12 @@ public sealed partial class MainWindow : Window
                 _currentDocument.PendingCropRect = crop;
                 MarkDocumentDirty(_currentDocument);
                 ApplyCropState(_currentDocument);
-                StatusText.Text = "Crop capture. Utilisez 'Appliquer crop'.";
+                StatusText.Text = SafetyText("CropPendingHint");
             }
             else
             {
                 ApplyCropState(_currentDocument);
-                StatusText.Text = "Le crop est trop petit.";
+                StatusText.Text = SafetyText("CropTooSmall");
             }
 
             FinishDrag(e);
@@ -1592,6 +1577,7 @@ public sealed partial class MainWindow : Window
 
     private void RenderAnnotations(ScreenshotDocument document)
     {
+        RefreshAnnotationObjects();
         AnnotationCanvas.Children.Clear();
         foreach (var annotation in document.Annotations.Where(item => item.Kind != AnnotationKind.Mask)
             .Concat(document.Annotations.Where(item => item.Kind == AnnotationKind.Mask)))
@@ -1897,7 +1883,7 @@ public sealed partial class MainWindow : Window
         CropPreview.Height = crop.Height;
         Canvas.SetLeft(CropPreview, crop.X);
         Canvas.SetTop(CropPreview, crop.Y);
-        CropBadgeText.Text = $"Crop {crop.Width:0} x {crop.Height:0}";
+        CropBadgeText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("CropBadge"), crop.Width, crop.Height);
         Canvas.SetLeft(CropBadge, crop.X + 12);
         Canvas.SetTop(CropBadge, Math.Max(12, crop.Y + 12));
     }
@@ -1935,15 +1921,15 @@ public sealed partial class MainWindow : Window
     private void UpdateStatus()
     {
         var hint = _editingTextAnnotation is not null
-            ? T("Double-cliquez pour terminer la modification du texte.", "Double-click to finish editing the text.")
-            : _toolHints[_currentTool];
+            ? SafetyText("UiDoubleClickToFinishEditingTheText")
+            : SafetyText(_toolHints[_currentTool]);
 
         StatusText.Text = hint;
 
         var annotationCount = _currentDocument?.Annotations.Count ?? 0;
         AnnotationCountText.Text = string.Format(
             CultureInfo.CurrentCulture,
-            T("{0} annotations · Zoom {1:0} %", "{0} annotations · Zoom {1:0} %"),
+            SafetyText("Ui0AnnotationsZoom10"),
             annotationCount,
             _currentZoom * 100);
     }
@@ -1953,45 +1939,46 @@ public sealed partial class MainWindow : Window
         return (SolidColorBrush)Application.Current.Resources[key];
     }
 
-    private async void Clipboard_ContentChanged(object? sender, object e)
-    {
-        DispatcherQueue.TryEnqueue(async () =>
-        {
-            await TryImportClipboardCaptureAsync();
-        });
-    }
+    private readonly ClipboardImportCoordinator _clipboardImports = new();
+    private long _projectEpoch;
+    private bool _clipboardDrainQueued;
 
-    private async void ClipboardPollTimer_Tick(DispatcherQueueTimer sender, object args)
+    private void Clipboard_ContentChanged(object? sender, object e)
     {
-        await TryImportClipboardCaptureAsync();
+        _clipboardImports.NotifyChanged();
+        if (_clipboardDrainQueued) return;
+        _clipboardDrainQueued = true;
+        if (!DispatcherQueue.TryEnqueue(async () =>
+        {
+            try
+            {
+                // Wait only for a pending change; no periodic clipboard read or image decode.
+                while (!_editorClosed && App.Preferences.AutoImportClipboard)
+                {
+                    if (_isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen || _isSavingProject || _isOpeningProject || _isProcessingClipboard)
+                    {
+                        await Task.Delay(100);
+                        continue;
+                    }
+                    await TryImportClipboardCaptureAsync();
+                    break;
+                }
+            }
+            finally { _clipboardDrainQueued = false; }
+        })) _clipboardDrainQueued = false;
     }
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         _editorClosed = true;
         ++_previewVersion;
-        _clipboardPollTimer.Stop();
         Clipboard.ContentChanged -= Clipboard_ContentChanged;
     }
 
-    private async Task PrimeClipboardWatcherAsync()
+    private Task PrimeClipboardWatcherAsync()
     {
-        try
-        {
-            var bytes = await ReadClipboardBitmapBytesAsync();
-            if (bytes is { Length: > 0 })
-            {
-                _lastClipboardFingerprint = await CreateClipboardFingerprintAsync(bytes);
-            }
-        }
-        catch
-        {
-            // Best effort only.
-        }
-        finally
-        {
-            _clipboardWatcherPrimed = true;
-        }
+        _clipboardWatcherPrimed = true;
+        return Task.CompletedTask;
     }
 
     private async Task<byte[]?> ReadClipboardBitmapBytesAsync()
@@ -2006,7 +1993,7 @@ public sealed partial class MainWindow : Window
             var dataPackage = Clipboard.GetContent();
             if (!dataPackage.Contains(StandardDataFormats.Bitmap))
             {
-                continue;
+                return null;
             }
 
             var streamReference = await dataPackage.GetBitmapAsync();
@@ -2024,76 +2011,28 @@ public sealed partial class MainWindow : Window
         return null;
     }
 
-    private static async Task<string> CreateClipboardFingerprintAsync(byte[] bytes)
+    private async Task TryImportClipboardCaptureAsync(bool force = false)
     {
-        using var stream = new InMemoryRandomAccessStream();
-        await stream.WriteAsync(bytes.AsBuffer());
-        stream.Seek(0);
-
+        if ((!force && !App.Preferences.AutoImportClipboard) || !_clipboardWatcherPrimed || _editorClosed
+            || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen || _isSavingProject || _isOpeningProject || _isProcessingClipboard) return;
+        _isProcessingClipboard = true;
+        var epoch = _projectEpoch;
         try
         {
-            var decoder = await BitmapDecoder.CreateAsync(stream);
-            var pixelData = await decoder.GetPixelDataAsync(
-                BitmapPixelFormat.Bgra8,
-                BitmapAlphaMode.Premultiplied,
-                new BitmapTransform(),
-                ExifOrientationMode.IgnoreExifOrientation,
-                ColorManagementMode.ColorManageToSRgb);
-
-            var pixels = pixelData.DetachPixelData();
-            var fingerprintBytes = new byte[8 + pixels.Length];
-            global::System.Buffer.BlockCopy(BitConverter.GetBytes((int)decoder.PixelWidth), 0, fingerprintBytes, 0, 4);
-            global::System.Buffer.BlockCopy(BitConverter.GetBytes((int)decoder.PixelHeight), 0, fingerprintBytes, 4, 4);
-            global::System.Buffer.BlockCopy(pixels, 0, fingerprintBytes, 8, pixels.Length);
-            return Convert.ToHexString(SHA256.HashData(fingerprintBytes));
+            var imported = await _clipboardImports.ImportAsync(force, ReadClipboardBitmapBytesAsync,
+                CreateDocumentFromClipboardAsync,
+                document => { PushUndoState(CaptureProjectState()); AddDocument(document, select: true); },
+                () => epoch == _projectEpoch && !_editorClosed && !_isApplyingProjectState);
+            if (imported > 0) StatusText.Text = SafetyText("ClipboardImported");
+            else if (force) StatusText.Text = SafetyText("ClipboardNoImage");
         }
-        catch
+        catch (Exception error)
         {
-            return Convert.ToHexString(SHA256.HashData(bytes));
+            AppDiagnostics.Record(error);
+            StatusText.Text = SafetyText("ClipboardFailed");
         }
+        finally { _isProcessingClipboard = false; }
     }
 
-    private async Task TryImportClipboardCaptureAsync()
-    {
-        try
-        {
-            if (!App.Preferences.AutoImportClipboard || !_clipboardWatcherPrimed || _isApplyingProjectState || _isCloseConfirmationOpen || _isProjectDialogOpen || _isSavingProject || _isOpeningProject)
-            {
-                return;
-            }
-
-            if (_isProcessingClipboard)
-            {
-                return;
-            }
-
-            _isProcessingClipboard = true;
-            var bytes = await ReadClipboardBitmapBytesAsync();
-
-            if (bytes is null || bytes.Length == 0)
-            {
-                return;
-            }
-
-            var fingerprint = await CreateClipboardFingerprintAsync(bytes);
-            if (string.Equals(fingerprint, _lastClipboardFingerprint, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            var imported = await CreateDocumentFromClipboardAsync(bytes);
-            PushUndoState(CaptureProjectState());
-            _lastClipboardFingerprint = fingerprint;
-            AddDocument(imported, select: true);
-            StatusText.Text = "Nouvelle capture importee.";
-        }
-        catch
-        {
-            StatusText.Text = "Impossible de lire la derniere capture depuis le presse-papiers.";
-        }
-        finally
-        {
-            _isProcessingClipboard = false;
-        }
-    }
+    private async void ImportClipboardMenuItem_Click(object sender, RoutedEventArgs e) => await TryImportClipboardCaptureAsync(force: true);
 }

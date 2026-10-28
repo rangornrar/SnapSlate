@@ -3,7 +3,7 @@
 ## Contrôles automatisés
 
 ```powershell
-dotnet test .\tests\SnapSlate.Tests.csproj -c Release -p:Platform=x64
+dotnet test .\tests\SnapSlate.Tests.csproj -c Release -p:Platform=x64 --filter "TestCategory!=Performance"
 ```
 
 Les sept tests initiaux couvrent : aller-retour JSON des coordonnées, champs géométriques inconnus imbriqués, types JSON invalides, échappement des contenus HTML, langue anglaise, notes multilignes et inclusion/exclusion des références d’images Markdown.
@@ -13,6 +13,10 @@ Le lot 1 porte la suite à 42 tests : sauvegarde atomique (y compris panne et ve
 Le projet de tests utilise les fichiers de production `ProjectJson`, `GuideTextExporter` et `GuideExportModels`, sans mocks de leur logique. Il n’exige ni capture d’écran ni démarrage de WinUI. La CI Windows compile séparément l’application entière puis lance les tests.
 
 Le lot 2 porte la suite à 61 tests : métadonnées globales et migration v1/v2, indépendance des brouillons, recadrage provisoire ignoré à l’export, conservation du recadrage appliqué, bornage des coordonnées, transparence et identité des PNG produits pour l’aperçu et le disque. Voir [validation du lot 2](LOT2_VALIDATION.md).
+
+Le lot 3 porte la suite à 83 tests : coordination du presse-papiers, déplacements, empreintes, parité FR/EN, confidentialité des sources, titres et langue DOCX/PDF, contrat HTTP Notion et Confluence Cloud v2 et erreurs 401/403/429 sans secrets. Un test de profilage séparé nécessite une image et un chemin de rapport explicites. Les tests HTTP utilisent un transport factice et ne publient aucune page réelle. Voir [validation du lot 3](LOT3_VALIDATION.md).
+
+La CI produit aussi le setup et l’archive portable, vérifie versions et contenu, puis effectue installation silencieuse, lancement et désinstallation sur Windows Server 2022. Ce test ne remplace pas une matrice Windows 10/11 ni le parcours interactif complet de l’installateur.
 
 ## Vérification manuelle avant une version distribuée
 

@@ -59,7 +59,6 @@ public sealed partial class MainWindow
         (EditingPreferences.Language == LanguageChoice.System &&
          CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.Equals("en", StringComparison.OrdinalIgnoreCase));
 
-    private string T(string french, string english) => UseEnglish ? english : french;
 
     private sealed record SettingsShortcutItem(string Key, string Description);
 
@@ -82,209 +81,214 @@ public sealed partial class MainWindow
 
     private void ApplyChromeLabels()
     {
-        SetMenuTitle(FileMenuBarItem, T("Fichier", "File"));
-        SetMenuTitle(EditMenuBarItem, T("Édition", "Edit"));
-        SetMenuTitle(ImageMenuBarItem, T("Image", "Image"));
-        SetMenuTitle(ExportMenuBarItem, T("Export", "Export"));
-        SetMenuTitle(HelpMenuBarItem, T("Aide", "Help"));
-        SetMenuTooltip(FileMenuBarItem, T("Ouvrir les actions de fichier", "Open file actions"));
-        SetMenuTooltip(EditMenuBarItem, T("Ouvrir les actions d’édition", "Open edit actions"));
-        SetMenuTooltip(ImageMenuBarItem, T("Ouvrir les actions image", "Open image actions"));
-        SetMenuTooltip(ExportMenuBarItem, T("Ouvrir les options d’export", "Open export options"));
-        SetMenuTooltip(HelpMenuBarItem, T("Ouvrir l’aide et les raccourcis", "Open help and shortcuts"));
+        LocalizedText.CurrentLanguage = UseEnglish ? "en-US" : "fr-FR";
+        RefreshAnnotationObjects();
+        ImportClipboardMenuItem.Text = SafetyText("ImportClipboard.Text");
+        ExportCancelButton.Content = SafetyText("ExportCancel.Content");
+        if (_currentDocument is not null) { CurrentToolText.Text = ToolbarCurrentToolText.Text = SafetyText(_toolLabels[_currentTool]); }
+        SetMenuTitle(FileMenuBarItem, SafetyText("UiFile"));
+        SetMenuTitle(EditMenuBarItem, SafetyText("UiEdit"));
+        SetMenuTitle(ImageMenuBarItem, SafetyText("UiImage"));
+        SetMenuTitle(ExportMenuBarItem, SafetyText("UiExport"));
+        SetMenuTitle(HelpMenuBarItem, SafetyText("UiHelp"));
+        SetMenuTooltip(FileMenuBarItem, SafetyText("UiOpenFileActions"));
+        SetMenuTooltip(EditMenuBarItem, SafetyText("UiOpenEditActions"));
+        SetMenuTooltip(ImageMenuBarItem, SafetyText("UiOpenImageActions"));
+        SetMenuTooltip(ExportMenuBarItem, SafetyText("UiOpenExportOptions"));
+        SetMenuTooltip(HelpMenuBarItem, SafetyText("UiOpenHelpAndShortcuts"));
 
-        SetMenuText(NewProjectMenuItem, T("Nouveau", "New"));
-        SetMenuText(OpenProjectMenuItem, T("Ouvrir", "Open"));
-        SetMenuText(SaveProjectMenuItem, T("Sauver", "Save"));
-        SetMenuText(UndoMenuItem, T("Annuler", "Undo"));
-        SetMenuText(RedoMenuItem, T("Refaire", "Redo"));
-        SetMenuText(ImportScreenshotMenuItem, T("Importer", "Import"));
+        SetMenuText(NewProjectMenuItem, SafetyText("UiNew"));
+        SetMenuText(OpenProjectMenuItem, SafetyText("UiOpen"));
+        SetMenuText(SaveProjectMenuItem, SafetyText("UiSave"));
+        SetMenuText(UndoMenuItem, SafetyText("UiUndo"));
+        SetMenuText(RedoMenuItem, SafetyText("UiRedo"));
+        SetMenuText(ImportScreenshotMenuItem, SafetyText("UiImport"));
         SetMenuText(OcrMenuItem, "OCR");
-        SetMenuText(ExportCurrentMenuItem, T("PNG de l’étape courante", "Current step PNG"));
-        SetMenuText(ExportAllFormatsMenuItem, T("Tout exporter", "Export all"));
+        SetMenuText(ExportCurrentMenuItem, SafetyText("UiCurrentStepPNG"));
+        SetMenuText(ExportAllFormatsMenuItem, SafetyText("UiExportAll"));
         SetMenuText(ExportMarkdownMenuItem, "Markdown");
         SetMenuText(ExportHtmlMenuItem, "HTML");
         SetMenuText(ExportPdfMenuItem, "PDF");
-        SetMenuText(ExportDocxMenuItem, T("Word", "Word"));
-        SetMenuText(PublishNotionMenuItem, T("Vers Notion", "To Notion"));
-        SetMenuText(PublishConfluenceMenuItem, T("Vers Confluence", "To Confluence"));
-        SetMenuText(PublishSharePointMenuItem, T("Vers SharePoint", "To SharePoint"));
-        SetMenuText(OpenHelpMenuItem, T("Aide rapide", "Quick help"));
-        SetMenuText(PrintScreenMenuItem, T("Impr écran", "Print Screen"));
-        SetMenuText(AltPrintScreenMenuItem, T("Alt + Impr écran", "Alt + Print Screen"));
-        SetMenuText(WinPrintScreenMenuItem, T("Win + Impr écran", "Win + Print Screen"));
-        SetMenuText(WinShiftSMenuItem, T("Win + Shift + S", "Win + Shift + S"));
-        SetMenuText(FnWinSpaceMenuItem, T("Fn + Win + Espace", "Fn + Win + Space"));
-        SetButtonContent(SettingsMenuButton, T("⚙ Réglages", "⚙ Settings"));
-        SetButtonTooltip(SettingsMenuButton, T("Ouvrir les réglages", "Open settings"));
-        SetButtonTooltip(AppMenuButton, T("Menu de l’application", "Application menu"));
-        SetButtonTooltip(DocumentTitleEditButton, T("Modifier le titre du document", "Edit the document title"));
-        SetButtonContent(InspectorToggleButton, T("◫", "◫"));
-        SetButtonTooltip(InspectorToggleButton, T("Afficher ou masquer l’inspecteur", "Show or hide the inspector"));
+        SetMenuText(ExportDocxMenuItem, SafetyText("UiWord"));
+        SetMenuText(PublishNotionMenuItem, SafetyText("UiToNotionTextOnly"));
+        SetMenuText(PublishConfluenceMenuItem, SafetyText("UiToConfluenceTextOnly"));
+        SetMenuText(PublishSharePointMenuItem, SafetyText("UiToSharePoint"));
+        SetMenuText(OpenHelpMenuItem, SafetyText("UiQuickHelp"));
+        SetMenuText(PrintScreenMenuItem, SafetyText("UiPrintScreen"));
+        SetMenuText(AltPrintScreenMenuItem, SafetyText("UiAltPrintScreen"));
+        SetMenuText(WinPrintScreenMenuItem, SafetyText("UiWinPrintScreen"));
+        SetMenuText(WinShiftSMenuItem, SafetyText("UiWinShiftS"));
+        SetMenuText(FnWinSpaceMenuItem, SafetyText("UiFnWinSpace"));
+        SetButtonContent(SettingsMenuButton, SafetyText("UiSettings"));
+        SetButtonTooltip(SettingsMenuButton, SafetyText("UiOpenSettings"));
+        SetButtonTooltip(AppMenuButton, SafetyText("UiApplicationMenu"));
+        SetButtonTooltip(DocumentTitleEditButton, SafetyText("UiEditTheDocumentTitle"));
+        SetButtonContent(InspectorToggleButton, SafetyText("UiText"));
+        SetButtonTooltip(InspectorToggleButton, SafetyText("UiShowOrHideTheInspector"));
 
-        SetText(SettingsGeneralNavText, T("Général", "General"));
-        SetText(SettingsCaptureNavText, T("Capture", "Capture"));
-        SetText(SettingsExportNavText, T("Export", "Export"));
-        SetText(SettingsPublicationNavText, T("Publication", "Publication"));
-        SetText(SettingsShortcutsNavText, T("Raccourcis", "Shortcuts"));
-        SetText(SettingsAboutNavText, T("À propos", "About"));
+        SetText(SettingsGeneralNavText, SafetyText("UiGeneral"));
+        SetText(SettingsCaptureNavText, SafetyText("UiCapture"));
+        SetText(SettingsExportNavText, SafetyText("UiExport"));
+        SetText(SettingsPublicationNavText, SafetyText("UiPublication"));
+        SetText(SettingsShortcutsNavText, SafetyText("UiShortcuts"));
+        SetText(SettingsAboutNavText, SafetyText("UiAbout"));
 
-        SetCommandButton(NewProjectButton, T("Nouveau", "New"), T("Nouveau projet", "New project"));
-        SetCommandButton(OpenProjectButton, T("Ouvrir", "Open"), T("Ouvrir un projet", "Open a project"));
-        SetCommandButton(SaveProjectButton, T("Sauver", "Save"), T("Sauvegarder le projet", "Save project"));
-        SetCommandButton(DemoProjectButton, T("Demo", "Demo"), T("Charger le modèle de démonstration", "Load the demo template"));
-        SetButtonContent(CaptureQuickImportButton, T("Importer", "Import"));
-        SetButtonContent(ImportScreenshotButton, T("Importer", "Import"));
-        SetCommandButton(OcrButton, T("OCR", "OCR"), T("Reconnaître le texte de la capture courante", "Recognize text from the current image"));
-        SetButtonContent(ExportCurrentButton, T("Exporter", "Export"));
-        SetCommandButton(UndoButton, T("Annuler", "Undo"), T("Annuler la dernière action", "Undo the last action"));
-        SetCommandButton(RedoButton, T("Rétablir", "Redo"), T("Rétablir la dernière action", "Redo the last action"));
-        SetButtonContent(CollapseStepsButton, T("Cacher étapes", "Hide steps"));
-        SetButtonContent(BrowseExportFolderButton, T("Parcourir", "Browse"));
-        SetButtonContent(BrowseSharePointFolderButton, T("Parcourir", "Browse"));
-        SetButtonContent(ZoomOutButton, T("−", "−"));
-        SetButtonContent(ZoomResetButton, T("100 %", "100 %"));
-        SetButtonContent(ZoomInButton, T("+", "+"));
+        SetCommandButton(NewProjectButton, SafetyText("UiNew"), SafetyText("UiNewProject"));
+        SetCommandButton(OpenProjectButton, SafetyText("UiOpen"), SafetyText("UiOpenAProject_207d0454"));
+        SetCommandButton(SaveProjectButton, SafetyText("UiSave"), SafetyText("UiSaveProject"));
+        SetCommandButton(DemoProjectButton, SafetyText("UiDemo"), SafetyText("UiLoadTheDemoTemplate_d853f526"));
+        SetButtonContent(CaptureQuickImportButton, SafetyText("UiImport"));
+        SetButtonContent(ImportScreenshotButton, SafetyText("UiImport"));
+        SetCommandButton(OcrButton, SafetyText("UiOCR"), SafetyText("UiRecognizeTextFromTheCurrentImage"));
+        SetButtonContent(ExportCurrentButton, SafetyText("UiExport_014c6f83"));
+        SetCommandButton(UndoButton, SafetyText("UiUndo"), SafetyText("UiUndoTheLastAction"));
+        SetCommandButton(RedoButton, SafetyText("UiRedo_2758230a"), SafetyText("UiRedoTheLastAction"));
+        SetButtonContent(CollapseStepsButton, SafetyText("UiHideSteps"));
+        SetButtonContent(BrowseExportFolderButton, SafetyText("UiBrowse"));
+        SetButtonContent(BrowseSharePointFolderButton, SafetyText("UiBrowse"));
+        SetButtonContent(ZoomOutButton, SafetyText("UiText_ffb392d1"));
+        SetButtonContent(ZoomResetButton, SafetyText("Ui100"));
+        SetButtonContent(ZoomInButton, SafetyText("UiText_e63541c0"));
         ZoomLevelText.Text = "100 %";
         SetButtonContent(ExportPngButton, "PNG");
-        SetButtonContent(ExportAllFormatsButton, T("Tout", "All"));
+        SetButtonContent(ExportAllFormatsButton, SafetyText("UiAll"));
         SetButtonContent(ExportMarkdownButton, "Markdown");
         SetButtonContent(ExportHtmlButton, "HTML");
         SetButtonContent(ExportPdfButton, "PDF");
-        SetButtonContent(ExportDocxButton, T("Word", "Word"));
-        SetCommandButton(ApplyCropButton, T("Appliquer", "Apply"), T("Appliquer le crop", "Apply crop"));
-        SetCommandButton(ResetCropButton, T("Réinitialiser", "Reset"), T("Réinitialiser le crop", "Reset crop"));
-        SetCommandButton(ClearAnnotationsButton, T("Effacer tout", "Clear all"), T("Effacer toutes les annotations", "Clear all annotations"));
-        SetCommandButton(DuplicateSelectedButton, T("Dupliquer", "Duplicate"), T("Dupliquer l’objet sélectionné", "Duplicate selected object"));
-        SetCommandButton(DeleteSelectedButton, T("Supprimer", "Delete"), T("Supprimer l’objet sélectionné", "Delete selected object"));
-        SetCommandButton(BringForwardButton, T("Devant", "Front"), T("Envoyer l’objet devant", "Bring the object to front"));
-        SetCommandButton(SendBackwardButton, T("Derrière", "Back"), T("Envoyer l’objet derrière", "Send the object to back"));
-        SetCommandButton(AddLegendButton, T("+ Légende", "+ Legend"), T("Ajouter une légende", "Add a legend"));
-        SetCommandButton(PublishNotionButton, T("Publier vers Notion", "Publish to Notion"), T("Publier le document courant vers Notion", "Publish the current guide to Notion"));
-        SetCommandButton(PublishConfluenceButton, T("Publier vers Confluence", "Publish to Confluence"), T("Publier le document courant vers Confluence", "Publish the current guide to Confluence"));
-        SetCommandButton(PublishSharePointButton, T("Publier vers SharePoint", "Publish to SharePoint"), T("Copier le package vers le dossier synchronisé", "Copy the package to the synchronized folder"));
-        SetButtonContent(AddStepButton, T("Ajouter", "Add"));
-        SetButtonContent(CollapseStepsButton, T("‹", "‹"));
-        SetButtonTooltip(CollapseStepsButton, T("Masquer les étapes", "Hide the steps"));
+        SetButtonContent(ExportDocxButton, SafetyText("UiWord"));
+        SetCommandButton(ApplyCropButton, SafetyText("UiApply"), SafetyText("UiApplyCrop"));
+        SetCommandButton(ResetCropButton, SafetyText("UiReset"), SafetyText("UiResetCrop"));
+        SetCommandButton(ClearAnnotationsButton, SafetyText("UiClearAll"), SafetyText("UiClearAllAnnotations"));
+        SetCommandButton(DuplicateSelectedButton, SafetyText("UiDuplicate"), SafetyText("UiDuplicateSelectedObject"));
+        SetCommandButton(DeleteSelectedButton, SafetyText("UiDelete"), SafetyText("UiDeleteSelectedObject"));
+        SetCommandButton(BringForwardButton, SafetyText("UiFront"), SafetyText("UiBringTheObjectToFront"));
+        SetCommandButton(SendBackwardButton, SafetyText("UiBack"), SafetyText("UiSendTheObjectToBack"));
+        SetCommandButton(AddLegendButton, SafetyText("UiLegend"), SafetyText("UiAddALegend"));
+        SetCommandButton(PublishNotionButton, SafetyText("UiPublishTextToNotion"), SafetyText("PublicationTextOnlyNotice"));
+        SetCommandButton(PublishConfluenceButton, SafetyText("UiPublishTextToConfluenceCloud"), SafetyText("PublicationTextOnlyNotice"));
+        SetCommandButton(PublishSharePointButton, SafetyText("UiPublishToSharePoint"), SafetyText("UiCopyThePackageToTheSynchronizedFolder"));
+        SetButtonContent(AddStepButton, SafetyText("UiAdd"));
+        SetButtonContent(CollapseStepsButton, SafetyText("UiText_7c12212b"));
+        SetButtonTooltip(CollapseStepsButton, SafetyText("UiHideTheSteps"));
 
-        SetCommandButton(ToolbarZoomOutButton, T("−", "−"), T("Rétrécir la vue", "Zoom out"));
-        SetCommandButton(ToolbarZoomResetButton, T("100 %", "100 %"), T("Remettre à 100 %", "Reset to 100%"));
-        SetCommandButton(ToolbarZoomInButton, T("+", "+"), T("Agrandir la vue", "Zoom in"));
-        SetCommandButton(ToolbarFitButton, T("Ajuster", "Fit"), T("Ajuster la vue", "Fit to view"));
-        SetCommandButton(ToolbarStepsButton, T("Étapes", "Steps"), T("Afficher ou masquer les étapes", "Show or hide the steps pane"));
+        SetCommandButton(ToolbarZoomOutButton, SafetyText("UiText_ffb392d1"), SafetyText("UiZoomOut"));
+        SetCommandButton(ToolbarZoomResetButton, SafetyText("Ui100"), SafetyText("UiResetTo100"));
+        SetCommandButton(ToolbarZoomInButton, SafetyText("UiText_e63541c0"), SafetyText("UiZoomIn"));
+        SetCommandButton(ToolbarFitButton, SafetyText("UiFit"), SafetyText("UiFitToView"));
+        SetCommandButton(ToolbarStepsButton, SafetyText("UiSteps"), SafetyText("UiShowOrHideTheStepsPane"));
 
-        SetToolButton(ToolbarSelectButton, EditorTool.Select, T("Sélection", "Select"));
-        SetToolButton(ToolbarCropButton, EditorTool.Crop, T("Recadrer la capture", "Crop the capture"));
-        SetOcrButton(ToolbarOcrButton, T("OCR", "OCR"));
-        SetToolButton(ToolbarTextButton, EditorTool.Text, T("Texte", "Text"));
-        SetToolButton(ToolbarStickerButton, EditorTool.Sticker, T("Gommette", "Sticker"));
-        SetToolButton(ToolbarArrowStraightButton, EditorTool.ArrowStraight, T("Flèche droite", "Straight arrow"));
-        SetToolButton(ToolbarArrowCurvedButton, EditorTool.ArrowCurved, T("Flèche courbe", "Curved arrow"));
-        SetToolButton(ToolbarRectangleButton, EditorTool.Rectangle, T("Rectangle", "Rectangle"));
-        SetToolButton(ToolbarEllipseButton, EditorTool.Ellipse, T("Ovale", "Ellipse"));
-        SetToolButton(ToolbarFocusButton, EditorTool.Focus, T("Focus", "Focus"));
-        SetToolButton(ToolbarMaskButton, EditorTool.Mask, T("Masquage", "Mask"));
+        SetToolButton(ToolbarSelectButton, EditorTool.Select, SafetyText("UiSelect"));
+        SetToolButton(ToolbarCropButton, EditorTool.Crop, SafetyText("UiCropTheCapture"));
+        SetOcrButton(ToolbarOcrButton, SafetyText("UiOCR"));
+        SetToolButton(ToolbarTextButton, EditorTool.Text, SafetyText("UiText_0420e350"));
+        SetToolButton(ToolbarStickerButton, EditorTool.Sticker, SafetyText("UiSticker"));
+        SetToolButton(ToolbarArrowStraightButton, EditorTool.ArrowStraight, SafetyText("UiStraightArrow"));
+        SetToolButton(ToolbarArrowCurvedButton, EditorTool.ArrowCurved, SafetyText("UiCurvedArrow"));
+        SetToolButton(ToolbarRectangleButton, EditorTool.Rectangle, SafetyText("UiRectangle"));
+        SetToolButton(ToolbarEllipseButton, EditorTool.Ellipse, SafetyText("UiEllipse"));
+        SetToolButton(ToolbarFocusButton, EditorTool.Focus, SafetyText("UiFocus"));
+        SetToolButton(ToolbarMaskButton, EditorTool.Mask, SafetyText("UiMask"));
         SetButtonTooltip(ToolbarMaskButton, SafetyText("MaskHelp"));
-        SetToolButton(ToolbarToolPickerButton, _currentTool, T("Choisir un outil", "Choose a tool"));
+        SetToolButton(ToolbarToolPickerButton, _currentTool, SafetyText("UiChooseATool"));
 
-        SetText(CapturePageTitleText, T("Aide", "Help"));
-        SetText(CapturePageSummaryText, T("Raccourcis de capture Windows et raccourcis SnapSlate utiles.", "Windows capture shortcuts and useful SnapSlate shortcuts."));
-        SetText(CaptureHowTitleText, T("Comment ça marche", "How it works"));
-        SetText(CaptureHowBodyText, T("Impr écran, Alt + Impr écran, Win + Impr écran, Win + Shift + S ou Fn + Win + Espace : toutes les façons courantes de capturer avant import.", "Print Screen, Alt + Print Screen, Win + Print Screen, Win + Shift + S, or Fn + Win + Space: the common ways to capture before import."));
-        SetText(CaptureStepOneTitleText, T("Impr écran", "Print Screen"));
-        SetText(CaptureStepOneBodyText, T("Copie l’écran entier dans le presse-papiers.", "Copies the whole screen to the clipboard."));
-        SetText(CaptureStepTwoTitleText, T("Alt + Impr écran", "Alt + Print Screen"));
-        SetText(CaptureStepTwoBodyText, T("Copie uniquement la fenêtre active.", "Copies only the active window."));
-        SetText(CaptureStepThreeTitleText, T("Win + Impr écran", "Win + Print Screen"));
-        SetText(CaptureStepThreeBodyText, T("Sauvegarde la capture dans Images > Captures d’écran.", "Saves the capture to Pictures > Screenshots."));
-        SetText(CaptureShortcutsTitleText, T("Raccourcis de capture", "Capture shortcuts"));
-        SetText(CaptureShortcutOneText, T("Win + Shift + S : outil Capture d’écran avec modes forme libre, rectangle, fenêtre et plein écran.", "Win + Shift + S: Snipping Tool with freeform, rectangle, window, and full-screen modes."));
-        SetText(CaptureShortcutTwoText, T("Fn + Win + Espace : utile sur les claviers sans touche Impr écran.", "Fn + Win + Space: useful on keyboards without a Print Screen key."));
-        SetText(CaptureShortcutThreeText, T("PrtScn, Alt + PrtScn et Win + PrtScn fonctionnent selon le matériel.", "PrtScn, Alt + PrtScn, and Win + PrtScn work depending on the hardware."));
-        SetText(CaptureShortcutFourText, T("Les captures importées peuvent aussi arriver automatiquement depuis le presse-papiers.", "Imported screenshots can also arrive automatically from the clipboard."));
-        SetText(CaptureShortcutFiveText, T("Ctrl + O : importer un fichier image.", "Ctrl + O: import an image file."));
-        SetText(HelpShortcutsTitleText, T("Raccourcis utiles", "Useful shortcuts"));
-        SetText(CaptureStatusTitleText, T("État", "Status"));
-        SetText(CaptureStatusBodyText, T("L’import automatique fonctionne tant que SnapSlate est ouvert.", "Automatic import works while SnapSlate is open."));
-        SetText(ProcedureTitleLabelText, T("Document", "Document"));
-        SetText(ToolbarDocumentLabelText, T("Document", "Document"));
-        SetText(CurrentToolLabelText, T("Outil", "Tool"));
-        SetText(ToolbarCurrentToolLabelText, T("Outil :", "Tool:"));
-        SetText(StepsPaneHintText, T("Glissez pour réordonner les étapes.", "Drag to reorder the steps."));
-        SetText(PaletteSectionTitleText, T("Palette", "Palette"));
-        SetText(ToolbarPaletteLabelText, T("Palette", "Palette"));
-        SetText(ShadeSectionTitleText, T("Nuances", "Shades"));
-        SetText(ToolbarOpacityLabelText, T("Opacité", "Opacity"));
+        SetText(CapturePageTitleText, SafetyText("UiHelp"));
+        SetText(CapturePageSummaryText, SafetyText("UiWindowsCaptureShortcutsAndUsefulSnapSlateShortcuts"));
+        SetText(CaptureHowTitleText, SafetyText("UiHowItWorks"));
+        SetText(CaptureHowBodyText, SafetyText("UiPrintScreenAltPrintScreenWinPrint"));
+        SetText(CaptureStepOneTitleText, SafetyText("UiPrintScreen"));
+        SetText(CaptureStepOneBodyText, SafetyText("UiCopiesTheWholeScreenToTheClipboard"));
+        SetText(CaptureStepTwoTitleText, SafetyText("UiAltPrintScreen"));
+        SetText(CaptureStepTwoBodyText, SafetyText("UiCopiesOnlyTheActiveWindow"));
+        SetText(CaptureStepThreeTitleText, SafetyText("UiWinPrintScreen"));
+        SetText(CaptureStepThreeBodyText, SafetyText("UiSavesTheCaptureToPicturesScreenshots"));
+        SetText(CaptureShortcutsTitleText, SafetyText("UiCaptureShortcuts"));
+        SetText(CaptureShortcutOneText, SafetyText("UiWinShiftSSnippingToolWithFreeform"));
+        SetText(CaptureShortcutTwoText, SafetyText("UiFnWinSpaceUsefulOnKeyboardsWithout"));
+        SetText(CaptureShortcutThreeText, SafetyText("UiPrtScnAltPrtScnAndWinPrtScnWork"));
+        SetText(CaptureShortcutFourText, SafetyText("UiImportedScreenshotsCanAlsoArriveAutomaticallyFrom"));
+        SetText(CaptureShortcutFiveText, SafetyText("UiCtrlOImportAnImageFile"));
+        SetText(HelpShortcutsTitleText, SafetyText("UiUsefulShortcuts"));
+        SetText(CaptureStatusTitleText, SafetyText("UiStatus"));
+        SetText(CaptureStatusBodyText, SafetyText("UiAutomaticImportWorksWhileSnapSlateIsOpen"));
+        SetText(ProcedureTitleLabelText, SafetyText("UiDocument"));
+        SetText(ToolbarDocumentLabelText, SafetyText("UiDocument"));
+        SetText(CurrentToolLabelText, SafetyText("UiTool"));
+        SetText(ToolbarCurrentToolLabelText, SafetyText("UiTool_9ad395ff"));
+        SetText(StepsPaneHintText, SafetyText("UiDragToReorderTheSteps"));
+        SetText(PaletteSectionTitleText, SafetyText("UiPalette"));
+        SetText(ToolbarPaletteLabelText, SafetyText("UiPalette"));
+        SetText(ShadeSectionTitleText, SafetyText("UiShades"));
+        SetText(ToolbarOpacityLabelText, SafetyText("UiOpacity"));
         SetText(ToolbarOpacityValueText, "100 %");
-        SetText(StepsPaneTitleText, T("Étapes", "Steps"));
-        SetText(StepDetailsSubtitleText, T("Titre et note de l’étape", "Step title and note"));
-        SetText(SelectedColorLabelText, T("Couleur", "Color"));
+        SetText(StepsPaneTitleText, SafetyText("UiSteps"));
+        SetText(StepDetailsSubtitleText, SafetyText("UiStepTitleAndNote"));
+        SetText(SelectedColorLabelText, SafetyText("UiColor"));
         CanvasSummaryTitleText.Visibility = Visibility.Collapsed;
         CanvasSummaryText.Visibility = Visibility.Collapsed;
         CanvasFileLabelText.Visibility = Visibility.Collapsed;
         CanvasFileNameText.Visibility = Visibility.Collapsed;
-        SetText(CanvasPreviewLabelText, T("Aperçu", "Preview"));
-        SetText(StepDetailsTitleText, T("Détails de l’étape", "Step details"));
-        SetText(StepTitleLabelText, T("Titre de l’étape", "Step title"));
-        SetText(StepNoteLabelText, T("Note de l’étape", "Step note"));
-        SetText(TemplateTypeLabelText, T("Type de document", "Document type"));
-        SetText(AudienceLabelText, T("Public visé", "Audience"));
-        SetText(AuthorLabelText, T("Auteur", "Author"));
-        SetText(DocumentVersionLabelText, T("Version", "Version"));
-        SetText(AnnotationPanelTitleText, T("Objet sélectionné", "Selected object"));
-        SetText(StickerValueLabelText, T("Valeur de la gommette", "Sticker value"));
-        SetText(StickerLegendLabelText, T("Légende de la gommette", "Sticker legend"));
-        SetText(AnnotationTextLabelText, T("Texte", "Text"));
-        SetText(StickerModeLabelText, T("Format de la gommette", "Sticker format"));
-        SetText(StrokeThicknessLabelText, T("Épaisseur", "Thickness"));
-        SetText(SelectedOpacityLabelText, T("Opacité", "Opacity"));
-        SetText(LegendTitleText, T("Légendes des gommettes", "Sticker legends"));
-        SetText(ExportPageTitleText, T("Export", "Export"));
-        SetText(ExportPageSummaryText, T("PNG pour l’étape courante. Les autres boutons exportent le document au format choisi, ou en lot avec Tout.", "PNG for the current step. The other buttons export the document in the chosen format, or in a batch with All."));
-        SetText(ExportTemplateLabelText, T("Type de document", "Document type"));
-        SetText(ExportFormatLabelText, T("Format principal", "Main format"));
-        SetText(ExportAudienceLabelText, T("Public", "Audience"));
-        SetText(ExportAuthorLabelText, T("Auteur", "Author"));
-        SetText(ExportVersionLabelText, T("Version", "Version"));
-        SetText(ExportFolderLabelText, T("Dossier d’export", "Export folder"));
-        SetText(ExportTemplateValueText, T("Type actuel : Manuel utilisateur", "Current type: User manual"));
-        SetText(ExportPreviewTitleText, T("Résumé", "Summary"));
-        SetText(ExportPreviewSummaryText, T("Tout génère Markdown, HTML, PDF et DOCX dans le même dossier que les images.", "All generates Markdown, HTML, PDF and DOCX in the same folder as the images."));
-        SetText(PublishPageTitleText, T("Publication", "Publish"));
-        SetText(PublishPageSummaryText, T("OCR depuis la barre d’outils, puis publication vers Notion, Confluence ou un dossier SharePoint synchronisé.", "Use OCR from the toolbar, then publish to Notion, Confluence, or a synchronized SharePoint folder."));
-        SetText(OcrSectionTitleText, T("OCR", "OCR"));
-        SetText(OcrSectionHelpText, T("Le texte reconnu est ajouté comme annotation texte sur la capture courante.", "Recognized text is inserted as a text annotation on the current capture."));
-        SetText(NotionSectionTitleText, T("Notion", "Notion"));
-        SetText(NotionSectionHelpText, T("Partagez la page parente avec votre intégration Notion, puis saisissez l’ID de la page parente et le jeton API.", "Share the parent page with your Notion integration, then enter the parent page ID and API token."));
-        SetText(NotionParentPageLabelText, T("ID de page parente", "Parent page ID"));
-        SetText(NotionTokenLabelText, T("Jeton API Notion", "Notion API token"));
-        SetText(ConfluenceSectionTitleText, T("Confluence", "Confluence"));
-        SetText(ConfluenceSectionHelpText, T("Créez une page dans un espace Confluence Cloud avec l’URL du site, la clé d’espace, l’e-mail et le jeton API.", "Create a page in a Confluence Cloud space using the site URL, space key, email, and API token."));
-        SetText(ConfluenceBaseUrlLabelText, T("URL du site", "Site URL"));
-        SetText(ConfluenceSpaceKeyLabelText, T("Clé d’espace", "Space key"));
-        SetText(ConfluenceParentPageLabelText, T("ID de page parente (optionnel)", "Parent page ID (optional)"));
-        SetText(ConfluenceEmailLabelText, T("E-mail du compte", "Account email"));
-        SetText(ConfluenceTokenLabelText, T("Jeton API Confluence", "Confluence API token"));
-        SetText(SharePointSectionTitleText, T("SharePoint", "SharePoint"));
-        SetText(SharePointSectionHelpText, T("Copiez le package d’export dans un dossier synchronisé avec SharePoint ou OneDrive.", "Copy the export package into a folder synchronized with SharePoint or OneDrive."));
-        SetText(SharePointFolderLabelText, T("Dossier SharePoint synchronisé", "Synchronized SharePoint folder"));
-        SetText(SettingsPageTitleText, T("Général", "General"));
-        SetText(AppearanceSettingsTitleText, T("Apparence", "Appearance"));
-        SetText(LanguageSettingsTitleText, T("Langue", "Language"));
-        SetText(CaptureSettingsTitleText, T("Capture", "Capture"));
-        SetText(ThemeSettingLabelText, T("Thème", "Theme"));
-        SetText(LanguageSettingLabelText, T("Langue de l’application", "App language"));
-        SetText(CaptureSettingLabelText, T("Import automatique", "Automatic import"));
-        SetText(ThemeSettingHelpText, T("Le mode Système suit le thème Windows automatiquement.", "System follows Windows automatically."));
-        SetText(LanguageSettingHelpText, T("Par défaut, SnapSlate suit la langue de Windows.", "By default, SnapSlate follows the Windows language."));
-        SetText(CaptureSettingHelpText, T("Active l’import automatique des captures copiées dans le presse-papiers.", "Enables automatic import of captures copied to the clipboard."));
-        SetText(SettingsRestartHintText, T("Le thème et la langue s’appliquent immédiatement, sans redémarrage.", "Theme and language apply immediately without restarting."));
-        SetText(SettingsAboutTitleText, T("À propos", "About"));
-        SetText(SettingsAboutBodyText, T("SnapSlate accélère la création de procédures visuelles avec captures, annotations, export et publication.", "SnapSlate accelerates visual procedure creation with captures, annotations, export, and publishing."));
-        SetButtonContent(SettingsCancelButton, T("Annuler", "Cancel"));
-        SetButtonContent(SettingsSaveButton, T("Enregistrer", "Save"));
-        SetText(SettingsTipTitleText, T("Conseil SnapSlate", "SnapSlate tip"));
-        SetText(SettingsTipBodyText, T("Les raccourcis utiles sont regroupés dans Aide pour rester visibles sans encombrer les réglages.", "Useful shortcuts are grouped in Help so they stay visible without crowding Settings."));
+        SetText(CanvasPreviewLabelText, SafetyText("UiPreview"));
+        SetText(StepDetailsTitleText, SafetyText("UiStepDetails"));
+        SetText(StepTitleLabelText, SafetyText("UiStepTitle"));
+        SetText(StepNoteLabelText, SafetyText("UiStepNote"));
+        SetText(TemplateTypeLabelText, SafetyText("UiDocumentType"));
+        SetText(AudienceLabelText, SafetyText("UiAudience"));
+        SetText(AuthorLabelText, SafetyText("UiAuthor"));
+        SetText(DocumentVersionLabelText, SafetyText("UiVersion"));
+        SetText(AnnotationPanelTitleText, SafetyText("UiSelectedObject"));
+        SetText(StickerValueLabelText, SafetyText("UiStickerValue"));
+        SetText(StickerLegendLabelText, SafetyText("UiStickerLegend"));
+        SetText(AnnotationTextLabelText, SafetyText("UiText_0420e350"));
+        SetText(StickerModeLabelText, SafetyText("UiStickerFormat"));
+        SetText(StrokeThicknessLabelText, SafetyText("UiThickness"));
+        SetText(SelectedOpacityLabelText, SafetyText("UiOpacity"));
+        SetText(LegendTitleText, SafetyText("UiStickerLegends"));
+        SetText(ExportPageTitleText, SafetyText("UiExport"));
+        SetText(ExportPageSummaryText, SafetyText("UiPNGForTheCurrentStepTheOther"));
+        SetText(ExportTemplateLabelText, SafetyText("UiDocumentType"));
+        SetText(ExportFormatLabelText, SafetyText("UiMainFormat"));
+        SetText(ExportAudienceLabelText, SafetyText("UiAudience_4bfa6ed2"));
+        SetText(ExportAuthorLabelText, SafetyText("UiAuthor"));
+        SetText(ExportVersionLabelText, SafetyText("UiVersion"));
+        SetText(ExportFolderLabelText, SafetyText("UiExportFolder"));
+        SetText(ExportTemplateValueText, SafetyText("UiCurrentTypeUserManual"));
+        SetText(ExportPreviewTitleText, SafetyText("UiSummary"));
+        SetText(ExportPreviewSummaryText, SafetyText("UiAllGeneratesMarkdownHTMLPDFAndDOCX"));
+        SetText(PublishPageTitleText, SafetyText("UiPublish"));
+        SetText(PublishPageSummaryText, SafetyText("PublicationModes"));
+        SetText(OcrSectionTitleText, SafetyText("UiOCR"));
+        SetText(OcrSectionHelpText, SafetyText("UiRecognizedTextIsInsertedAsAText"));
+        SetText(NotionSectionTitleText, SafetyText("UiNotion"));
+        SetText(NotionSectionHelpText, SafetyText("UiShareTheParentPageWithYourNotion"));
+        SetText(NotionParentPageLabelText, SafetyText("UiParentPageID"));
+        SetText(NotionTokenLabelText, SafetyText("UiNotionAPIToken"));
+        SetText(ConfluenceSectionTitleText, SafetyText("UiConfluence"));
+        SetText(ConfluenceSectionHelpText, SafetyText("UiCreateAPageInAConfluenceCloud"));
+        SetText(ConfluenceBaseUrlLabelText, SafetyText("UiSiteURL"));
+        SetText(ConfluenceSpaceKeyLabelText, SafetyText("UiSpaceKey"));
+        SetText(ConfluenceParentPageLabelText, SafetyText("UiParentPageIDOptional"));
+        SetText(ConfluenceEmailLabelText, SafetyText("UiAccountEmail"));
+        SetText(ConfluenceTokenLabelText, SafetyText("UiConfluenceAPIToken"));
+        SetText(SharePointSectionTitleText, SafetyText("UiSharePoint"));
+        SetText(SharePointSectionHelpText, SafetyText("UiCopyTheExportPackageIntoAFolder"));
+        SetText(SharePointFolderLabelText, SafetyText("UiSynchronizedSharePointFolder"));
+        SetText(SettingsPageTitleText, SafetyText("UiGeneral"));
+        SetText(AppearanceSettingsTitleText, SafetyText("UiAppearance"));
+        SetText(LanguageSettingsTitleText, SafetyText("UiLanguage"));
+        SetText(CaptureSettingsTitleText, SafetyText("UiCapture"));
+        SetText(ThemeSettingLabelText, SafetyText("UiTheme"));
+        SetText(LanguageSettingLabelText, SafetyText("UiAppLanguage"));
+        SetText(CaptureSettingLabelText, SafetyText("UiAutomaticImport"));
+        SetText(ThemeSettingHelpText, SafetyText("UiSystemFollowsWindowsAutomatically"));
+        SetText(LanguageSettingHelpText, SafetyText("UiByDefaultSnapSlateFollowsTheWindowsLanguage"));
+        SetText(CaptureSettingHelpText, SafetyText("UiEnablesAutomaticImportOfCapturesCopiedTo"));
+        SetText(SettingsRestartHintText, SafetyText("UiThemeAndLanguageApplyImmediatelyWithoutRestarting"));
+        SetText(SettingsAboutTitleText, SafetyText("UiAbout"));
+        SetText(SettingsAboutBodyText, SafetyText("UiSnapSlateAcceleratesVisualProcedureCreationWithCaptures"));
+        SetButtonContent(SettingsCancelButton, SafetyText("UiCancel"));
+        SetButtonContent(SettingsSaveButton, SafetyText("UiSave_63e08f48"));
+        SetText(SettingsTipTitleText, SafetyText("UiSnapSlateTip"));
+        SetText(SettingsTipBodyText, SafetyText("UiUsefulShortcutsAreGroupedInHelpSo"));
         AutoImportClipboardToggleSwitch.OnContent = string.Empty;
         AutoImportClipboardToggleSwitch.OffContent = string.Empty;
     }
@@ -293,22 +297,23 @@ public sealed partial class MainWindow
     {
         ExportStepsListView.ItemsSource = new[]
         {
-            T("PNG de l’étape courante", "Current step PNG"),
-            T("Markdown + images", "Markdown + images"),
-            T("HTML + images", "HTML + images"),
-            T("PDF du document", "Document PDF"),
-            T("Word / DOCX", "Word / DOCX")
+            SafetyText("UiCurrentStepPNG"),
+            SafetyText("UiMarkdownImages"),
+            SafetyText("UiHTMLImages"),
+            SafetyText("UiDocumentPDF"),
+            SafetyText("UiWordDOCX")
         };
         HelpShortcutsListView.ItemsSource = new[]
         {
-            new SettingsShortcutItem("Ctrl + Z", T("Annuler la dernière action", "Undo the last action")),
-            new SettingsShortcutItem("Ctrl + Y", T("Rétablir la dernière action", "Redo the last action")),
-            new SettingsShortcutItem("Ctrl + S", T("Sauvegarder le projet", "Save the project")),
-            new SettingsShortcutItem("Ctrl + O", T("Ouvrir un projet", "Open a project")),
-            new SettingsShortcutItem("Ctrl + N", T("Nouveau projet", "New project")),
-            new SettingsShortcutItem("Ctrl + Shift + N", T("Modèle de démonstration", "Demo template")),
-            new SettingsShortcutItem("Win + Shift + S", T("Importer la capture active", "Import the current capture")),
-            new SettingsShortcutItem("Suppr", T("Supprimer l’objet sélectionné", "Delete the selected object"))
+            new SettingsShortcutItem("Ctrl + Z", SafetyText("UiUndoTheLastAction")),
+            new SettingsShortcutItem("Ctrl + Y", SafetyText("UiRedoTheLastAction")),
+            new SettingsShortcutItem("Ctrl + S", SafetyText("UiSaveTheProject")),
+            new SettingsShortcutItem("Ctrl + O", SafetyText("UiOpenAProject_207d0454")),
+            new SettingsShortcutItem("Ctrl + N", SafetyText("UiNewProject")),
+            new SettingsShortcutItem("Ctrl + Shift + N", SafetyText("UiDemoTemplate")),
+            new SettingsShortcutItem("Win + Shift + S", SafetyText("CaptureShortcutHelp")),
+            new SettingsShortcutItem("Ctrl + Shift + V", SafetyText("ImportClipboard.Text")),
+            new SettingsShortcutItem("Suppr", SafetyText("UiDeleteTheSelectedObject"))
         };
     }
 
@@ -316,9 +321,9 @@ public sealed partial class MainWindow
     {
         return theme switch
         {
-            ThemeChoice.Light => T("Clair", "Light"),
-            ThemeChoice.Dark => T("Sombre", "Dark"),
-            _ => T("Système", "System")
+            ThemeChoice.Light => SafetyText("UiLight"),
+            ThemeChoice.Dark => SafetyText("UiDark"),
+            _ => SafetyText("UiSystem")
         };
     }
 
@@ -326,9 +331,9 @@ public sealed partial class MainWindow
     {
         return language switch
         {
-            LanguageChoice.French => T("Français", "French"),
-            LanguageChoice.English => T("English", "English"),
-            _ => T("Suivre Windows", "Follow Windows")
+            LanguageChoice.French => SafetyText("UiFrench"),
+            LanguageChoice.English => SafetyText("UiEnglish"),
+            _ => SafetyText("UiFollowWindows")
         };
     }
 
@@ -339,7 +344,7 @@ public sealed partial class MainWindow
             ExportFormatChoice.Html => "HTML",
             ExportFormatChoice.Markdown => "Markdown",
             ExportFormatChoice.Pdf => "PDF",
-            ExportFormatChoice.Docx => T("Word", "Word"),
+            ExportFormatChoice.Docx => SafetyText("UiWord"),
             _ => "PNG"
         };
     }
@@ -353,11 +358,11 @@ public sealed partial class MainWindow
     {
         return type switch
         {
-            GuideTemplateType.UserManual => T("Manuel utilisateur", "User manual"),
-            GuideTemplateType.InternalProcedure => T("Procédure interne", "Internal procedure"),
-            GuideTemplateType.SupportPlaybook => T("Support client", "Support playbook"),
-            GuideTemplateType.ReleaseNotes => T("Notes de version", "Release notes"),
-            _ => T("Manuel utilisateur", "User manual")
+            GuideTemplateType.UserManual => SafetyText("UiUserManual"),
+            GuideTemplateType.InternalProcedure => SafetyText("UiInternalProcedure"),
+            GuideTemplateType.SupportPlaybook => SafetyText("UiSupportPlaybook"),
+            GuideTemplateType.ReleaseNotes => SafetyText("UiReleaseNotes"),
+            _ => SafetyText("UiUserManual")
         };
     }
 
@@ -371,47 +376,47 @@ public sealed partial class MainWindow
         var templateType = EditingMetadata.TemplateType;
         ExportTemplateValueText.Text = string.Format(
             CultureInfo.CurrentCulture,
-            T("Type actuel : {0}", "Current type: {0}"),
+            SafetyText("UiCurrentType0"),
             GetTemplateDisplayName(templateType));
     }
 
     private void ConfigureComboBoxes()
     {
         PopulateComboBox(ThemeComboBox,
-            (T("Système", "System"), ThemeChoice.System),
-            (T("Clair", "Light"), ThemeChoice.Light),
-            (T("Sombre", "Dark"), ThemeChoice.Dark));
+            (SafetyText("UiSystem"), ThemeChoice.System),
+            (SafetyText("UiLight"), ThemeChoice.Light),
+            (SafetyText("UiDark"), ThemeChoice.Dark));
 
         PopulateComboBox(LanguageComboBox,
-            (T("Suivre Windows", "Follow Windows"), LanguageChoice.System),
-            (T("Français", "French"), LanguageChoice.French),
-            (T("English", "English"), LanguageChoice.English));
+            (SafetyText("UiFollowWindows"), LanguageChoice.System),
+            (SafetyText("UiFrench"), LanguageChoice.French),
+            (SafetyText("UiEnglish"), LanguageChoice.English));
 
         PopulateComboBox(ExportFormatComboBox,
             ("PNG", ExportFormatChoice.Png),
             ("Markdown", ExportFormatChoice.Markdown),
             ("HTML", ExportFormatChoice.Html),
             ("PDF", ExportFormatChoice.Pdf),
-            (T("Word", "Word"), ExportFormatChoice.Docx));
+            (SafetyText("UiWord"), ExportFormatChoice.Docx));
 
         PopulateComboBox(TemplateTypeComboBox,
-            (T("Manuel utilisateur", "User manual"), GuideTemplateType.UserManual),
-            (T("Procédure interne", "Internal procedure"), GuideTemplateType.InternalProcedure),
-            (T("Support client", "Support playbook"), GuideTemplateType.SupportPlaybook),
-            (T("Notes de version", "Release notes"), GuideTemplateType.ReleaseNotes));
+            (SafetyText("UiUserManual"), GuideTemplateType.UserManual),
+            (SafetyText("UiInternalProcedure"), GuideTemplateType.InternalProcedure),
+            (SafetyText("UiSupportPlaybook"), GuideTemplateType.SupportPlaybook),
+            (SafetyText("UiReleaseNotes"), GuideTemplateType.ReleaseNotes));
 
         PopulateComboBox(ExportTemplateComboBox,
-            (T("Manuel utilisateur", "User manual"), GuideTemplateType.UserManual),
-            (T("Procédure interne", "Internal procedure"), GuideTemplateType.InternalProcedure),
-            (T("Support client", "Support playbook"), GuideTemplateType.SupportPlaybook),
-            (T("Notes de version", "Release notes"), GuideTemplateType.ReleaseNotes));
+            (SafetyText("UiUserManual"), GuideTemplateType.UserManual),
+            (SafetyText("UiInternalProcedure"), GuideTemplateType.InternalProcedure),
+            (SafetyText("UiSupportPlaybook"), GuideTemplateType.SupportPlaybook),
+            (SafetyText("UiReleaseNotes"), GuideTemplateType.ReleaseNotes));
 
         TemplateTypeComboBox.SelectedIndex = 0;
         ExportTemplateComboBox.SelectedIndex = 0;
 
         PopulateComboBox(StickerModeComboBox,
-            (T("Numérique", "Numeric"), 0),
-            (T("Alphabétique", "Alphabetic"), 1));
+            (SafetyText("UiNumeric"), 0),
+            (SafetyText("UiAlphabetic"), 1));
     }
 
     private void PopulateComboBox<T>(ComboBox comboBox, params (string label, T value)[] items)
@@ -453,8 +458,8 @@ public sealed partial class MainWindow
         CollapseStepsButton.Visibility = stepsCollapsed ? Visibility.Collapsed : Visibility.Visible;
         AddStepButton.Visibility = stepsCollapsed ? Visibility.Collapsed : Visibility.Visible;
         StepsPaneHintText.Visibility = stepsCollapsed ? Visibility.Collapsed : Visibility.Visible;
-        InspectorToggleButton.Content = _isInspectorPaneCollapsed ? T("◫", "◫") : T("◫", "◫");
-        ToolbarStepsButton.Content = stepsCollapsed ? T("Étapes", "Steps") : T("Étapes", "Steps");
+        InspectorToggleButton.Content = _isInspectorPaneCollapsed ? SafetyText("UiText") : SafetyText("UiText");
+        ToolbarStepsButton.Content = stepsCollapsed ? SafetyText("UiSteps") : SafetyText("UiSteps");
         ToolbarOpacityValueText.Text = string.Format(CultureInfo.CurrentCulture, "{0:0} %", ToolbarOpacitySlider.Value * 100);
     }
 
@@ -517,7 +522,7 @@ public sealed partial class MainWindow
                 FontSize = 9
             };
             button.Click += ShadeButton_Click;
-            var tooltip = string.Format(CultureInfo.CurrentCulture, T("Nuance {0}", "Shade {0}"), i + 1);
+            var tooltip = string.Format(CultureInfo.CurrentCulture, SafetyText("UiShade0"), i + 1);
             ToolTipService.SetToolTip(button, tooltip);
             AutomationProperties.SetName(button, tooltip);
             ShadeStrip.Children.Add(button);
@@ -1145,13 +1150,13 @@ public sealed partial class MainWindow
 
         SetText(SettingsPageTitleText, sectionKey switch
         {
-            "General" => T("Général", "General"),
-            "Capture" => T("Capture", "Capture"),
-            "Export" => T("Export", "Export"),
-            "Publication" => T("Publication", "Publication"),
-            "Shortcuts" => T("Raccourcis", "Shortcuts"),
-            "About" => T("À propos", "About"),
-            _ => T("Général", "General")
+            "General" => SafetyText("UiGeneral"),
+            "Capture" => SafetyText("UiCapture"),
+            "Export" => SafetyText("UiExport"),
+            "Publication" => SafetyText("UiPublication"),
+            "Shortcuts" => SafetyText("UiShortcuts"),
+            "About" => SafetyText("UiAbout"),
+            _ => SafetyText("UiGeneral")
         });
 
         UIElement? target = sectionKey switch
@@ -1184,7 +1189,7 @@ public sealed partial class MainWindow
         {
             SetSection(ShellSection.Capture);
             HelpShortcutsTitleText.StartBringIntoView();
-            StatusText.Text = T("Aide ouverte.", "Help opened.");
+            StatusText.Text = SafetyText("UiHelpOpened");
             return;
         }
 
@@ -1209,7 +1214,7 @@ public sealed partial class MainWindow
             }
             _isSavingSettings = false;
             ReturnToProcedureSection();
-            StatusText.Text = T("Réglages enregistrés.", "Settings saved.");
+            StatusText.Text = SafetyText("UiSettingsSaved");
         }
         catch (Exception error) { AppDiagnostics.Record(error); StatusText.Text = SafetyText("OperationFailed"); }
         finally { _isSavingSettings = false; SettingsScrollViewer.IsEnabled = true; }
@@ -1218,7 +1223,7 @@ public sealed partial class MainWindow
     private void SettingsCancelButton_Click(object sender, RoutedEventArgs e)
     {
         ReturnToProcedureSection();
-        StatusText.Text = T("Réglages annulés.", "Settings cancelled.");
+        StatusText.Text = SafetyText("UiSettingsCancelled");
     }
 
     private void FloatingToolRailDragThumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -1238,7 +1243,7 @@ public sealed partial class MainWindow
     {
         SetSection(ShellSection.Capture);
         HelpShortcutsTitleText.StartBringIntoView();
-        StatusText.Text = T("Aide ouverte.", "Help opened.");
+        StatusText.Text = SafetyText("UiHelpOpened");
     }
 
     private void ReturnToProcedureMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1252,7 +1257,7 @@ public sealed partial class MainWindow
             SetSection(ShellSection.Procedure);
         }
 
-        StatusText.Text = T("Retour à la procédure.", "Back to the procedure.");
+        StatusText.Text = SafetyText("UiBackToTheProcedure");
     }
 
     private void CaptureShortcutMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1263,14 +1268,14 @@ public sealed partial class MainWindow
         var description = sender is MenuFlyoutItem { Tag: string tag }
             ? tag switch
             {
-                "PrintScreen" => T("Impr écran : copie tout l’écran dans le presse-papiers.", "Print Screen: copies the whole screen to the clipboard."),
-                "AltPrintScreen" => T("Alt + Impr écran : copie la fenêtre active dans le presse-papiers.", "Alt + Print Screen: copies the active window to the clipboard."),
-                "WinPrintScreen" => T("Win + Impr écran : enregistre la capture dans Images > Captures d’écran.", "Win + Print Screen: saves the capture to Pictures > Screenshots."),
-                "WinShiftS" => T("Win + Shift + S : ouvre l’outil Capture d’écran.", "Win + Shift + S: opens Snipping Tool."),
-                "FnWinSpace" => T("Fn + Win + Espace : alternative sur certains claviers sans touche Impr écran.", "Fn + Win + Space: alternate on some keyboards without a Print Screen key."),
-                _ => T("Aide capture ouverte.", "Screenshot help opened.")
+                "PrintScreen" => SafetyText("UiPrintScreenCopiesTheWholeScreenTo"),
+                "AltPrintScreen" => SafetyText("UiAltPrintScreenCopiesTheActiveWindow"),
+                "WinPrintScreen" => SafetyText("UiWinPrintScreenSavesTheCaptureTo"),
+                "WinShiftS" => SafetyText("UiWinShiftSOpensSnippingTool"),
+                "FnWinSpace" => SafetyText("UiFnWinSpaceAlternateOnSomeKeyboards"),
+                _ => SafetyText("UiScreenshotHelpOpened")
             }
-            : T("Aide capture ouverte.", "Screenshot help opened.");
+            : SafetyText("UiScreenshotHelpOpened");
 
         StatusText.Text = description;
     }
@@ -1564,7 +1569,7 @@ public sealed partial class MainWindow
         var folder = await picker.PickSingleFolderAsync();
         if (folder is null)
         {
-            StatusText.Text = T("Choix de dossier annulé.", "Folder selection cancelled.");
+            StatusText.Text = SafetyText("UiFolderSelectionCancelled");
             return;
         }
 
@@ -1576,7 +1581,7 @@ public sealed partial class MainWindow
         }
 
         UpdateSettingsSummary();
-        StatusText.Text = string.Format(CultureInfo.CurrentCulture, T("Dossier d’export : {0}", "Export folder: {0}"), folder.Path);
+        StatusText.Text = string.Format(CultureInfo.CurrentCulture, SafetyText("UiExportFolder0"), folder.Path);
     }
 
     private void ExportFormatComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1757,15 +1762,15 @@ public sealed partial class MainWindow
 
         var flyout = new MenuFlyout();
 
-        var moveUp = new MenuFlyoutItem { Text = T("Monter", "Move up") };
+        var moveUp = new MenuFlyoutItem { Text = SafetyText("UiMoveUp") };
         moveUp.Click += (_, _) => MoveDocument(document, -1);
         flyout.Items.Add(moveUp);
 
-        var moveDown = new MenuFlyoutItem { Text = T("Descendre", "Move down") };
+        var moveDown = new MenuFlyoutItem { Text = SafetyText("UiMoveDown") };
         moveDown.Click += (_, _) => MoveDocument(document, 1);
         flyout.Items.Add(moveDown);
 
-        var duplicate = new MenuFlyoutItem { Text = T("Dupliquer", "Duplicate") };
+        var duplicate = new MenuFlyoutItem { Text = SafetyText("UiDuplicate") };
         duplicate.Click += (_, _) =>
         {
             PushUndoState(CaptureProjectState());
@@ -1780,7 +1785,7 @@ public sealed partial class MainWindow
 
         flyout.Items.Add(new MenuFlyoutSeparator());
 
-        var delete = new MenuFlyoutItem { Text = T("Supprimer", "Delete") };
+        var delete = new MenuFlyoutItem { Text = SafetyText("UiDelete") };
         delete.Click += async (_, _) => await TryCloseDocumentAsync(document);
         flyout.Items.Add(delete);
 
@@ -1790,7 +1795,7 @@ public sealed partial class MainWindow
     private void AddLegendButton_Click(object sender, RoutedEventArgs e)
     {
         SelectTool(EditorTool.Sticker);
-        StatusText.Text = T("Cliquez dans le canvas pour ajouter une gommette.", "Click the canvas to add a sticker.");
+        StatusText.Text = SafetyText("UiClickTheCanvasToAddASticker");
     }
 
     private async void DeleteSelectedAnnotationButton_Click(object sender, RoutedEventArgs e)
@@ -1810,11 +1815,11 @@ public sealed partial class MainWindow
             var dialog = new ContentDialog
             {
                 XamlRoot = RootGrid.XamlRoot,
-                Title = T("Supprimer la gommette ?", "Delete the sticker?"),
-                Content = T("Voulez-vous renuméroter les gommettes restantes ?", "Do you want to renumber the remaining stickers?"),
-                PrimaryButtonText = T("Renuméroter", "Renumber"),
-                SecondaryButtonText = T("Supprimer sans renuméroter", "Delete without renumbering"),
-                CloseButtonText = T("Annuler", "Cancel"),
+                Title = SafetyText("UiDeleteTheSticker"),
+                Content = SafetyText("UiDoYouWantToRenumberTheRemaining"),
+                PrimaryButtonText = SafetyText("UiRenumber"),
+                SecondaryButtonText = SafetyText("UiDeleteWithoutRenumbering"),
+                CloseButtonText = SafetyText("UiCancel"),
                 DefaultButton = ContentDialogButton.Primary
             };
 
@@ -1850,7 +1855,7 @@ public sealed partial class MainWindow
             if (_settingsDraft is not null || e.OriginalSource is not TextBox)
             {
                 ReturnToProcedureSection();
-                StatusText.Text = T("Retour à la procédure.", "Back to the procedure.");
+                StatusText.Text = SafetyText("UiBackToTheProcedure");
                 e.Handled = true;
             }
 
@@ -1881,7 +1886,7 @@ public sealed partial class MainWindow
         _editingTextAnnotation = annotation;
         RenderAnnotations(_currentDocument);
         SelectAnnotation(annotation);
-        StatusText.Text = T("Texte modifiable dans l’aperçu.", "Text editable in the preview.");
+        StatusText.Text = SafetyText("UiTextEditableInThePreview");
     }
 
     private void StopInlineTextEdit(bool rerender = true, bool refreshSelection = true)
@@ -2070,7 +2075,7 @@ public sealed partial class MainWindow
             .Select(annotation =>
             {
                 var legend = string.IsNullOrWhiteSpace(annotation.LegendText)
-                    ? T("À compléter", "To fill in")
+                    ? SafetyText("UiToFillIn")
                     : annotation.LegendText;
                 return $"{annotation.Text} : {legend}";
             })
@@ -2090,6 +2095,9 @@ public sealed partial class MainWindow
         }
 
         _selectedAnnotation = annotation;
+        _isSyncingObjectList = true;
+        AnnotationObjectsList.SelectedItem = annotation;
+        _isSyncingObjectList = false;
         if (_currentDocument is null)
         {
             return;
@@ -2103,8 +2111,8 @@ public sealed partial class MainWindow
                 StepDetailsPanel.Visibility = Visibility.Visible;
                 AnnotationContextPanel.Visibility = Visibility.Collapsed;
                 SelectionOutline.Visibility = Visibility.Collapsed;
-                StepDetailsSubtitleText.Text = T("Titre et note de l’étape", "Step title and note");
-                SelectedAnnotationSummaryText.Text = T("Aucun objet sélectionné.", "No object selected.");
+                StepDetailsSubtitleText.Text = SafetyText("UiStepTitleAndNote");
+                SelectedAnnotationSummaryText.Text = SafetyText("UiNoObjectSelected");
                 SelectedColorLabelText.Visibility = Visibility.Collapsed;
                 SelectedColorText.Visibility = Visibility.Collapsed;
                 SelectedOpacitySlider.Value = _currentDocument.DefaultOpacity;
@@ -2113,18 +2121,18 @@ public sealed partial class MainWindow
 
             StepDetailsPanel.Visibility = Visibility.Collapsed;
             AnnotationContextPanel.Visibility = Visibility.Visible;
-            StepDetailsSubtitleText.Text = T("Objet sélectionné", "Selected object");
+            StepDetailsSubtitleText.Text = SafetyText("UiSelectedObject");
             AnnotationPanelTitleText.Text = annotation.Kind switch
             {
-                AnnotationKind.Sticker => T("Gommette", "Sticker"),
-                AnnotationKind.Text => T("Texte", "Text"),
-                AnnotationKind.Rectangle => T("Rectangle", "Rectangle"),
-                AnnotationKind.Ellipse => T("Ovale", "Ellipse"),
-                AnnotationKind.ArrowStraight => T("Flèche droite", "Straight arrow"),
-                AnnotationKind.ArrowCurved => T("Flèche courbe", "Curved arrow"),
-                AnnotationKind.Focus => T("Focus", "Focus"),
-                AnnotationKind.Mask => T("Masquage", "Mask"),
-                _ => T("Objet", "Object")
+                AnnotationKind.Sticker => SafetyText("UiSticker"),
+                AnnotationKind.Text => SafetyText("UiText_0420e350"),
+                AnnotationKind.Rectangle => SafetyText("UiRectangle"),
+                AnnotationKind.Ellipse => SafetyText("UiEllipse"),
+                AnnotationKind.ArrowStraight => SafetyText("UiStraightArrow"),
+                AnnotationKind.ArrowCurved => SafetyText("UiCurvedArrow"),
+                AnnotationKind.Focus => SafetyText("UiFocus"),
+                AnnotationKind.Mask => SafetyText("UiMask"),
+                _ => SafetyText("UiObject")
             };
 
             var isSticker = annotation.Kind == AnnotationKind.Sticker;
@@ -2151,15 +2159,15 @@ public sealed partial class MainWindow
             ApplyCropButton.Visibility = _currentDocument.PendingCropRect is not null ? Visibility.Visible : Visibility.Collapsed;
             ResetCropButton.Visibility = (_currentDocument.PendingCropRect is not null || _currentDocument.AppliedCropRect is not null) ? Visibility.Visible : Visibility.Collapsed;
 
-            StickerValueLabelText.Text = T("Valeur de la gommette", "Sticker value");
+            StickerValueLabelText.Text = SafetyText("UiStickerValue");
             StickerValueText.Text = annotation.Text;
-            StickerLegendLabelText.Text = T("Légende de la gommette", "Sticker legend");
+            StickerLegendLabelText.Text = SafetyText("UiStickerLegend");
             StickerLegendTextBox.Text = annotation.LegendText;
-            StickerLegendTextBox.PlaceholderText = T("Décrivez ce que pointe cette gommette", "Describe what this sticker points to");
-            AnnotationTextLabelText.Text = T("Texte", "Text");
+            StickerLegendTextBox.PlaceholderText = SafetyText("UiDescribeWhatThisStickerPointsTo");
+            AnnotationTextLabelText.Text = SafetyText("UiText_0420e350");
             AnnotationTextBox.Text = annotation.Text;
-            AnnotationTextBox.PlaceholderText = T("Saisissez le texte", "Enter text");
-            SelectedColorLabelText.Text = T("Couleur", "Color");
+            AnnotationTextBox.PlaceholderText = SafetyText("UiEnterText");
+            SelectedColorLabelText.Text = SafetyText("UiColor");
             SelectedColorText.Text = string.Format(CultureInfo.CurrentCulture, "{0} · {1}", paletteName, annotation.PaletteShadeIndex + 1);
             SelectedAnnotationSummaryText.Text = annotation.Kind switch
             {
@@ -2250,6 +2258,7 @@ public sealed partial class MainWindow
             return;
         }
 
+        _annotationMoveSnapshot = CaptureProjectState();
         _draggingAnnotation = annotation;
         _draggingAnnotationElement = element;
         _isDraggingAnnotation = true;
@@ -2316,6 +2325,8 @@ public sealed partial class MainWindow
             return;
         }
 
+        if (_annotationMoveSnapshot is { } before && !AreProjectStatesEquivalent(before, CaptureProjectState())) PushUndoState(before);
+        _annotationMoveSnapshot = null;
         var document = _currentDocument;
         var selectedAnnotation = _selectedAnnotation;
         MarkDocumentDirty(_currentDocument);
@@ -2377,7 +2388,7 @@ public sealed partial class MainWindow
     {
         var duplicate = new ScreenshotDocument
         {
-            BaseTitle = $"{source.BaseTitle} - copie",
+            BaseTitle = string.Format(CultureInfo.CurrentCulture, SafetyText("CopyTitle"), source.BaseTitle),
             StepNote = source.StepNote,
             Origin = source.Origin,
             OriginLabel = source.OriginLabel,
@@ -2424,7 +2435,7 @@ public sealed partial class MainWindow
             var package = await BuildGuidePackageAsync(rootFolder, formats);
             if (package is not null)
                 StatusText.Text = string.Format(CultureInfo.CurrentCulture,
-                    T("Export terminé : {0} dans {1}", "Export complete: {0} in {1}"),
+                    SafetyText("UiExportComplete0In1"),
                     string.Join(", ", package.GeneratedFormats), package.PackageFolder);
         }
         catch (Exception error)
@@ -2438,10 +2449,10 @@ public sealed partial class MainWindow
     {
         return templateType switch
         {
-            GuideTemplateType.InternalProcedure => T("Procédure interne", "Internal procedure"),
-            GuideTemplateType.SupportPlaybook => T("Support client", "Support playbook"),
-            GuideTemplateType.ReleaseNotes => T("Notes de version", "Release notes"),
-            _ => T("Manuel utilisateur", "User manual")
+            GuideTemplateType.InternalProcedure => SafetyText("UiInternalProcedure"),
+            GuideTemplateType.SupportPlaybook => SafetyText("UiSupportPlaybook"),
+            GuideTemplateType.ReleaseNotes => SafetyText("UiReleaseNotes"),
+            _ => SafetyText("UiUserManual")
         };
     }
 

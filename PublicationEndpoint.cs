@@ -4,6 +4,12 @@ namespace SnapSlate;
 
 internal static class PublicationEndpoint
 {
+    public static Uri ConfluenceV2(string baseUrl)
+    {
+        var legacy = Confluence(baseUrl).AbsoluteUri;
+        return new Uri(legacy[..^"rest/api/content/".Length] + "api/v2/");
+    }
+
     public static Uri Confluence(string baseUrl)
     {
         if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var site) || site.Scheme != Uri.UriSchemeHttps

@@ -41,7 +41,7 @@ Point important a garder dans la description publique:
 
 La release note prete a copier dans GitHub est ici:
 
-- `docs/github/RELEASE_v2026.04.29_001.md`
+- `docs/github/RELEASE_v2026.10.28_001.md`
 
 La procedure de branchement, merge et publication est ici:
 
@@ -49,11 +49,14 @@ La procedure de branchement, merge et publication est ici:
 
 ### Titre conseille
 
-`SnapSlate v2026.10.27.002`
+`SnapSlate v2026.10.28.001`
 
 ### Fichier a attacher a la release
 
 - `SnapSlate-Setup.exe`
+- `SnapSlate-Installer-x64.zip`
+- `SHA256SUMS.txt`
+- `build-provenance.json`
 
 ### Limitation actuelle
 

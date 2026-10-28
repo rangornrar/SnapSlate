@@ -162,6 +162,7 @@
                                     <MenuFlyoutItem x:Name="RedoMenuItem" Click="RedoButton_Click" />
                                 </MenuBarItem>
                                 <MenuBarItem x:Name="ImageMenuBarItem" Title="Image">
+                                    <MenuFlyoutItem x:Name="ImportClipboardMenuItem" x:Uid="ImportClipboard" Click="ImportClipboardMenuItem_Click" />
                                     <MenuFlyoutItem x:Name="ImportScreenshotMenuItem" Click="ImportScreenshotButton_Click" />
                                     <MenuFlyoutItem x:Name="OcrMenuItem" Click="OcrButton_Click" />
                                 </MenuBarItem>
@@ -322,6 +323,7 @@
                                             </ListView.ItemsPanel>
                                             <ListView.ItemContainerStyle>
                                                 <Style TargetType="ListViewItem">
+                                                    <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleStepName}" />
                                                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                                     <Setter Property="Padding" Value="0" />
                                                     <Setter Property="Margin" Value="0,0,0,8" />
@@ -349,7 +351,7 @@
                                                                     <TextBlock Text="{Binding StepNote}" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextTrimming="CharacterEllipsis" />
                                                                 </Border>
                                                             </StackPanel>
-                                                            <Button Grid.Column="3" Tag="{Binding}" Click="StepMoreButton_Click" Content="⋯" MinWidth="28" MinHeight="28" Padding="0" Background="Transparent" BorderBrush="Transparent" />
+                                                            <Button Grid.Column="3" Tag="{Binding}" Click="StepMoreButton_Click" AutomationProperties.Name="{Binding StepActionsName}" AutomationProperties.AutomationId="{Binding StepActionsId}" Content="⋯" MinWidth="28" MinHeight="28" Padding="0" Background="Transparent" BorderBrush="Transparent" />
                                                         </Grid>
                                                     </Border>
                                                 </DataTemplate>
@@ -375,6 +377,7 @@
                                             </ListView.ItemsPanel>
                                             <ListView.ItemContainerStyle>
                                                 <Style TargetType="ListViewItem">
+                                                    <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleStepName}" />
                                                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                                     <Setter Property="Padding" Value="0" />
                                                     <Setter Property="Margin" Value="0,0,0,8" />
@@ -608,6 +611,18 @@
 
                                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                                         <StackPanel Spacing="14">
+                                            <Expander x:Name="AnnotationObjectsExpander" IsExpanded="True" HorizontalAlignment="Stretch">
+                                                <StackPanel Spacing="8">
+                                                    <ListView x:Name="AnnotationObjectsList" MaxHeight="160" DisplayMemberPath="AccessibleLabel" SelectionMode="Single" SelectionChanged="AnnotationObjectsList_SelectionChanged" AutomationProperties.AutomationId="AnnotationObjectsList" />
+                                                    <TextBlock x:Name="ObjectMoveHelpText" TextWrapping="Wrap" FontSize="11" />
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <Button x:Name="MoveObjectLeftButton" x:Uid="MoveObjectLeft" Content="←" Tag="Left" Click="MoveAnnotationButton_Click" AutomationProperties.AutomationId="MoveObjectLeft" />
+                                                        <Button x:Name="MoveObjectUpButton" x:Uid="MoveObjectUp" Content="↑" Tag="Up" Click="MoveAnnotationButton_Click" AutomationProperties.AutomationId="MoveObjectUp" />
+                                                        <Button x:Name="MoveObjectDownButton" x:Uid="MoveObjectDown" Content="↓" Tag="Down" Click="MoveAnnotationButton_Click" AutomationProperties.AutomationId="MoveObjectDown" />
+                                                        <Button x:Name="MoveObjectRightButton" x:Uid="MoveObjectRight" Content="→" Tag="Right" Click="MoveAnnotationButton_Click" AutomationProperties.AutomationId="MoveObjectRight" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Expander>
                                             <StackPanel x:Name="StepDetailsPanel" Spacing="10">
                                                 <TextBlock x:Name="StepTitleLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
                                                 <TextBox x:Name="StepTitleTextBox" TextChanged="StepTitleTextBox_TextChanged" />

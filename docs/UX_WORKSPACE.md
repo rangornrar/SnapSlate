@@ -32,4 +32,4 @@ Captures PNG du même écran Windows, sans recomposition :
 - Enregistrement du projet, réouverture avec les deux captures et le rectangle conservés.
 - Export PNG 3840 × 2160 ; la différence de pixels avec la source reste limitée au rectangle. Le contour de sélection de l’éditeur n’est pas exporté.
 
-Les essais natifs portent sur ce poste Windows et ces tailles de fenêtre. Les écrans tactiles, les autres échelles DPI, Narrator et le mode de contraste élevé de Windows ne sont pas validés ici. Cette refonte est indépendante de la release du lot 3, `2026.10.28.001`.
+Les essais natifs portent sur ce poste Windows et ces tailles de fenêtre. Les écrans tactiles, les autres échelles DPI, Narrator et le mode de contraste élevé de Windows ne sont pas validés ici. Cette refonte est distribuée dans `2026.10.28.002` (binaires `2026.10.28.2`), après la release du lot 3 `2026.10.28.001`.

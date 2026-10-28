@@ -11,7 +11,7 @@ $version = $project.SelectSingleNode("/Project/PropertyGroup/Version").InnerText
 [xml]$manifest = Get-Content -LiteralPath (Join-Path $projectRoot 'Package.appxmanifest')
 if ($manifest.Package.Identity.Version -ne $version) { throw 'Manifest version mismatch.' }
 foreach ($file in @($setup,$portable)) { if (-not (Test-Path -LiteralPath $file) -or (Get-Item -LiteralPath $file).Length -eq 0) { throw "Missing distribution: $file" } }
-if ((Get-Item -LiteralPath $setup).VersionInfo.ProductVersion -ne $version) { throw 'Setup version mismatch.' }
+if ((Get-Item -LiteralPath $setup).VersionInfo.ProductVersion.Trim() -ne $version) { throw 'Setup version mismatch.' }
 $application = Join-Path $PSScriptRoot 'dist\app\SnapSlate.exe'
 if ((Get-Item -LiteralPath $application).VersionInfo.FileVersion -ne $version) { throw 'Application version mismatch.' }
 $zip = [IO.Compression.ZipFile]::OpenRead($portable)

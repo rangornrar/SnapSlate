@@ -37,7 +37,7 @@ Prérequis : Windows 10/11, SDK .NET fixé par `global.json` et outils Windows/W
 Depuis la racine du dépôt :
 
 ```powershell
-dotnet restore .\SnapSlate.csproj -p:Configuration=Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false --locked-mode
+dotnet restore .\SnapSlate.csproj -p:Configuration=Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64 -p:PublishReadyToRun=false --locked-mode
 dotnet build .\SnapSlate.csproj -c Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false --no-restore
 dotnet test .\tests\SnapSlate.Tests.csproj -c Release -p:Platform=x64 --filter "TestCategory!=Performance"
 ```

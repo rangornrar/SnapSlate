@@ -9,6 +9,7 @@ namespace SnapSlate;
 public sealed partial class MainWindow
 {
     private bool _isSyncingObjectList;
+    private string _objectListLanguage = string.Empty;
     private SnapSlateProjectState? _annotationMoveSnapshot;
 
     private void RefreshAnnotationObjects()
@@ -18,8 +19,10 @@ public sealed partial class MainWindow
         {
             var annotations = _currentDocument?.Annotations.ToArray() ?? [];
             // Keep the realized containers and keyboard focus when only geometry changes.
-            if (AnnotationObjectsList.ItemsSource is not AnnotationModel[] current || !current.SequenceEqual(annotations))
+            if (_objectListLanguage != LocalizedText.CurrentLanguage
+                || AnnotationObjectsList.ItemsSource is not AnnotationModel[] current || !current.SequenceEqual(annotations))
                 AnnotationObjectsList.ItemsSource = annotations;
+            _objectListLanguage = LocalizedText.CurrentLanguage;
             AnnotationObjectsList.SelectedItem = _selectedAnnotation;
             AnnotationObjectsExpander.Header = SafetyText("AnnotationObjects");
             AutomationProperties.SetName(AnnotationObjectsList, SafetyText("AnnotationObjects"));

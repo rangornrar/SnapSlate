@@ -21,7 +21,7 @@ jobs:
       # Restore and build must agree on configuration, platform and ReadyToRun.
       # The installer also builds without ReadyToRun; publishing may opt in separately.
       - name: Restore
-        run: dotnet restore .\SnapSlate.csproj -p:Configuration=Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false --locked-mode
+        run: dotnet restore .\SnapSlate.csproj -p:Configuration=Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64 -p:PublishReadyToRun=false --locked-mode
       - name: Build
         run: dotnet build .\SnapSlate.csproj -c Release -p:Platform=x64 -r win-x64 -p:PublishReadyToRun=false -p:ContinuousIntegrationBuild=true --no-restore
       - name: Restore locked test dependencies

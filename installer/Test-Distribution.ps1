@@ -28,6 +28,12 @@ $sums = foreach ($file in @($setup,$portable)) { (Get-FileHash -LiteralPath $fil
 [IO.File]::WriteAllLines((Join-Path $release 'SHA256SUMS.txt'),$sums,[Text.UTF8Encoding]::new($false))
 $revision = git -C $projectRoot rev-parse HEAD
 if ($LASTEXITCODE -ne 0) { throw 'Git revision unavailable.' }
+foreach ($ownedFile in @('SnapSlate.exe','SnapSlate.dll')) {
+    $builtVersion = (Get-Item -LiteralPath (Join-Path $PSScriptRoot "dist\app\$ownedFile")).VersionInfo.ProductVersion
+    if ($builtVersion -notmatch '\+([a-fA-F0-9]{40})$' -or $Matches[1] -ne $revision) {
+        throw "Built revision mismatch: $ownedFile. Rebuild from the current committed revision."
+    }
+}
 @{ version=$version; commit=$revision; sdk=(dotnet --version); signed=((Get-AuthenticodeSignature -LiteralPath $setup).Status -eq 'Valid'); sha256=$sums } |
     ConvertTo-Json -Depth 3 | Set-Content -LiteralPath (Join-Path $release 'build-provenance.json') -Encoding utf8
 if (-not $InstallSmoke) { return }

@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
         <TitleBar x:Name="AppTitleBar" Title="SnapSlate" Height="32" MinHeight="32">
             <TitleBar.IconSource>
-                <ImageIconSource ImageSource="Assets/AppIcon.ico" />
+                <ImageIconSource ImageSource="Assets/Square44x44Logo.targetsize-256_altform-unplated.png" />
             </TitleBar.IconSource>
         </TitleBar>
         <Border Grid.Row="1" Visibility="Collapsed" />

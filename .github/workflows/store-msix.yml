@@ -1,0 +1,67 @@
+name: Microsoft Store MSIX
+
+on:
+  pull_request:
+    paths:
+      - '**/*.cs'
+      - '**/*.xaml'
+      - '**/*.resw'
+      - 'Assets/**'
+      - 'store/**'
+      - 'SnapSlate.csproj'
+      - 'Package.appxmanifest'
+      - 'packages.lock.json'
+      - 'global.json'
+      - '.github/workflows/store-msix.yml'
+  workflow_dispatch:
+    inputs:
+      preview:
+        description: 'Technical preview only; keep enabled until Partner Center identity is available.'
+        type: boolean
+        default: true
+      identity_name:
+        description: 'Partner Center: Package/Identity/Name'
+        type: string
+      publisher:
+        description: 'Partner Center: Package/Identity/Publisher (CN=GUID)'
+        type: string
+      publisher_display_name:
+        description: 'Partner Center: Package/Properties/PublisherDisplayName'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  store-msix:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    env:
+      STORE_PREVIEW: ${{ github.event_name != 'workflow_dispatch' || inputs.preview }}
+      SNAPSLATE_STORE_IDENTITY_NAME: ${{ inputs.identity_name }}
+      SNAPSLATE_STORE_PUBLISHER: ${{ inputs.publisher }}
+      SNAPSLATE_STORE_PUBLISHER_DISPLAY_NAME: ${{ inputs.publisher_display_name }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+      - name: Build and verify unsigned Store upload
+        shell: pwsh
+        run: |
+          if ($env:STORE_PREVIEW -eq 'true') {
+            .\store\Build-StorePackage.ps1 -Preview -Platform x64
+          } else {
+            .\store\Build-StorePackage.ps1 -Platform x64
+          }
+      - name: Upload Store package and provenance
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: store-msix-${{ env.STORE_PREVIEW == 'true' && 'preview' || 'submission' }}-x64
+          if-no-files-found: error
+          compression-level: 0
+          path: |
+            AppPackages/Store/**/*.msixupload
+            AppPackages/Store/**/store-build.json
+            AppPackages/Store/**/Package.appxmanifest
+            AppPackages/Store/**/PREVIEW-NOT-FOR-SUBMISSION.txt

@@ -44,11 +44,21 @@ if ($process.ExitCode -ne 0) { throw "Setup smoke failed: $($process.ExitCode)."
 $installedExe = Join-Path $destination 'SnapSlate.exe'
 if ((Get-FileHash -LiteralPath $installedExe).Hash -ne (Get-FileHash -LiteralPath $application).Hash) { throw 'Installed binary mismatch.' }
 $app = $null
+$launchStarted = Get-Date
 try {
-    $app = Start-Process -FilePath $installedExe -PassThru -WindowStyle Hidden
+    $app = Start-Process -FilePath $installedExe -WorkingDirectory $destination -PassThru -WindowStyle Hidden
     $deadline = (Get-Date).AddSeconds(25)
     do { Start-Sleep -Milliseconds 250; $app.Refresh() } until ($app.HasExited -or $app.MainWindowHandle -ne [IntPtr]::Zero -or (Get-Date) -ge $deadline)
-    if ($app.HasExited -or $app.MainWindowHandle -eq [IntPtr]::Zero) { throw 'Installed application failed to create its window.' }
+    if ($app.HasExited -or $app.MainWindowHandle -eq [IntPtr]::Zero) {
+        if ($app.HasExited) { Write-Host ('Application exit code: {0:X8}' -f $app.ExitCode) }
+        $diagnosticLog = Join-Path $env:LOCALAPPDATA 'SnapSlate\errors.log'
+        if (Test-Path -LiteralPath $diagnosticLog) { Get-Content -LiteralPath $diagnosticLog -Tail 20 | Write-Host }
+        # Disposable CI runner only; include native/.NET startup faults before uninstalling.
+        Get-WinEvent -FilterHashtable @{ LogName='Application'; StartTime=$launchStarted } -ErrorAction SilentlyContinue |
+            Where-Object { $_.Message -match [regex]::Escape($destination) } |
+            Select-Object -First 3 -ExpandProperty Message | Write-Host
+        throw 'Installed application failed to create its window.'
+    }
 } finally {
     if ($app -and -not $app.HasExited) { Stop-Process -Id $app.Id -Force }
     $uninstaller = Join-Path $destination 'unins000.exe'

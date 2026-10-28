@@ -60,6 +60,12 @@ Résultat : `installer/release/SnapSlate-Setup.exe`, archive portable, empreinte
 
 La release actuelle est **non signée Authenticode** : aucun certificat de production n’est disponible. La chaîne peut signer l’application et le setup lorsqu’un certificat sera fourni ; elle ne modifie aucun magasin de confiance.
 
+## Microsoft Store (MSIX)
+
+La préparation de la distribution Store est décrite dans [store/README.md](store/README.md). Le build génère un `.msixupload` autonome x64 sans certificat personnel ; Microsoft signera le package après certification.
+
+Le compte développeur et le nom ne sont pas encore réservés. Le mode aperçu porte une identité de test et ne doit pas être soumis au Store. Les trois identifiants Partner Center sont obligatoires pour produire le candidat associé au compte. Les descriptions français/anglais, le logo et la politique de confidentialité sont préparés dans `store/`.
+
 ## Architecture et qualité
 
 - [Architecture et limites actuelles](docs/ARCHITECTURE.md)

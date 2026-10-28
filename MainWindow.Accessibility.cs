@@ -56,6 +56,8 @@ public sealed partial class MainWindow
     {
         foreach (var (field, label) in new (DependencyObject, UIElement)[]
         {
+            (ToolbarOpacitySlider, ToolbarOpacityLabelText), (SelectedOpacitySlider, SelectedOpacityLabelText),
+            (StrokeThicknessSlider, StrokeThicknessLabelText), (StickerModeComboBox, StickerModeLabelText),
             (StepTitleTextBox, StepTitleLabelText), (StepNoteTextBox, StepNoteLabelText),
             (AudienceTextBox, AudienceLabelText), (AuthorTextBox, AuthorLabelText),
             (DocumentVersionTextBox, DocumentVersionLabelText), (AnnotationTextBox, AnnotationTextLabelText),

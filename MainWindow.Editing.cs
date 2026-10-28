@@ -100,7 +100,8 @@ public sealed partial class MainWindow
 
     private void CanvasWorkspace_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        FloatingToolRail.MaxHeight = Math.Max(48, e.NewSize.Height - 16);
+        FloatingToolRail.MaxHeight = Math.Max(48, e.NewSize.Height - 8);
         ApplyFloatingToolRailPosition(EditingPreferences.FloatingToolRailLeft, EditingPreferences.FloatingToolRailTop);
+        if (_autoFitPreview) QueueWorkspaceFit();
     }
 }

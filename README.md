@@ -12,7 +12,9 @@ Application Windows en C# / WinUI 3 pour transformer des captures d’écran en 
 2. Installer puis ouvrir SnapSlate.
 3. Réaliser une capture avec `Win + Shift + S` : lorsque SnapSlate est ouverte, la capture est importée dans un nouvel onglet.
 4. Ajouter textes, flèches, gommettes, cadres, zones de focus ou de masquage.
-5. Enregistrer le projet `.snapslate` ou exporter les documents.
+5. Cliquer sur **Copier l’image** (`Ctrl + Shift + C`) pour coller la capture annotée dans une autre application, enregistrer le projet `.snapslate` ou exporter les documents.
+
+La copie inclut les annotations, les masques opaques et le recadrage confirmé, à la résolution de l’image. Elle reste disponible après fermeture de SnapSlate et ne crée pas automatiquement une nouvelle étape dans l’application. Le collage manuel avec `Ctrl + Shift + V` reste possible.
 
 L’application doit être ouverte pour importer les captures du presse-papiers. Elle ne remplace pas le raccourci système lorsqu’elle est fermée. Le menu Fichier → Importer le presse-papiers (`Ctrl + Shift + V`) permet aussi de créer volontairement une nouvelle étape avec la même image ; chaque insertion est annulable.
 

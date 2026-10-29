@@ -2007,7 +2007,7 @@ public sealed partial class MainWindow : Window
         return Task.CompletedTask;
     }
 
-    private async Task<byte[]?> ReadClipboardBitmapBytesAsync()
+    private async Task<byte[]?> ReadClipboardBitmapBytesAsync(bool force)
     {
         for (var attempt = 0; attempt < 5; attempt++)
         {
@@ -2021,6 +2021,12 @@ public sealed partial class MainWindow : Window
             {
                 return null;
             }
+
+            // Ignore our own output for automatic import, but allow an explicit paste.
+            if (!force && dataPackage.Contains(ClipboardImageSourceFormat)
+                && await dataPackage.GetDataAsync(ClipboardImageSourceFormat) is string source
+                && source == _clipboardImageSource)
+                return null;
 
             var streamReference = await dataPackage.GetBitmapAsync();
             using var stream = await streamReference.OpenReadAsync();
@@ -2045,7 +2051,7 @@ public sealed partial class MainWindow : Window
         var epoch = _projectEpoch;
         try
         {
-            var imported = await _clipboardImports.ImportAsync(force, ReadClipboardBitmapBytesAsync,
+            var imported = await _clipboardImports.ImportAsync(force, () => ReadClipboardBitmapBytesAsync(force),
                 CreateDocumentFromClipboardAsync,
                 document => { PushUndoState(CaptureProjectState()); AddDocument(document, select: true); },
                 () => epoch == _projectEpoch && !_editorClosed && !_isApplyingProjectState);

@@ -104,6 +104,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        _windowThemeSettings = Microsoft.UI.System.ThemeSettings.CreateForWindowId(AppWindow.Id);
 
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
@@ -144,7 +145,9 @@ public sealed partial class MainWindow : Window
         BuildPaletteStrip();
         BuildShadeStrip();
         SelectTool(EditorTool.Select);
-        AddDocument(CreateDemoDocument(isInitial: true), select: true);
+        AddDocument(CreateBlankProjectDocument(), select: true);
+        InitializeToolShortcuts();
+        InitializeWorkflowTheme();
         MarkProjectClean();
         AppWindow.Closing += MainWindow_Closing;
 
@@ -247,6 +250,12 @@ public sealed partial class MainWindow : Window
 
     private void AddDocument(ScreenshotDocument document, bool select)
     {
+        if (_showWelcome && document.Origin != DocumentOrigin.BlankProject)
+        {
+            _documents.Clear();
+            _currentDocument = null;
+            _showWelcome = false;
+        }
         _documents.Add(document);
         RefreshDocumentOrderMetadata();
 
@@ -330,7 +339,7 @@ public sealed partial class MainWindow : Window
             ThumbnailSource = thumbnailSource,
             SelectedPaletteKey = palette.Key,
             SelectedPaletteShadeIndex = 3,
-            PaletteDisplayName = palette.DisplayName,
+            PaletteDisplayName = SafetyText("Palette" + palette.Key),
             AnnotationText = SafetyText("QuickNote"),
             StickerModeIndex = 0,
             StrokeThickness = 6,
@@ -363,6 +372,8 @@ public sealed partial class MainWindow : Window
         ++_previewVersion;
         RenderedSceneImage.Source = null;
         _currentDocument = document;
+        _showWelcome = _documents.Count == 1 && document.Origin == DocumentOrigin.BlankProject && document.Annotations.Count == 0 && document.ImageBytes is not { Length: > 0 };
+        UpdateWelcomeSurface();
         _autoFitPreview = true;
         _isInspectorPaneCollapsed = true;
         _inspectorOpenedManually = false;
@@ -449,12 +460,13 @@ public sealed partial class MainWindow : Window
     {
         if (tool != EditorTool.Select && tool != _currentTool && _selectedAnnotation is not null) SelectAnnotation(null);
         _currentTool = tool;
+        if (tool is EditorTool.ArrowStraight or EditorTool.ArrowCurved) _lastArrowTool = tool;
+        if (tool is EditorTool.Rectangle or EditorTool.Ellipse) _lastShapeTool = tool;
+        UpdateGroupedTools();
         foreach (var button in _toolButtons)
         {
-            var isSelected = string.Equals(button.Tag?.ToString(), tool.ToString(), StringComparison.Ordinal);
-            button.Background = GetBrush(isSelected ? "ToolSelectedBrush" : "ShellPanelBrush");
-            button.BorderBrush = GetBrush(isSelected ? "ToolSelectedBrush" : "ShellStrokeBrush");
-            button.BorderThickness = new Thickness(isSelected ? 2 : 1);
+            if (Enum.TryParse<EditorTool>(button.Tag?.ToString(), out var buttonTool))
+                UpdateToolButtonState(button, buttonTool);
         }
 
         _iconBrushOverride = CreateToolAccentBrush(tool);
@@ -562,14 +574,14 @@ public sealed partial class MainWindow : Window
             _isSyncingPaletteUi = false;
         }
 
-        var paletteSummary = string.Format(CultureInfo.CurrentCulture, SafetyText("UiActivePalette0"), palette.DisplayName);
+        var paletteSummary = string.Format(CultureInfo.CurrentCulture, SafetyText("UiActivePalette0"), SafetyText("Palette" + palette.Key));
         PaletteSummaryText.Text = paletteSummary;
 
         if (_currentDocument is not null && updateDocument)
         {
             _currentDocument.SelectedPaletteKey = key;
             _currentDocument.SelectedPaletteShadeIndex = Math.Clamp(shadeIndex, 0, 6);
-            _currentDocument.PaletteDisplayName = palette.DisplayName;
+            _currentDocument.PaletteDisplayName = SafetyText("Palette" + palette.Key);
         }
 
         if (updateSelectedAnnotation && _selectedAnnotation is not null)
@@ -579,6 +591,7 @@ public sealed partial class MainWindow : Window
         }
 
         RefreshShadeStrip();
+        RefreshQuickColors();
     }
 
     private async Task<bool?> PromptStickerRenumberAsync()
@@ -818,7 +831,8 @@ public sealed partial class MainWindow : Window
 
         if (_documents.Count == 0)
         {
-            var replacement = CreateDemoDocument(isInitial: true);
+            var replacement = CreateBlankProjectDocument();
+            _showWelcome = true;
             AddDocument(replacement, select: true);
             RefreshDocumentOrderMetadata();
             if (projectRemainsClean)
@@ -874,6 +888,7 @@ public sealed partial class MainWindow : Window
 
     private async Task<bool> SaveDocumentAsync(ScreenshotDocument document)
     {
+        if (_showWelcome) return false;
         try
         {
             StorageFile? file = null;
@@ -1947,7 +1962,7 @@ public sealed partial class MainWindow : Window
 
     private void UpdateStatus()
     {
-        var hint = _editingTextAnnotation is not null
+        var hint = _showWelcome ? SafetyText("WelcomeHelp") : _editingTextAnnotation is not null
             ? SafetyText("UiDoubleClickToFinishEditingTheText")
             : SafetyText(_toolHints[_currentTool]);
 
@@ -1962,6 +1977,11 @@ public sealed partial class MainWindow : Window
 
     private SolidColorBrush GetBrush(string key)
     {
+        var dictionaries = Application.Current.Resources.ThemeDictionaries;
+        var theme = _windowThemeSettings?.HighContrast == true ? "HighContrast" : RootGrid.ActualTheme.ToString();
+        if (dictionaries.TryGetValue(theme, out var value) && value is ResourceDictionary resources
+            && resources.TryGetValue(key, out var brush) && brush is SolidColorBrush themedBrush)
+            return themedBrush;
         return (SolidColorBrush)Application.Current.Resources[key];
     }
 
@@ -1997,6 +2017,8 @@ public sealed partial class MainWindow : Window
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         _editorClosed = true;
+        RootGrid.ActualThemeChanged -= WorkflowThemeChanged;
+        _windowThemeSettings.Changed -= WorkflowSystemThemeChanged;
         ++_previewVersion;
         Clipboard.ContentChanged -= Clipboard_ContentChanged;
     }

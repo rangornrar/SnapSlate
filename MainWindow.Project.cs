@@ -590,6 +590,7 @@ public sealed partial class MainWindow
         {
             _documents[index].StepNumber = index + 1;
         }
+        UpdateWelcomeSurface();
     }
 
     private int GetNextSequentialIndex(string prefix)

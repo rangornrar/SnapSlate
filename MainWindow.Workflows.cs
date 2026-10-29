@@ -183,12 +183,23 @@ public sealed partial class MainWindow
         ApplyProcedurePaneLayout();
     }
 
+    private void UpdateToolButtonState(Button button, EditorTool tool)
+    {
+        var selected = _currentTool == tool;
+        _iconBrushOverride = GetBrush(selected ? "ToolSelectedTextBrush" : "ShellStrongTextBrush");
+        button.Content = CreateToolIcon(tool);
+        _iconBrushOverride = null;
+        button.Background = GetBrush(selected ? "ToolSelectedBrush" : "ShellPanelBrush");
+        button.BorderBrush = GetBrush(selected ? "ToolSelectedBrush" : "ShellStrokeBrush");
+        button.BorderThickness = new Thickness(selected ? 2 : 1);
+    }
+
     private void UpdateGroupedTools()
     {
         void Update(Button button, EditorTool tool)
         {
             button.Tag = tool.ToString();
-            button.Content = CreateToolIcon(tool);
+            UpdateToolButtonState(button, tool);
             SetButtonTooltip(button, SafetyText(_toolLabels[tool]) + (tool is EditorTool.ArrowStraight or EditorTool.ArrowCurved ? " (A)" : tool == EditorTool.Rectangle ? " (R)" : " (O)") + " · " + SafetyText("ToolVariantsHelp"));
         }
         Update(ToolbarArrowStraightButton, _lastArrowTool);

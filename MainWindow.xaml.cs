@@ -465,10 +465,8 @@ public sealed partial class MainWindow : Window
         UpdateGroupedTools();
         foreach (var button in _toolButtons)
         {
-            var isSelected = string.Equals(button.Tag?.ToString(), tool.ToString(), StringComparison.Ordinal);
-            button.Background = GetBrush(isSelected ? "ToolSelectedBrush" : "ShellPanelBrush");
-            button.BorderBrush = GetBrush(isSelected ? "ToolSelectedBrush" : "ShellStrokeBrush");
-            button.BorderThickness = new Thickness(isSelected ? 2 : 1);
+            if (Enum.TryParse<EditorTool>(button.Tag?.ToString(), out var buttonTool))
+                UpdateToolButtonState(button, buttonTool);
         }
 
         _iconBrushOverride = CreateToolAccentBrush(tool);

@@ -561,23 +561,24 @@ public sealed partial class MainWindow
 
     private void SetToolButton(Button button, EditorTool tool, string tooltip)
     {
-        _iconBrushOverride = CreateToolAccentBrush(tool);
-        button.Content = CreateToolIcon(tool);
-        _iconBrushOverride = null;
+        UpdateToolButtonState(button, tool);
         button.MinWidth = 38;
         button.MinHeight = 38;
         button.Padding = new Thickness(0);
-        button.Background = GetBrush("ShellPanelBrush");
-        button.BorderBrush = GetBrush("ShellStrokeBrush");
-        button.BorderThickness = new Thickness(1);
         button.CornerRadius = new CornerRadius(10);
+        var shortcut = tool switch
+        {
+            EditorTool.Select => "V", EditorTool.Text => "T", EditorTool.ArrowStraight => "A",
+            EditorTool.Rectangle => "R", EditorTool.Ellipse => "O", EditorTool.Mask => "M", _ => null
+        };
+        if (shortcut is not null) tooltip += " (" + shortcut + ")";
         ToolTipService.SetToolTip(button, tooltip);
         AutomationProperties.SetName(button, tooltip);
     }
 
     private void SetOcrButton(Button button, string tooltip)
     {
-        _iconBrushOverride = CreateOcrAccentBrush();
+        _iconBrushOverride = GetBrush("ShellStrongTextBrush");
         button.Content = CreateOcrIcon();
         _iconBrushOverride = null;
         button.MinWidth = 38;

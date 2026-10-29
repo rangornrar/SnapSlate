@@ -10,7 +10,6 @@ namespace SnapSlate;
 public sealed partial class MainWindow
 {
     private const string ClipboardImageSourceFormat = "SnapSlate.AnnotatedImage.Source";
-    private readonly string _clipboardImageSource = Guid.NewGuid().ToString("N");
     private bool _isCopyingImage;
 
     private async Task CopyCurrentImageAsync()
@@ -37,7 +36,7 @@ public sealed partial class MainWindow
             stream.Seek(0);
             var content = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
             content.SetBitmap(RandomAccessStreamReference.CreateFromStream(stream));
-            content.SetData(ClipboardImageSourceFormat, _clipboardImageSource);
+            content.SetData(ClipboardImageSourceFormat, "SnapSlate");
             for (var attempt = 0; attempt < 3; attempt++)
             {
                 if (_editorClosed) return;

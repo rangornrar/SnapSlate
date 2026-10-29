@@ -2023,9 +2023,7 @@ public sealed partial class MainWindow : Window
             }
 
             // Ignore our own output for automatic import, but allow an explicit paste.
-            if (!force && dataPackage.Contains(ClipboardImageSourceFormat)
-                && await dataPackage.GetDataAsync(ClipboardImageSourceFormat) is string source
-                && source == _clipboardImageSource)
+            if (!force && dataPackage.Contains(ClipboardImageSourceFormat))
                 return null;
 
             var streamReference = await dataPackage.GetBitmapAsync();

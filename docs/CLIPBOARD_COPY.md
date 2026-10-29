@@ -4,7 +4,7 @@ Le bouton **Copier l’image**, à côté d’**Exporter PNG**, copie la capture
 
 Le rendu PNG est calculé sur un instantané en arrière-plan avec `GuideImageRenderer.RenderPng`, comme l’export. Il conserve la résolution de la source et applique uniquement le recadrage confirmé. Les masques sont opaques et le contour de sélection n’est pas rendu. Aucun chemin de fichier, note de guide ou projet éditable n’est ajouté au presse-papiers.
 
-Le contenu est publié comme bitmap Windows et conservé avec `Clipboard.Flush` avant libération du flux mémoire. Une marque contenant un identifiant aléatoire de la session empêche l’import automatique de réimporter sa propre copie. Le collage manuel reste possible, ainsi que l’import des captures produites par les autres applications. Les commandes sont désactivées pendant la copie ; les échecs de rendu ou de presse-papiers donnent un message localisé.
+Le contenu est publié comme bitmap Windows et conservé avec `Clipboard.Flush` avant libération du flux mémoire. Un format personnalisé marque les images produites par SnapSlate pour éviter leur réimportation automatique, y compris entre plusieurs sessions de l’application. La présence du format suffit : aucune désérialisation du marqueur n’est nécessaire après sa mise en cache par Windows. Le collage manuel reste possible, ainsi que l’import des captures produites par les autres applications. Les commandes sont désactivées pendant la copie ; les échecs de rendu ou de presse-papiers donnent un message localisé.
 
 ## Vérifications réalisées
 

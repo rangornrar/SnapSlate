@@ -287,9 +287,9 @@ public sealed partial class MainWindow
         }
     }
 
-    private async Task<GuidePackageResult?> BuildGuidePackageAsync(string rootFolder, ExportFormatChoice[] requestedFormats)
+    private async Task<GuidePackageResult?> BuildGuidePackageAsync(string rootFolder, ExportFormatChoice[] requestedFormats, System.Collections.Generic.IReadOnlyList<ScreenshotDocument>? documents = null)
     {
-        if (_documents.Count == 0)
+        if (_showWelcome || _documents.Count == 0)
         {
             StatusText.Text = SafetyText("UiNoStepsToExport");
             return null;
@@ -307,7 +307,7 @@ public sealed partial class MainWindow
 
         try
         {
-            return await GuidePackageBuilder.BuildAsync(rootFolder, _documents, _projectMetadata,
+            return await GuidePackageBuilder.BuildAsync(rootFolder, documents ?? _documents, _projectMetadata,
                 _palettes, requestedFormats, GetTemplateLabel(_projectMetadata.TemplateType), UseEnglish,
                 (step, count) => StatusText.Text = string.Format(CultureInfo.CurrentCulture,
                     SafetyText("ExportProgress"), step, count), cancellation.Token);

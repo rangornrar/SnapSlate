@@ -90,6 +90,25 @@ public sealed class GuidePackageBuilderTests
         Assert.AreEqual(0, Directory.GetDirectories(_root).Length);
     }
 
+    [TestMethod]
+    public async Task BuildAsync_ActiveCaptureScope_ExportsOnlySelectedAnnotatedImage()
+    {
+        var active = Source();
+        active.StepTitle = "Active screenshot";
+        active.Annotations.Add(new() { Kind = AnnotationKind.Mask, Bounds = new Windows.Foundation.Rect(10, 10, 20, 20), Opacity = 0.1 });
+        var activePackage = await GuidePackageBuilder.BuildAsync(_root, [active], new(), Palettes(), [ExportFormatChoice.Png], "Manual", true, null, CancellationToken.None);
+        Assert.AreEqual(1, activePackage.Manifest.Steps.Count);
+        Assert.AreEqual("Active screenshot", activePackage.Manifest.Steps[0].Title);
+        Assert.AreEqual(1, Directory.GetFiles(Path.Combine(activePackage.PackageFolder, "images"), "*.png").Length);
+        Assert.IsFalse(File.Exists(Path.Combine(activePackage.PackageFolder, "guide.html")));
+        using var image = new Bitmap(activePackage.Manifest.Steps[0].ImagePath);
+        Assert.AreEqual(Color.FromArgb(255, 18, 18, 18).ToArgb(), image.GetPixel(15, 15).ToArgb());
+        var completePackage = await GuidePackageBuilder.BuildAsync(_root, [Source(), active, Source()], new(), Palettes(), [ExportFormatChoice.Png], "Manual", true, null, CancellationToken.None);
+        Assert.AreEqual(3, completePackage.Manifest.Steps.Count);
+        Assert.AreEqual(3, Directory.GetFiles(Path.Combine(completePackage.PackageFolder, "images"), "*.png").Length);
+        Assert.AreEqual("Active screenshot", completePackage.Manifest.Steps[1].Title);
+    }
+
     private static ScreenshotDocument Source()
     {
         using var bitmap = new Bitmap(100, 100);

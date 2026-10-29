@@ -190,15 +190,12 @@
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8" MinWidth="80">
                             <TextBox x:Name="DocumentTitleTextBox" Width="180" MinWidth="80" Background="Transparent" BorderThickness="0" Padding="0" FontSize="13" FontWeight="SemiBold" HorizontalContentAlignment="Center" TextChanged="DocumentTitleTextBox_TextChanged" />
                             <Button x:Name="DocumentTitleEditButton" Click="DocumentTitleEditButton_Click" MinWidth="30" MinHeight="30" Padding="0" CornerRadius="8" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Visibility="Collapsed">
-                                <FontIcon Glyph="&#xE70F;" FontSize="14" />
+                                <FontIcon Glyph="" FontSize="14" />
                             </Button>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                            <Button
-                                x:Name="CopyImageButton"
-                                AutomationProperties.AutomationId="CopyImageButton"
-                                Click="CopyImageButton_Click" />
-                            <Button x:Name="ExportCurrentButton" Click="ExportCurrentMenuItem_Click" />
+                            <Button x:Name="CopyImageButton" AutomationProperties.AutomationId="CopyImageButton" Click="CopyImageButton_Click" />
+                            <Button x:Name="ExportCurrentButton" Click="OpenExportDialog_Click" />
                             <Button x:Name="SettingsMenuButton" Click="SettingsButton_Click" HorizontalAlignment="Right" VerticalAlignment="Center" MinHeight="34" Padding="12,6" CornerRadius="10" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" />
                         </StackPanel>
                     </Grid>
@@ -206,35 +203,42 @@
                 <Border Grid.Row="1" Padding="12,4" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="0,0,0,1" Visibility="Collapsed" x:Name="WorkspaceContextBar">
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
                         <StackPanel Orientation="Horizontal" Spacing="18">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="4" VerticalAlignment="Center">
-                                <TextBlock x:Name="ToolbarCurrentToolLabelText" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" Visibility="Collapsed" />
-                                <TextBlock x:Name="ToolbarCurrentToolText" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                            </StackPanel>
+                            <TextBlock x:Name="ToolbarCurrentToolLabelText" Visibility="Collapsed" />
+                            <TextBlock x:Name="ToolbarCurrentToolText" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
                             <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" x:Name="WorkspaceBrushControls">
                                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                     <TextBlock x:Name="ToolbarPaletteLabelText" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" Visibility="Collapsed" />
-                                    <ComboBox x:Name="ToolbarPaletteComboBox" Width="150" SelectionChanged="ToolbarPaletteComboBox_SelectionChanged">
-                                        <ComboBox.Resources>
-                                            <DataTemplate x:Key="PaletteComboTemplate" x:DataType="local:GradientPaletteDefinition">
-                                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                                    <Border Width="16" Height="16" CornerRadius="8" Background="{Binding DisplayBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" />
-                                                    <TextBlock Text="{Binding DisplayName}" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="6" x:Name="QuickColorStrip" />
+                                    <Button x:Name="MoreColorsButton" AutomationProperties.AutomationId="MoreColorsButton">
+                                        <Button.Flyout>
+                                            <Flyout Opened="ToolOptions_Opened" Closed="ToolOptions_Closed">
+                                                <StackPanel Spacing="12" Width="300">
+                                                    <ComboBox x:Name="ToolbarPaletteComboBox" Width="150" SelectionChanged="ToolbarPaletteComboBox_SelectionChanged">
+                                                        <ComboBox.Resources>
+                                                            <DataTemplate x:Key="PaletteComboTemplate" x:DataType="local:GradientPaletteDefinition">
+                                                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                                    <Border Width="16" Height="16" CornerRadius="8" Background="{Binding DisplayBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" />
+                                                                    <TextBlock Text="{Binding DisplayName}" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ComboBox.Resources>
+                                                        <ComboBox.ItemTemplate>
+                                                            <StaticResource ResourceKey="PaletteComboTemplate" />
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                                        <TextBlock x:Name="ShadeSectionTitleText" Visibility="Collapsed" />
+                                                        <StackPanel x:Name="ShadeStrip" Orientation="Horizontal" Spacing="4" />
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                        <TextBlock x:Name="ToolbarOpacityLabelText" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                                        <Slider x:Name="ToolbarOpacitySlider" Width="96" Minimum="0.1" Maximum="1" Value="1" StepFrequency="0.05" ValueChanged="OpacitySlider_ValueChanged" />
+                                                        <TextBlock x:Name="ToolbarOpacityValueText" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                                    </StackPanel>
                                                 </StackPanel>
-                                            </DataTemplate>
-                                        </ComboBox.Resources>
-                                        <ComboBox.ItemTemplate>
-                                            <StaticResource ResourceKey="PaletteComboTemplate" />
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                                    <TextBlock x:Name="ShadeSectionTitleText" Visibility="Collapsed" />
-                                    <StackPanel x:Name="ShadeStrip" Orientation="Horizontal" Spacing="4" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                    <TextBlock x:Name="ToolbarOpacityLabelText" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                    <Slider x:Name="ToolbarOpacitySlider" Width="96" Minimum="0.1" Maximum="1" Value="1" StepFrequency="0.05" ValueChanged="OpacitySlider_ValueChanged" />
-                                    <TextBlock x:Name="ToolbarOpacityValueText" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                            </Flyout>
+                                        </Button.Flyout>
+                                    </Button>
                                 </StackPanel>
                                 <StackPanel x:Name="WorkspaceStrokeControls" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                     <TextBlock x:Name="StrokeThicknessLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
@@ -264,7 +268,7 @@
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="1" ColumnSpacing="0" x:Name="EditorWorkspaceGrid">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="StepsPaneColumn" Width="240" />
+                                <ColumnDefinition x:Name="StepsPaneColumn" Width="320" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition x:Name="InspectorPaneColumn" Width="300" />
                             </Grid.ColumnDefinitions>
@@ -284,7 +288,7 @@
                                             <TextBlock x:Name="StepsPaneHintText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="10" Visibility="Collapsed" />
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
-                                            <Button x:Name="AddStepButton" Click="NewDemoTabButton_Click" />
+                                            <Button x:Name="AddStepButton" Click="ImportScreenshotButton_Click" />
                                             <Button x:Name="CollapseStepsButton" Click="CollapseStepsButton_Click" />
                                         </StackPanel>
                                     </Grid>
@@ -305,11 +309,11 @@
                                             </ListView.ItemContainerStyle>
                                             <ListView.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Border Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="18" Padding="10">
+                                                    <Border Loaded="StepCard_Loaded" Unloaded="StepCard_Unloaded" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="18" Padding="10">
                                                         <Grid ColumnSpacing="10" VerticalAlignment="Center">
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="56" />
+                                                                <ColumnDefinition Width="40" />
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="Auto" />
                                                             </Grid.ColumnDefinitions>
@@ -320,10 +324,8 @@
                                                                 <Image Source="{Binding ThumbnailSource}" Stretch="UniformToFill" />
                                                             </Border>
                                                             <StackPanel Grid.Column="2" Spacing="4" VerticalAlignment="Center">
-                                                                <TextBlock Text="{Binding TabTitle}" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" TextTrimming="CharacterEllipsis" />
-                                                                <Border Background="{ThemeResource ShellBackgroundBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="999" Padding="8,3" HorizontalAlignment="Left">
-                                                                    <TextBlock Text="{Binding StepNote}" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextTrimming="CharacterEllipsis" />
-                                                                </Border>
+                                                                <TextBlock Text="{Binding TabTitle}" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxLines="2" />
+                                                                <TextBlock Text="{Binding StepNote}" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextTrimming="CharacterEllipsis" MaxLines="2" TextWrapping="Wrap" />
                                                             </StackPanel>
                                                             <Button Grid.Column="3" Tag="{Binding}" Click="StepMoreButton_Click" AutomationProperties.Name="{Binding StepActionsName}" AutomationProperties.AutomationId="{Binding StepActionsId}" Content="⋯" MinWidth="28" MinHeight="28" Padding="0" Background="Transparent" BorderBrush="Transparent" />
                                                         </Grid>
@@ -484,10 +486,26 @@
                                                                 <Button x:Name="ToolbarOcrButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="OcrButton_Click" />
                                                                 <Button x:Name="ToolbarTextButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Text" />
                                                                 <Button x:Name="ToolbarStickerButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Sticker" />
-                                                                <Button x:Name="ToolbarArrowStraightButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="ArrowStraight" />
-                                                                <Button x:Name="ToolbarArrowCurvedButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="ArrowCurved" />
-                                                                <Button x:Name="ToolbarRectangleButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Rectangle" />
-                                                                <Button x:Name="ToolbarEllipseButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Ellipse" />
+                                                                <Button x:Name="ToolbarArrowStraightButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="GroupedTool_Click" Tag="ArrowStraight">
+                                                                    <Button.ContextFlyout>
+                                                                        <MenuFlyout Opened="ToolOptions_Opened" Closed="ToolOptions_Closed">
+                                                                            <MenuFlyoutItem x:Name="ToolVariantArrowStraight" Tag="ArrowStraight" Click="ToolVariant_Click" />
+                                                                            <MenuFlyoutItem x:Name="ToolVariantArrowCurved" Tag="ArrowCurved" Click="ToolVariant_Click" />
+                                                                        </MenuFlyout>
+                                                                    </Button.ContextFlyout>
+                                                                </Button>
+                                                                <Button x:Name="ArrowVariantsButton" Click="ShowToolVariants_Click" Content="⌄" MinWidth="38" MinHeight="20" Height="20" Padding="0" AutomationProperties.AutomationId="ArrowVariantsButton" />
+                                                                <Button x:Name="ToolbarArrowCurvedButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="ArrowCurved" Visibility="Collapsed" />
+                                                                <Button x:Name="ToolbarRectangleButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="GroupedTool_Click" Tag="Rectangle">
+                                                                    <Button.ContextFlyout>
+                                                                        <MenuFlyout Opened="ToolOptions_Opened" Closed="ToolOptions_Closed">
+                                                                            <MenuFlyoutItem x:Name="ToolVariantRectangle" Tag="Rectangle" Click="ToolVariant_Click" />
+                                                                            <MenuFlyoutItem x:Name="ToolVariantEllipse" Tag="Ellipse" Click="ToolVariant_Click" />
+                                                                        </MenuFlyout>
+                                                                    </Button.ContextFlyout>
+                                                                </Button>
+                                                                <Button x:Name="ShapeVariantsButton" Click="ShowToolVariants_Click" Content="⌄" MinWidth="38" MinHeight="20" Height="20" Padding="0" AutomationProperties.AutomationId="ShapeVariantsButton" />
+                                                                <Button x:Name="ToolbarEllipseButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Ellipse" Visibility="Collapsed" />
                                                                 <Button x:Name="ToolbarFocusButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Focus" />
                                                                 <Button x:Name="ToolbarMaskButton" Style="{StaticResource FloatingToolRailButtonStyle}" Click="ToolButton_Click" Tag="Mask" />
                                                             </StackPanel>
@@ -604,10 +622,21 @@
                                     </ScrollViewer>
                                 </Grid>
                             </Border>
-                        </Grid>
+
+<primitives:Thumb x:Name="StepsResizeThumb" Grid.Column="0" HorizontalAlignment="Right" Width="6" DragDelta="StepsResizeThumb_DragDelta" KeyDown="StepsResizeThumb_KeyDown" AutomationProperties.AutomationId="StepsResizeThumb" Background="{ThemeResource ShellStrokeBrush}" /></Grid>
                     </Grid>
                 </Border>
-            </Grid>
+
+                <Grid x:Name="WelcomeHost" Grid.Row="2" Background="{ThemeResource CanvasBackdropBrush}">
+                    <StackPanel Spacing="18" MaxWidth="540" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock x:Name="WelcomeTitleText" FontSize="30" TextWrapping="Wrap" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                        <TextBlock x:Name="WelcomeHelpText" FontSize="16" TextWrapping="Wrap" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                        <Button x:Name="WelcomePasteButton" Click="ImportClipboardMenuItem_Click" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="WelcomePasteButton" />
+                        <Button x:Name="WelcomeImageButton" Click="ImportScreenshotButton_Click" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="WelcomeImageButton" />
+                        <Button x:Name="WelcomeProjectButton" Click="OpenProjectButton_Click" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="WelcomeProjectButton" />
+                        <Button x:Name="WelcomeExampleButton" Click="DemoProjectButton_Click" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="WelcomeExampleButton" />
+                    </StackPanel>
+                </Grid></Grid>
             <Grid x:Name="SettingsSection" Visibility="Collapsed">
                 <Grid Padding="20" ColumnSpacing="16">
                     <Grid.ColumnDefinitions>
@@ -626,43 +655,48 @@
                             <StackPanel Spacing="10">
                                 <Button x:Name="SettingsGeneralNavButton" Tag="General" Click="SettingsNavButton_Click" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="12" Background="{ThemeResource ToolSelectedBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1">
                                     <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <FontIcon Glyph="&#xE713;" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                        <TextBlock x:Name="SettingsGeneralNavText" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        <FontIcon Glyph="" FontSize="14" />
+                                        <TextBlock x:Name="SettingsGeneralNavText" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" />
                                     </StackPanel>
                                 </Button>
                                 <Button x:Name="SettingsCaptureNavButton" Tag="Capture" Click="SettingsNavButton_Click" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="12" Background="Transparent" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1">
                                     <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <FontIcon Glyph="&#xE8B8;" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                        <TextBlock x:Name="SettingsCaptureNavText" VerticalAlignment="Center" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        <FontIcon Glyph="" FontSize="14" />
+                                        <TextBlock x:Name="SettingsCaptureNavText" VerticalAlignment="Center" FontSize="14" />
                                     </StackPanel>
                                 </Button>
-                                <Button x:Name="SettingsExportNavButton" Tag="Export" Click="SettingsNavButton_Click" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="12" Background="Transparent" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1">
+                                <Button x:Name="SettingsGuideNavButton" Tag="Guide" Click="SettingsNavButton_Click" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="12" Background="Transparent" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1">
                                     <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <FontIcon Glyph="&#xE8A1;" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                        <TextBlock x:Name="SettingsExportNavText" VerticalAlignment="Center" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        <FontIcon Glyph="" FontSize="14" />
+                                        <TextBlock x:Name="SettingsGuideNavText" VerticalAlignment="Center" FontSize="14" />
+                                    </StackPanel>
+                                </Button><Button x:Name="SettingsExportNavButton" Tag="Export" Click="SettingsNavButton_Click" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="12" Background="Transparent" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <FontIcon Glyph="" FontSize="14" />
+                                        <TextBlock x:Name="SettingsExportNavText" VerticalAlignment="Center" FontSize="14" />
                                     </StackPanel>
                                 </Button>
                                 <Button x:Name="SettingsPublicationNavButton" Tag="Publication" Click="SettingsNavButton_Click" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="12" Background="Transparent" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1">
                                     <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <FontIcon Glyph="&#xE72D;" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                        <TextBlock x:Name="SettingsPublicationNavText" VerticalAlignment="Center" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        <FontIcon Glyph="" FontSize="14" />
+                                        <TextBlock x:Name="SettingsPublicationNavText" VerticalAlignment="Center" FontSize="14" />
                                     </StackPanel>
                                 </Button>
                                 <Button x:Name="SettingsShortcutsNavButton" Tag="Shortcuts" Click="SettingsNavButton_Click" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="12" Background="Transparent" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1">
                                     <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <FontIcon Glyph="&#xE765;" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                        <TextBlock x:Name="SettingsShortcutsNavText" VerticalAlignment="Center" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        <FontIcon Glyph="" FontSize="14" />
+                                        <TextBlock x:Name="SettingsShortcutsNavText" VerticalAlignment="Center" FontSize="14" />
                                     </StackPanel>
                                 </Button>
                                 <Button x:Name="SettingsAboutNavButton" Tag="About" Click="SettingsNavButton_Click" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="12" Background="Transparent" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1">
                                     <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <FontIcon Glyph="&#xE946;" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                        <TextBlock x:Name="SettingsAboutNavText" VerticalAlignment="Center" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                        <FontIcon Glyph="" FontSize="14" />
+                                        <TextBlock x:Name="SettingsAboutNavText" VerticalAlignment="Center" FontSize="14" />
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
 
-                            <Border Grid.Row="2" Background="{ThemeResource ShellPanelAltBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="18" Padding="14">
+                            <Border Grid.Row="2" Background="{ThemeResource ShellPanelAltBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="18" Padding="14" Visibility="Collapsed">
                                 <StackPanel Spacing="8">
                                     <TextBlock x:Name="SettingsTipTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="14" Foreground="{ThemeResource ShellStrongTextBrush}" />
                                     <TextBlock x:Name="SettingsTipBodyText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="12" TextWrapping="Wrap" />
@@ -671,7 +705,11 @@
                         </Grid>
                     </Border>
 
-                    <ScrollViewer Grid.Column="1" x:Name="SettingsScrollViewer" VerticalScrollBarVisibility="Auto">
+                    <Grid Grid.Column="1">
+<Grid.RowDefinitions>
+<RowDefinition Height="*" />
+<RowDefinition Height="Auto" /></Grid.RowDefinitions>
+<ScrollViewer x:Name="SettingsScrollViewer" VerticalScrollBarVisibility="Auto">
                         <StackPanel Spacing="14" Padding="0,0,8,12">
                             <Grid ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
@@ -679,7 +717,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock x:Name="SettingsPageTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="32" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                <Button Grid.Column="1" Content="×" Click="SettingsCancelButton_Click" MinWidth="32" MinHeight="32" Padding="0" CornerRadius="10" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                <Button x:Name="SettingsCloseButton" Grid.Column="1" Content="×" Click="SettingsCancelButton_Click" MinWidth="32" MinHeight="32" Padding="0" CornerRadius="10" HorizontalAlignment="Right" VerticalAlignment="Top" />
                             </Grid>
 
                             <Border x:Name="SettingsGeneralCard" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="20" Padding="16">
@@ -709,36 +747,43 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border x:Name="ExportSection" Visibility="Visible" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="24">
+                            <Border x:Name="SettingsGuideCard" Visibility="Visible" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="24">
                                 <StackPanel Spacing="14">
-                                    <TextBlock x:Name="ExportPageTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="24" Foreground="{ThemeResource ShellStrongTextBrush}" />
-                                    <TextBlock x:Name="ExportPageSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
-
                                     <StackPanel Spacing="8">
                                         <TextBlock x:Name="ExportTemplateLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
                                         <ComboBox x:Name="ExportTemplateComboBox" SelectionChanged="ExportTemplateComboBox_SelectionChanged" />
                                         <TextBlock x:Name="ExportTemplateValueText" Foreground="{ThemeResource ShellMutedTextBrush}" FontSize="11" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
+                                    <StackPanel Spacing="8">
+                                        <TextBlock x:Name="ExportAudienceLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="ExportAudienceTextBox" TextChanged="ExportAudienceTextBox_TextChanged" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="8">
+                                        <TextBlock x:Name="ExportAuthorLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="ExportAuthorTextBox" TextChanged="ExportAuthorTextBox_TextChanged" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="8">
+                                        <TextBlock x:Name="ExportVersionLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
+                                        <TextBox x:Name="ExportVersionTextBox" TextChanged="ExportVersionTextBox_TextChanged" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border><Border x:Name="ExportSection" Visibility="Visible" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="24" Padding="24">
+                                <StackPanel Spacing="14">
+                                    <TextBlock x:Name="ExportPageTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="24" Foreground="{ThemeResource ShellStrongTextBrush}" />
+                                    <TextBlock x:Name="ExportPageSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
+
+
 
                                     <StackPanel Spacing="8">
                                         <TextBlock x:Name="ExportFormatLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
                                         <ComboBox x:Name="ExportFormatComboBox" SelectionChanged="ExportFormatComboBox_SelectionChanged" />
                                     </StackPanel>
 
-                                    <StackPanel Spacing="8">
-                                        <TextBlock x:Name="ExportAudienceLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                        <TextBox x:Name="ExportAudienceTextBox" TextChanged="ExportAudienceTextBox_TextChanged" />
-                                    </StackPanel>
 
-                                    <StackPanel Spacing="8">
-                                        <TextBlock x:Name="ExportAuthorLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                        <TextBox x:Name="ExportAuthorTextBox" TextChanged="ExportAuthorTextBox_TextChanged" />
-                                    </StackPanel>
 
-                                    <StackPanel Spacing="8">
-                                        <TextBlock x:Name="ExportVersionLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
-                                        <TextBox x:Name="ExportVersionTextBox" TextChanged="ExportVersionTextBox_TextChanged" />
-                                    </StackPanel>
+
+
+
 
                                     <StackPanel Spacing="8">
                                         <TextBlock x:Name="ExportFolderLabelText" Foreground="{ThemeResource ShellMutedTextBrush}" />
@@ -752,7 +797,7 @@
                                         </Grid>
                                     </StackPanel>
 
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Visibility="Collapsed">
                                         <Button x:Name="ExportPngButton" Click="ExportButton_Click" />
                                         <Button x:Name="ExportAllFormatsButton" Click="ExportAllFormatsButton_Click" />
                                         <Button x:Name="ExportMarkdownButton" Click="ExportMarkdownButton_Click" />
@@ -762,7 +807,7 @@
                                     </StackPanel>
 
                                     <Border Background="{ThemeResource ShellPanelAltBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="18" Padding="16">
-                                        <StackPanel Spacing="12">
+                                        <StackPanel Spacing="12" Visibility="Collapsed">
                                             <TextBlock x:Name="ExportPreviewTitleText" FontFamily="Bahnschrift SemiBold SemiConden" FontSize="18" Foreground="{ThemeResource ShellStrongTextBrush}" />
                                             <TextBlock x:Name="ExportPreviewSummaryText" Foreground="{ThemeResource ShellMutedTextBrush}" TextWrapping="Wrap" />
                                             <ListView x:Name="ExportStepsListView" />
@@ -855,12 +900,13 @@
                                 </StackPanel>
                             </Border>
 
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
-                                <Button x:Name="SettingsCancelButton" Click="SettingsCancelButton_Click" />
-                                <Button x:Name="SettingsSaveButton" Click="SettingsSaveButton_Click" />
-                            </StackPanel>
+
                         </StackPanel>
                     </ScrollViewer>
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0" Grid.Row="1" Padding="0,12,8,0">
+                                <Button x:Name="SettingsCancelButton" Click="SettingsCancelButton_Click" />
+                                <Button x:Name="SettingsSaveButton" Click="SettingsSaveButton_Click" />
+                            </StackPanel></Grid>
                 </Grid>
             </Grid>
 
@@ -877,7 +923,7 @@
                 <StackPanel x:Name="WorkspaceFooterLeft" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <Button x:Name="ToolbarStepsButton" Click="CollapseStepsButton_Click" Margin="4,0,0,0" MinHeight="34" Padding="12,6" CornerRadius="10" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" />
                     <Button x:Name="InspectorPaneToggleButton" Click="InspectorToggleButton_Click" Visibility="Visible" />
-                    <ComboBox x:Name="ToolbarDocumentComboBox" Width="140" DisplayMemberPath="StepTitle" SelectionChanged="ToolbarDocumentComboBox_SelectionChanged" />
+                    <TextBlock x:Name="StepPositionText" VerticalAlignment="Center" Foreground="{ThemeResource ShellMutedTextBrush}" /><ComboBox x:Name="ToolbarDocumentComboBox" Width="180" DisplayMemberPath="StepTitle" SelectionChanged="ToolbarDocumentComboBox_SelectionChanged" />
                 </StackPanel>
                 <TextBlock x:Name="StatusText" Foreground="{ThemeResource ShellMutedTextBrush}" TextTrimming="CharacterEllipsis" FontSize="12" IsHitTestVisible="False" Grid.Column="1" VerticalAlignment="Center" />
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">

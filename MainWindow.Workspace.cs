@@ -29,7 +29,7 @@ public sealed partial class MainWindow
         Icon(DeleteSelectedButton, "\uE74D", SafetyText("UiDeleteTheSelectedObject"));
         Icon(SettingsMenuButton, "\uE713", SafetyText("UiOpenSettings"));
         ImportScreenshotButton.Content = SafetyText("WorkspaceImport");
-        ExportCurrentButton.Content = SafetyText("WorkspaceExportPng");
+        ExportCurrentButton.Content = SafetyText("ExportAction");
         ExportCurrentButton.Background = GetBrush("PrimaryActionBrush");
         ExportCurrentButton.Foreground = GetBrush("PrimaryActionTextBrush");
         ExportCurrentButton.Padding = new Thickness(12, 6, 12, 6);
@@ -40,6 +40,7 @@ public sealed partial class MainWindow
         AutomationProperties.SetName(ToolbarDocumentComboBox, SafetyText("WorkspaceCapture"));
         AutomationProperties.SetName(ToolbarPaletteComboBox, SafetyText("UiColor"));
         AutomationProperties.SetName(ToolbarOpacitySlider, SafetyText("UiOpacity"));
+        ApplyWorkflowLabels();
         UpdateWorkspaceZoomLabel();
         UpdateWorkspaceContext();
     }

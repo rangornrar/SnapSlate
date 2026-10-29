@@ -429,4 +429,44 @@
   <data name="ClipboardCopying" xml:space="preserve"><value>Copie de la capture annotée…</value></data>
   <data name="ClipboardCopySucceeded" xml:space="preserve"><value>Capture annotée copiée dans le presse-papiers.</value></data>
   <data name="ClipboardCopyFailed" xml:space="preserve"><value>Impossible de copier l’image. Réessayez en gardant SnapSlate au premier plan.</value></data>
+  <data name="WelcomeTitle" xml:space="preserve"><value>Annotez votre capture</value></data>
+  <data name="WelcomeHelp" xml:space="preserve"><value>Collez une capture ou importez une image pour commencer.</value></data>
+  <data name="WelcomePaste" xml:space="preserve"><value>Coller une capture · Ctrl+Maj+V</value></data>
+  <data name="WelcomeImage" xml:space="preserve"><value>Importer une image</value></data>
+  <data name="WelcomeProject" xml:space="preserve"><value>Ouvrir un projet · Ctrl+O</value></data>
+  <data name="WelcomeExample" xml:space="preserve"><value>Explorer un exemple</value></data>
+  <data name="GuideSettings" xml:space="preserve"><value>Informations du guide</value></data>
+  <data name="ResizeSteps" xml:space="preserve"><value>Largeur des étapes · glisser ou flèches gauche et droite</value></data>
+  <data name="ToolVariants" xml:space="preserve"><value>choisir une variante</value></data>
+  <data name="StepPosition" xml:space="preserve"><value>Étape {0} sur {1}</value></data>
+  <data name="SelectedCategory" xml:space="preserve"><value>Catégorie sélectionnée</value></data>
+  <data name="ExportScope" xml:space="preserve"><value>Contenu à exporter</value></data>
+  <data name="ExportActiveCapture" xml:space="preserve"><value>Capture active avec ses annotations</value></data>
+  <data name="ExportWholeGuide" xml:space="preserve"><value>Guide complet · {0} étapes</value></data>
+  <data name="ExportGuideFormats" xml:space="preserve"><value>Tous les formats du guide</value></data>
+  <data name="ExportFormatLabel" xml:space="preserve"><value>Format</value></data>
+  <data name="ExportDestination" xml:space="preserve"><value>Dossier de destination</value></data>
+  <data name="ExportSubfolderHelp" xml:space="preserve"><value>Un nouveau sous-dossier contiendra les fichiers exportés. PNG crée une image annotée par étape.</value></data>
+  <data name="ExportFolderRequired" xml:space="preserve"><value>Choisissez un chemin de dossier complet.</value></data>
+  <data name="ToolVariantsHelp" xml:space="preserve"><value>clic droit ou Maj+F10 pour les variantes</value></data>
+  <data name="ToolShortcuts" xml:space="preserve"><value>Sélection, texte, flèche, rectangle, ellipse, masque (hors saisie)</value></data>
+  <data name="SettingsPreviewHelp" xml:space="preserve"><value>Aperçu immédiat. Enregistrez pour conserver vos modifications ou annulez pour revenir aux réglages précédents.</value></data>
+  <data name="ExportPreferencesHelp" xml:space="preserve"><value>Choisissez les valeurs par défaut. Pour exporter, utilisez le bouton Exporter dans l’éditeur.</value></data>
+  <data name="PaletteSunset" xml:space="preserve"><value>Orange corail</value></data>
+  <data name="PaletteEmber" xml:space="preserve"><value>Rouge</value></data>
+  <data name="PaletteCitrus" xml:space="preserve"><value>Jaune</value></data>
+  <data name="PaletteMint" xml:space="preserve"><value>Vert menthe</value></data>
+  <data name="PaletteLagoon" xml:space="preserve"><value>Turquoise</value></data>
+  <data name="PaletteSky" xml:space="preserve"><value>Bleu clair</value></data>
+  <data name="PaletteOcean" xml:space="preserve"><value>Bleu foncé</value></data>
+  <data name="PaletteRose" xml:space="preserve"><value>Rose</value></data>
+  <data name="PaletteBerry" xml:space="preserve"><value>Magenta</value></data>
+  <data name="PaletteGrape" xml:space="preserve"><value>Violet</value></data>
+  <data name="GuideNav" xml:space="preserve"><value>Guide</value></data>
+  <data name="ExportAction" xml:space="preserve"><value>Exporter</value></data>
+  <data name="ArrowVariants" xml:space="preserve"><value>Variantes de flèche</value></data>
+  <data name="ShapeVariants" xml:space="preserve"><value>Variantes de forme</value></data>
+  <data name="SelectedColor" xml:space="preserve"><value>Couleur sélectionnée</value></data>
+  <data name="MoreColors" xml:space="preserve"><value>Autres couleurs…</value></data>
+  <data name="MoreColorsHelp" xml:space="preserve"><value>Toutes les palettes, nuances et réglages d’opacité</value></data>
 </root>

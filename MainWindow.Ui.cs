@@ -62,11 +62,6 @@ public sealed partial class MainWindow
 
     private sealed record SettingsShortcutItem(string Key, string Description);
 
-    private static Brush? TryGetBrush(string resourceKey)
-    {
-        return Application.Current.Resources.TryGetValue(resourceKey, out var value) ? value as Brush : null;
-    }
-
     private void PopulatePaletteOrder()
     {
         _paletteOrder.Clear();
@@ -74,7 +69,7 @@ public sealed partial class MainWindow
         {
             if (_palettes.TryGetValue(key, out var palette))
             {
-                _paletteOrder.Add(palette);
+                _paletteOrder.Add(palette with { DisplayName = SafetyText("Palette" + palette.Key) });
             }
         }
     }
@@ -82,6 +77,7 @@ public sealed partial class MainWindow
     private void ApplyChromeLabels()
     {
         LocalizedText.CurrentLanguage = UseEnglish ? "en-US" : "fr-FR";
+        LocalizePalettes();
         RefreshAnnotationObjects();
         ImportClipboardMenuItem.Text = SafetyText("ImportClipboard.Text");
         ExportCancelButton.Content = SafetyText("ExportCancel.Content");
@@ -108,7 +104,7 @@ public sealed partial class MainWindow
         SetMenuText(ImportScreenshotMenuItem, SafetyText("UiImport"));
         SetMenuText(OcrMenuItem, "OCR");
         SetMenuText(ExportCurrentMenuItem, SafetyText("UiCurrentStepPNG"));
-        SetMenuText(ExportAllFormatsMenuItem, SafetyText("UiExportAll"));
+        SetMenuText(ExportAllFormatsMenuItem, SafetyText("ExportGuideFormats"));
         SetMenuText(ExportMarkdownMenuItem, "Markdown");
         SetMenuText(ExportHtmlMenuItem, "HTML");
         SetMenuText(ExportPdfMenuItem, "PDF");
@@ -247,7 +243,7 @@ public sealed partial class MainWindow
         SetText(SelectedOpacityLabelText, SafetyText("UiOpacity"));
         SetText(LegendTitleText, SafetyText("UiStickerLegends"));
         SetText(ExportPageTitleText, SafetyText("UiExport"));
-        SetText(ExportPageSummaryText, SafetyText("UiPNGForTheCurrentStepTheOther"));
+        SetText(ExportPageSummaryText, SafetyText("ExportPreferencesHelp"));
         SetText(ExportTemplateLabelText, SafetyText("UiDocumentType"));
         SetText(ExportFormatLabelText, SafetyText("UiMainFormat"));
         SetText(ExportAudienceLabelText, SafetyText("UiAudience_4bfa6ed2"));
@@ -285,7 +281,7 @@ public sealed partial class MainWindow
         SetText(ThemeSettingHelpText, SafetyText("UiSystemFollowsWindowsAutomatically"));
         SetText(LanguageSettingHelpText, SafetyText("UiByDefaultSnapSlateFollowsTheWindowsLanguage"));
         SetText(CaptureSettingHelpText, SafetyText("UiEnablesAutomaticImportOfCapturesCopiedTo"));
-        SetText(SettingsRestartHintText, SafetyText("UiThemeAndLanguageApplyImmediatelyWithoutRestarting"));
+        SetText(SettingsRestartHintText, SafetyText("SettingsPreviewHelp"));
         SetText(SettingsAboutTitleText, SafetyText("UiAbout"));
         SetText(SettingsAboutBodyText, SafetyText("UiSnapSlateAcceleratesVisualProcedureCreationWithCaptures"));
         SetButtonContent(SettingsCancelButton, SafetyText("UiCancel"));
@@ -318,6 +314,7 @@ public sealed partial class MainWindow
             new SettingsShortcutItem("Win + Shift + S", SafetyText("CaptureShortcutHelp")),
             new SettingsShortcutItem("Ctrl + Shift + V", SafetyText("ImportClipboard.Text")),
             new SettingsShortcutItem("Ctrl + Shift + C", SafetyText("ClipboardCopy")),
+            new SettingsShortcutItem("V / T / A / R / O / M", SafetyText("ToolShortcuts")),
             new SettingsShortcutItem("Suppr", SafetyText("UiDeleteTheSelectedObject"))
         };
     }
@@ -455,7 +452,8 @@ public sealed partial class MainWindow
     private void ApplyProcedurePaneLayout()
     {
         if (_isDraggingAnnotation) return;
-        StepsPaneColumn.Width = new GridLength(_showStepsPane ? 240 : 0);
+        StepsPaneColumn.Width = new GridLength(_showStepsPane ? _stepsPaneWidth : 0);
+        StepsResizeThumb.Visibility = _showStepsPane ? Visibility.Visible : Visibility.Collapsed;
         StepsPaneHost.Visibility = _showStepsPane ? Visibility.Visible : Visibility.Collapsed;
         InspectorPaneColumn.Width = new GridLength(_isInspectorPaneCollapsed ? 0 : 284);
         InspectorPaneHost.Visibility = _isInspectorPaneCollapsed ? Visibility.Collapsed : Visibility.Visible;
@@ -509,10 +507,10 @@ public sealed partial class MainWindow
             var button = new Button
             {
                 Tag = i,
-                Width = 20,
-                Height = 20,
+                Width = 28,
+                Height = 28,
                 Padding = new Thickness(0),
-                Content = (i + 1).ToString(),
+                Content = string.Empty,
                 FontSize = 9
             };
             button.Click += ShadeButton_Click;
@@ -1102,7 +1100,8 @@ public sealed partial class MainWindow
         SettingsSection.Visibility = section == ShellSection.Settings ? Visibility.Visible : Visibility.Collapsed;
         WorkspaceFooterLeft.Visibility = section == ShellSection.Procedure ? Visibility.Visible : Visibility.Collapsed;
         foreach (var control in new UIElement[] { ToolbarZoomOutButton, ToolbarZoomResetButton, ToolbarZoomInButton, ToolbarFitButton, AnnotationCountText })
-            control.Visibility = section == ShellSection.Procedure ? Visibility.Visible : Visibility.Collapsed;
+            control.Visibility = section == ShellSection.Procedure && !_showWelcome ? Visibility.Visible : Visibility.Collapsed;
+        UpdateWelcomeSurface();
     }
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -1138,9 +1137,11 @@ public sealed partial class MainWindow
 
     private void SelectSettingsNavSection(string sectionKey)
     {
+        _selectedSettingsSection = sectionKey;
         SetSettingsNavButtonState(SettingsGeneralNavButton, sectionKey == "General");
         SetSettingsNavButtonState(SettingsCaptureNavButton, sectionKey == "Capture");
         SetSettingsNavButtonState(SettingsExportNavButton, sectionKey == "Export");
+        SetSettingsNavButtonState(SettingsGuideNavButton, sectionKey == "Guide");
         SetSettingsNavButtonState(SettingsPublicationNavButton, sectionKey == "Publication");
         SetSettingsNavButtonState(SettingsShortcutsNavButton, sectionKey == "Shortcuts");
         SetSettingsNavButtonState(SettingsAboutNavButton, sectionKey == "About");
@@ -1150,29 +1151,26 @@ public sealed partial class MainWindow
             "General" => SafetyText("UiGeneral"),
             "Capture" => SafetyText("UiCapture"),
             "Export" => SafetyText("UiExport"),
+            "Guide" => SafetyText("GuideSettings"),
             "Publication" => SafetyText("UiPublication"),
             "Shortcuts" => SafetyText("UiShortcuts"),
             "About" => SafetyText("UiAbout"),
             _ => SafetyText("UiGeneral")
         });
 
-        UIElement? target = sectionKey switch
-        {
-            "General" => SettingsGeneralCard,
-            "Capture" => SettingsCaptureCard,
-            "Export" => ExportSection,
-            "Publication" => PublishSection,
-            "Shortcuts" => HelpShortcutsTitleText,
-            "About" => SettingsAboutCard,
-            _ => SettingsGeneralCard
-        };
-
-        target?.StartBringIntoView();
+        foreach (var (key, card) in new[] {
+            ("General", SettingsGeneralCard), ("Capture", SettingsCaptureCard), ("Guide", SettingsGuideCard),
+            ("Export", ExportSection), ("Publication", PublishSection), ("About", SettingsAboutCard) })
+            card.Visibility = key == sectionKey ? Visibility.Visible : Visibility.Collapsed;
+        SettingsScrollViewer.ChangeView(null, 0, null);
     }
 
     private void SetSettingsNavButtonState(Button button, bool isSelected)
     {
-        button.Background = isSelected ? (Brush?)TryGetBrush("ToolSelectedBrush") ?? new SolidColorBrush(Colors.Transparent) : new SolidColorBrush(Colors.Transparent);
+        button.Background = GetBrush(isSelected ? "ToolSelectedBrush" : "ShellPanelBrush");
+        button.Foreground = GetBrush(isSelected ? "ToolSelectedTextBrush" : "ShellStrongTextBrush");
+        button.BorderThickness = new Thickness(isSelected ? 3 : 1, 1, 1, 1);
+        AutomationProperties.SetItemStatus(button, isSelected ? SafetyText("SelectedCategory") : string.Empty);
     }
 
     private void SettingsNavButton_Click(object sender, RoutedEventArgs e)
@@ -1195,9 +1193,9 @@ public sealed partial class MainWindow
 
     private async void SettingsSaveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_settingsDraft is null || _settingsMetadata is null) return;
+        if (_isSavingSettings || _settingsDraft is null || _settingsMetadata is null) return;
         _isSavingSettings = true;
-        SettingsScrollViewer.IsEnabled = false;
+        SettingsScrollViewer.IsEnabled = SettingsSaveButton.IsEnabled = SettingsCancelButton.IsEnabled = false;
         try
         {
             var preferences = _settingsDraft.Clone();
@@ -1214,7 +1212,7 @@ public sealed partial class MainWindow
             StatusText.Text = SafetyText("UiSettingsSaved");
         }
         catch (Exception error) { AppDiagnostics.Record(error); StatusText.Text = SafetyText("OperationFailed"); }
-        finally { _isSavingSettings = false; SettingsScrollViewer.IsEnabled = true; }
+        finally { _isSavingSettings = false; SettingsScrollViewer.IsEnabled = SettingsSaveButton.IsEnabled = SettingsCancelButton.IsEnabled = true; }
     }
 
     private void SettingsCancelButton_Click(object sender, RoutedEventArgs e)

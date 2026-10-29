@@ -9,7 +9,7 @@
   <Identity
     Name="E3C7A4ED-2E83-45C8-852A-A0469B8C2291"
     Publisher="CN=AppPublisher"
-    Version="2026.10.29.1" />
+    Version="2026.10.29.2" />
 
   <Properties>
     <DisplayName>SnapSlate</DisplayName>

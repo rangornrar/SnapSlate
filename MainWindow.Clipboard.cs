@@ -14,7 +14,7 @@ public sealed partial class MainWindow
 
     private async Task CopyCurrentImageAsync()
     {
-        if (_currentDocument is null || _isCopyingImage || _editorClosed) return;
+        if (_showWelcome || _currentDocument is null || _isCopyingImage || _editorClosed) return;
         _isCopyingImage = true;
         CopyImageButton.IsEnabled = CopyImageMenuItem.IsEnabled = false;
         try

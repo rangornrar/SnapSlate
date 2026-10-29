@@ -4,6 +4,18 @@ Tous les changements notables de ce projet seront documentes ici.
 
 Le format est volontairement simple et oriente publication GitHub.
 
+## [2026.10.29.002] - 2026-10-29
+
+### Ergonomie
+
+- Accueil avec collage, import d’image et ouverture de projet ; exemple accessible à la demande.
+- Réglages par catégorie, sélection lisible et boutons Annuler / Enregistrer fixes.
+- Informations du guide séparées des préférences d’export ; aperçu des réglages explicite.
+- Étapes redimensionnables, titres sur deux lignes, notes simplifiées et position dans le guide.
+- Export avec choix capture active / guide complet, format et destination ; accès PNG direct conservé dans le menu.
+- Flèches et formes regroupées, variante mémorisée et raccourcis hors saisie.
+- Cinq couleurs directes, palettes traduites et nuances / opacité dans « Autres couleurs… ».
+
 ## [2026.10.29.001] - 2026-10-29
 
 ### Ajouté

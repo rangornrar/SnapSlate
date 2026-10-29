@@ -142,6 +142,29 @@ public sealed class EditorConsistencyTests
         Assert.AreEqual(new Rect(99, 79, 1, 1), CropGeometry.Clamp(new Rect(200, 200, 10, 10), 100, 80));
     }
 
+    [TestMethod]
+    public void RenderPng_SnapshotPreservesCropAndOpaqueMaskWhenOriginalChanges()
+    {
+        var document = Source();
+        document.Annotations.Add(new() { Kind = AnnotationKind.Mask, Bounds = new Rect(30, 40, 80, 50), Opacity = 0.1 });
+        document.AppliedCropRect = new Rect(10, 20, 180, 150);
+        var snapshot = document.CloneForHistory();
+        document.Annotations.Clear();
+        document.AppliedCropRect = null;
+
+        using var bytes = new MemoryStream(GuideImageRenderer.RenderPng(snapshot, Palettes()));
+        using var result = new Bitmap(bytes);
+
+        Assert.AreEqual(180, result.Width);
+        Assert.AreEqual(150, result.Height);
+        Assert.AreEqual(Color.FromArgb(255, 18, 18, 18).ToArgb(), result.GetPixel(25, 25).ToArgb());
+        Assert.AreEqual(Color.White.ToArgb(), result.GetPixel(5, 5).ToArgb());
+        Assert.IsNotNull(document.ImageBytes);
+        using var originalBytes = new MemoryStream(document.ImageBytes);
+        using var original = new Bitmap(originalBytes);
+        Assert.AreEqual(Color.White.ToArgb(), original.GetPixel(35, 45).ToArgb());
+    }
+
     private static ScreenshotDocument Source()
     {
         using var bitmap = new Bitmap(400, 240);

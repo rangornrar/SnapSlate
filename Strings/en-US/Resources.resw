@@ -424,4 +424,9 @@
   <data name="WorkspaceOpaqueMask" xml:space="preserve"><value>Opaque redaction</value></data>
   <data name="WorkspaceAnnotationCount" xml:space="preserve"><value>{0} annotations</value></data>
   <data name="WorkspaceAnnotationCountSingle" xml:space="preserve"><value>1 annotation</value></data>
+  <data name="ClipboardCopy" xml:space="preserve"><value>Copy image</value></data>
+  <data name="ClipboardCopyHelp" xml:space="preserve"><value>Copy the annotated screenshot (Ctrl + Shift + C)</value></data>
+  <data name="ClipboardCopying" xml:space="preserve"><value>Copying the annotated screenshot…</value></data>
+  <data name="ClipboardCopySucceeded" xml:space="preserve"><value>Annotated screenshot copied to the clipboard.</value></data>
+  <data name="ClipboardCopyFailed" xml:space="preserve"><value>Unable to copy the image. Try again with SnapSlate in the foreground.</value></data>
 </root>

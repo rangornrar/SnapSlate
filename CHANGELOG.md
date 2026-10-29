@@ -4,6 +4,20 @@ Tous les changements notables de ce projet seront documentes ici.
 
 Le format est volontairement simple et oriente publication GitHub.
 
+## [2026.10.29.001] - 2026-10-29
+
+### Ajouté
+
+- Bouton **Copier l’image** à côté de l’export PNG, commande Édition et raccourci **Ctrl + Shift + C**.
+- Copie de la capture active avec annotations, masques opaques et recadrage confirmé, produite par le même moteur que l’export PNG.
+- Image conservée dans le presse-papiers après fermeture de l’application, sans fichier temporaire à enregistrer.
+- Import automatique protégé contre la réimportation de la propre copie de SnapSlate ; le collage manuel reste disponible.
+- Libellés, aide clavier et messages de résultat en français et en anglais.
+
+### Vérification
+
+- 84 tests automatisés ; parcours natifs bouton/raccourci, copie/collage et fermeture/réouverture. Comparaison RGBA identique à l’export PNG, masque opaque et recadrage 2400 × 1350 conservés. Détails : `docs/CLIPBOARD_COPY.md`.
+
 ## [2026.10.28.002] - 2026-10-28
 
 ### Interface d’annotation

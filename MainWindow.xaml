@@ -148,6 +148,8 @@
                                     <MenuFlyoutItem x:Name="SaveProjectMenuItem" Click="SaveProjectButton_Click" />
                                 </MenuBarItem>
                                 <MenuBarItem x:Name="EditMenuBarItem" Title="Édition">
+                                    <MenuFlyoutItem x:Name="CopyImageMenuItem" Click="CopyImageButton_Click" />
+                                    <MenuFlyoutSeparator />
                                     <MenuFlyoutItem x:Name="UndoMenuItem" Click="UndoButton_Click" />
                                     <MenuFlyoutItem x:Name="RedoMenuItem" Click="RedoButton_Click" />
                                 </MenuBarItem>
@@ -192,6 +194,10 @@
                             </Button>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <Button
+                                x:Name="CopyImageButton"
+                                AutomationProperties.AutomationId="CopyImageButton"
+                                Click="CopyImageButton_Click" />
                             <Button x:Name="ExportCurrentButton" Click="ExportCurrentMenuItem_Click" />
                             <Button x:Name="SettingsMenuButton" Click="SettingsButton_Click" HorizontalAlignment="Right" VerticalAlignment="Center" MinHeight="34" Padding="12,6" CornerRadius="10" Background="{ThemeResource ShellPanelBrush}" BorderBrush="{ThemeResource ShellStrokeBrush}" BorderThickness="1" />
                         </StackPanel>

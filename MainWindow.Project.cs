@@ -70,6 +70,7 @@ public sealed partial class MainWindow
         AddKeyboardAccelerator(VirtualKey.N, VirtualKeyModifiers.Control, NewProjectKeyboardAccelerator_Invoked);
         AddKeyboardAccelerator(VirtualKey.N, VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift, DemoProjectKeyboardAccelerator_Invoked);
         AddKeyboardAccelerator(VirtualKey.O, VirtualKeyModifiers.Control, OpenProjectKeyboardAccelerator_Invoked);
+        AddKeyboardAccelerator(VirtualKey.C, VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift, CopyImageKeyboardAccelerator_Invoked);
         AddKeyboardAccelerator(VirtualKey.Z, VirtualKeyModifiers.Control, UndoProjectKeyboardAccelerator_Invoked);
         AddKeyboardAccelerator(VirtualKey.Y, VirtualKeyModifiers.Control, RedoProjectKeyboardAccelerator_Invoked);
     }

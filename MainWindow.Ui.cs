@@ -102,6 +102,9 @@ public sealed partial class MainWindow
         SetMenuText(SaveProjectMenuItem, SafetyText("UiSave"));
         SetMenuText(UndoMenuItem, SafetyText("UiUndo"));
         SetMenuText(RedoMenuItem, SafetyText("UiRedo"));
+        SetMenuText(CopyImageMenuItem, SafetyText("ClipboardCopyHelp"));
+        SetButtonContent(CopyImageButton, SafetyText("ClipboardCopy"));
+        SetButtonTooltip(CopyImageButton, SafetyText("ClipboardCopyHelp"));
         SetMenuText(ImportScreenshotMenuItem, SafetyText("UiImport"));
         SetMenuText(OcrMenuItem, "OCR");
         SetMenuText(ExportCurrentMenuItem, SafetyText("UiCurrentStepPNG"));
@@ -314,6 +317,7 @@ public sealed partial class MainWindow
             new SettingsShortcutItem("Ctrl + Shift + N", SafetyText("UiDemoTemplate")),
             new SettingsShortcutItem("Win + Shift + S", SafetyText("CaptureShortcutHelp")),
             new SettingsShortcutItem("Ctrl + Shift + V", SafetyText("ImportClipboard.Text")),
+            new SettingsShortcutItem("Ctrl + Shift + C", SafetyText("ClipboardCopy")),
             new SettingsShortcutItem("Suppr", SafetyText("UiDeleteTheSelectedObject"))
         };
     }

@@ -31,7 +31,7 @@ These rules apply to **every UI change**. They are not optional add-ons.
 
 ## Validation
 
-- Build & register the MSIX package — see **Build, Run & Deploy** in `.github/agents/Agents.md`.
+- Build & register the MSIX package — see **Développement sous Windows** in `README.md`.
 - Test keyboard navigation: tab through every new/changed UI area.
 - Test High Contrast: switch to Windows High Contrast theme and verify readability.
 - Run Accessibility Insights for Windows on the app.

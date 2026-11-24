@@ -116,7 +116,7 @@ Before submitting any code change, verify:
 - Review every new/changed class for SRP violations — ask "does this class have more than one reason to change?"
 - Search the codebase for duplicate logic before adding new helpers: `grep_search` for similar method names or patterns.
 - Verify no speculative code was added — every line must trace back to the original request.
-- Build & register the MSIX package — see **Build, Run & Deploy** in `.github/agents/Agents.md`.
+- Build & register the MSIX package — see **Développement sous Windows** in `README.md`.
 
 ---
 

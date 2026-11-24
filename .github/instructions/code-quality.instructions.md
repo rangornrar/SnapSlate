@@ -145,7 +145,7 @@ Each `.cs` file should follow this order:
 
 ## Validation
 
-- Build & register the MSIX package — see **Build, Run & Deploy** in `.github/agents/Agents.md`.
+- Build & register the MSIX package — see **Développement sous Windows** in `README.md`.
 - Fix **all** warnings — do not suppress without justification in a code comment.
 - Verify no unused `using` statements remain after every edit.
 - Verify no commented-out code remains.

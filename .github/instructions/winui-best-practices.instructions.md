@@ -7,6 +7,8 @@ applyTo: '**/*.cs, **/*.xaml, **/*.csproj'
 
 This file covers WinUI 3-specific patterns, conventions, and architecture guidance for this project.
 
+> **SnapSlate specifics — read first.** This is generic WinUI 3 guidance. SnapSlate does **not** use MVVM, a DI container or CommunityToolkit: `MainWindow` is split into partial classes (`MainWindow.*.cs`) and the model/services are plain classes at the repository root (`ProjectState.cs`, `ProjectPersistence.cs`, `GuideExporter.cs`…). The sample file names below (`Item.cs`, `MainViewModel.cs`, `IDataService.cs`…) do not exist here. Follow the existing structure; do not introduce MVVM or DI unless explicitly requested.
+
 ---
 
 ## 1. Architecture -- MVVM Pattern
@@ -350,7 +352,7 @@ Alternatives:
 
 ## 10. Validation
 
-Build & register the MSIX package -- see **Build, Run & Deploy** in `.github/agents/Agents.md`.
+Build & register the MSIX package -- see **Développement sous Windows** in `README.md`.
 
 ### Verify
 

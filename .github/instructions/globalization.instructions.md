@@ -35,7 +35,7 @@ These rules apply to **every feature and change** involving user-facing text. Th
 
 ## Validation
 
-- Build & register the MSIX package — see **Build, Run & Deploy** in `.github/agents/Agents.md`.
+- Build & register the MSIX package — see **Développement sous Windows** in `README.md`.
 - Check for hard-coded strings: search `Content="` and `Text="` in `.xaml` files — replace with `x:Uid`.
 
 ### Verification Checklist

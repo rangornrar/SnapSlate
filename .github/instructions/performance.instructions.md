@@ -30,7 +30,7 @@ These rules apply to **every feature and change**. They are not optional add-ons
 
 ## Validation
 
-- Build & register the MSIX package — see **Build, Run & Deploy** in `.github/agents/Agents.md`.
+- Build & register the MSIX package — see **Développement sous Windows** in `README.md`.
 
 ### Verification Checklist
 
